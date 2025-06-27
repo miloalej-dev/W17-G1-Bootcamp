@@ -3,6 +3,11 @@ package models
 // Wharehouse is a struct that represents a wharehouse
 type Warehouse struct {
 	ID   				int
+	WarehouseAttributes
+}
+
+// Represents the warehouse attributes
+type WarehouseAttributes struct {
 	Code 				string
 	Address 			string
 	Telephone 			string
