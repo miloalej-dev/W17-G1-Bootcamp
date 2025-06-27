@@ -1,4 +1,4 @@
-package product
+package productLoader
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 

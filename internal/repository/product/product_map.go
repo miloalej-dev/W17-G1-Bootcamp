@@ -1,4 +1,4 @@
-package product
+package productRepository
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 
@@ -15,4 +15,14 @@ func NewProductMap(db map[int]models.Product) *ProductMap {
 		defaultDb = db
 	}
 	return &ProductMap{db: defaultDb}
+}
+
+// FindAll is a method that returns a map of all Products
+func (r *ProductMap) FindAll() (v map[int]models.Product, err error) {
+	v = make(map[int]models.Product)
+	// copy db
+	for key, value := range r.db {
+		v[key] = value
+	}
+	return
 }

@@ -1,17 +1,20 @@
 package application
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
+	"net/http"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the vehicles
+	// LoaderFilePath is the path to the file that contains the products
 	LoaderFilePath string
 }
 
@@ -40,21 +43,25 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
-	// loaderFilePath is the path to the file that contains the vehicles
+	// loaderFilePath is the path to the file that contains the products
 	loaderFilePath string
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
-
 	// - loader
-
+	ld := productLoader.NewProductJSONFile(a.loaderFilePath)
+	db, err := ld.Load()
+	if err != nil {
+		return
+	}
 	// - repositories
-
+	rpProduct := productRepository.NewProductMap(db)
 	// - services
-
+	svProduct := productService.NewProductDefault(rpProduct)
 	// - handlers
+	hdProduct := productHandler.NewProductDefault(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -64,6 +71,10 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
+	rt.Route("/products", func(rt chi.Router) {
+		// - GET /products
+		rt.Get("/", hdProduct.GetAll())
+	})
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
