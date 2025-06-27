@@ -16,7 +16,7 @@ type WarehouseAttributes struct {
 }
 
 // WharehouseDoc is a struct that represents a wharehouse in JSON format
-type FooDoc struct {
+type WarehouseDoc struct {
 	ID   				int		`json:"id"`
 	Code 				string	`json:"code"`
 	Address 			string	`json:"address"`
