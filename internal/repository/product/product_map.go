@@ -2,14 +2,14 @@ package product
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 
-// ProductMap es un struct que representa el repositorio de producto
+// ProductMap is a struct that represents  repositorio of producto
 type ProductMap struct {
-	// db es un mapa de products
+	// db is a map of product
 	db map[int]models.Product
 }
 
 func NewProductMap(db map[int]models.Product) *ProductMap {
-	// defaultDb es un mapa vacio
+	// defaultDb is an empty map
 	defaultDb := make(map[int]models.Product)
 	if db != nil {
 		defaultDb = db
