@@ -1,22 +1,11 @@
 package response
 
 import (
-	"net/http"
 	"github.com/go-chi/render"
+	"net/http"
 )
 
-func SetResponse(w http.ResponseWriter, r *http.Request, status int, responseBody any, err error) {
-	var resp any
-	if err != nil {
-		resp = Error{
-			Message: err.Error(),
-		}
-	} else {
-		resp = Success{
-			Data: responseBody,
-		}
-	}
+func SetResponse(w http.ResponseWriter, r *http.Request, status int, responseBody any) {
 	render.Status(r, status)
-	render.JSON(w, r, resp)
+	render.JSON(w, r, responseBody)
 }
-
