@@ -1,21 +1,19 @@
 package models
 
-// Seller is a struct that represents a seller
+// Seller is a struct that represents a seller company
 type Seller struct {
-	CID       int
-	Name      string
-	Address   string
-	Telephone string
-	Locality  *Locality
+	Id        int    `json:"id"`        // Id is the identifier of the seller company
+	Name      string `json:"name"`      // Name is the name of the seller company
+	Address   string `json:"address"`   // Address is the address of the seller company
+	Telephone string `json:"telephone"` // Telephone is the telephone of the seller company
 }
 
 // NewSeller is a function that creates a new seller
-func NewSeller(cid int, name string, address string, telephone string, locality *Locality) *Seller {
+func NewSeller(id int, name string, address string, telephone string) *Seller {
 	return &Seller{
-		CID:       cid,
+		Id:        id,
 		Name:      name,
 		Address:   address,
 		Telephone: telephone,
-		Locality:  locality,
 	}
 }
