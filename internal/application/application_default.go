@@ -15,7 +15,13 @@ type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
 	// LoaderFilePath is the path to the file that contains the products
-	LoaderFilePath string
+	LoaderFilePathProducts string
+}
+type ServerChi struct {
+	// serverAddress is the address where the server will be listening
+	serverAddress string
+	// loaderFilePathProducts is the path to the file that contains the products
+	loaderFilePathProducts string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -28,36 +34,30 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		if cfg.LoaderFilePathProducts != "" {
+			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
 	}
 
 	return &ServerChi{
-		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		serverAddress:          defaultConfig.ServerAddress,
+		loaderFilePathProducts: defaultConfig.LoaderFilePathProducts,
 	}
 }
 
 // ServerChi is a struct that implements the Application interface
-type ServerChi struct {
-	// serverAddress is the address where the server will be listening
-	serverAddress string
-	// loaderFilePath is the path to the file that contains the products
-	loaderFilePath string
-}
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	ld := productLoader.NewProductJSONFile(a.loaderFilePath)
-	db, err := ld.Load()
+	ld := productLoader.NewProductJSONFile(a.loaderFilePathProducts)
+	dbProduct, err := ld.Load()
 	if err != nil {
 		return
 	}
 	// - repositories
-	rpProduct := productRepository.NewProductMap(db)
+	rpProduct := productRepository.NewProductMap(dbProduct)
 	// - services
 	svProduct := productService.NewProductDefault(rpProduct)
 	// - handlers
@@ -71,9 +71,10 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/products", func(rt chi.Router) {
+	rt.Route("/api/v1/", func(rt chi.Router) {
 		// - GET /products
-		rt.Get("/", hdProduct.GetAll())
+		rt.Get("/products", hdProduct.GetAll())
+
 	})
 
 	// run server
