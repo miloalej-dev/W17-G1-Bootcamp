@@ -27,10 +27,14 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
+		if cfg.LoaderFilePath != "" {
+			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		}
 	}
 
 	return &ServerChi{
 		serverAddress:  defaultConfig.ServerAddress,
+		loaderFilePath: defaultConfig.LoaderFilePath,
 	}
 }
 
@@ -38,14 +42,18 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
+	// loaderFilePath is the path to the file that contains the vehicles
+	loaderFilePath string
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 
+	// - loader
+
 	// - repositories
-	warehouseRepo := repository.NewWarehouseMap()	
+	warehouseRepo := repository.NewWarehouseMap()
 
 	// - services
 	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
@@ -53,6 +61,7 @@ func (a *ServerChi) Run() (err error) {
 	// - handlers
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 
+	hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -61,6 +70,10 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
+	rt.Route("/foo", func(rt chi.Router) {
+		rt.Get("/", hd.GetAllFoo)
+		rt.Post("/", hd.PostFoo)
+	})
 	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
 		rt.Get("/", warehouseHand.GetAll())
 		rt.Get("/{id}", warehouseHand.GetById())
