@@ -65,6 +65,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/", warehouseHand.GetAll())
 		rt.Get("/{id}", warehouseHand.GetById())
 		rt.Post("/", warehouseHand.Create())
+		rt.Patch("/{id}", warehouseHand.Update())
 	})
 
 

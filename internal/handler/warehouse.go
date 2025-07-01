@@ -106,3 +106,49 @@ func (h *WarehouseDefault) Create() http.HandlerFunc {
 		render.JSON(w, r, warehouse)
 	}
 }
+
+func (h *WarehouseDefault) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var warehouseJson models.WarehouseDoc
+		if err := json.NewDecoder(r.Body).Decode(&warehouseJson); err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, "Internal error")
+			return
+		}
+
+		idRequest := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idRequest)
+		if err != nil {
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, "Invalid id")
+			return
+		}
+
+		warehouse, err := h.sv.GetById(id)
+		if err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, "Internal error")
+			return
+		}
+
+		if warehouseJson.Code != "" && warehouseJson.Code != warehouse.Code {
+			warehouse.Code = warehouseJson.Code
+		}
+		if warehouseJson.Address != "" && warehouseJson.Address != warehouse.Address {
+			warehouse.Address = warehouseJson.Address
+		}
+		if warehouseJson.Telephone != "" && warehouseJson.Telephone != warehouse.Telephone {
+			warehouse.Telephone = warehouseJson.Telephone
+		}
+
+		err = h.sv.Update(warehouse)
+		if err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, "Internal error")
+			return
+		}
+
+		render.Status(r, http.StatusCreated)
+		render.JSON(w, r, warehouse)
+	}
+}

@@ -30,3 +30,8 @@ func (s *WarehouseDefault) Create(warehouseJson models.WarehouseDoc) (warehouse 
 	warehouse, err = s.rp.Create(warehouseJson)
 	return
 }
+
+func (s *WarehouseDefault) Update(warehouse models.Warehouse) (err error) {
+	err = s.rp.Update(warehouse)
+	return
+}

@@ -60,3 +60,8 @@ func (r *WarehouseMap) Create(warehouseJson models.WarehouseDoc) (warehouse mode
 	r.db[id] = warehouse
 	return
 }
+
+func (r *WarehouseMap) Update(warehouse models.Warehouse) (err error) {
+	r.db[warehouse.ID] = warehouse
+	return
+}
