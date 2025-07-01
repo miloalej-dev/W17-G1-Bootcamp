@@ -3,8 +3,9 @@ package models
 // Foo is a struct that represents a foo
 
 type Foo struct {
-	ID   int
-	Name string
+	ID          int
+	Name        string
+	Description string
 }
 
 type FooDoc struct {
