@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -55,16 +56,18 @@ func (a *ServerChi) Run() (err error) {
 	// - services
 
 	// - handlers
-
+	hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
-
 	// - middlewares
 	rt.Use(middleware.Logger)
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-
+	rt.Route("/foo", func(rt chi.Router) {
+		rt.Get("/", hd.GetAllFoo)
+		rt.Post("/", hd.PostFoo)
+	})
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
