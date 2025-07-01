@@ -7,4 +7,5 @@ import (
 type WarehouseService interface {
 	GetAll() (warehouses map[int]models.Warehouse, err error)
 	GetById(id int) (warehouse models.Warehouse, err error)
+	Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error)
 }

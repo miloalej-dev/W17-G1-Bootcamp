@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"encoding/json"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
@@ -82,5 +83,26 @@ func (h *WarehouseDefault) GetById() http.HandlerFunc {
 
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, warehouseJson)
+	}
+}
+
+func (h *WarehouseDefault) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var warehouseJson models.WarehouseDoc
+		if err := json.NewDecoder(r.Body).Decode(&warehouseJson); err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, "Internal error")
+			return
+		}
+
+		warehouse, err := h.sv.Create(warehouseJson)
+		if err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, "Internal error")
+			return
+		}
+
+		render.Status(r, http.StatusCreated)
+		render.JSON(w, r, warehouse)
 	}
 }

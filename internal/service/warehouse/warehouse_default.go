@@ -25,3 +25,8 @@ func (s *WarehouseDefault) GetById(id int) (warehouse models.Warehouse, err erro
 	warehouse, err = s.rp.GetById(id)
 	return
 }
+
+func (s *WarehouseDefault) Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error) {
+	warehouse, err = s.rp.Create(warehouseJson)
+	return
+}

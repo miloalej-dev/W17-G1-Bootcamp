@@ -43,3 +43,20 @@ func (r *WarehouseMap) GetById(id int) (warehouse models.Warehouse, err error) {
 	warehouse =  r.db[id]
 	return
 }
+
+func (r *WarehouseMap) Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error) {
+	id := len(r.db) + 1
+	warehouse = models.Warehouse {
+		ID:	id,
+		WarehouseAttributes: models.WarehouseAttributes {
+			Code: warehouseJson.Code,
+			Address: warehouseJson.Address,
+			Telephone: warehouseJson.Telephone,
+			MinimunCapacity: warehouseJson.MinimunCapacity,
+			MinimumTemperature: warehouseJson.MinimumTemperature,
+		},
+	}
+
+	r.db[id] = warehouse
+	return
+}
