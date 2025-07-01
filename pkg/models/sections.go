@@ -1,6 +1,12 @@
 package models
 
-type section struct {
+import (
+	"github.com/go-playground/validator/v10"
+)
+
+var validate = validator.New()
+
+type Section struct {
 	Id                 int   `json:"id"`
 	SectionNumber      int   `json:"section_number"`
 	CurrentTemperature int   `json:"current_temperature"`
