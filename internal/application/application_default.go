@@ -63,6 +63,7 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
 		rt.Get("/", warehouseHand.GetAll())
+		rt.Get("/{id}", warehouseHand.GetById())
 	})
 
 

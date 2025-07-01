@@ -20,3 +20,8 @@ func (s *WarehouseDefault) GetAll() (warehouses map[int]models.Warehouse, err er
 	warehouses,err = s.rp.GetAll()
 	return
 }
+
+func (s *WarehouseDefault) GetById(id int) (warehouse models.Warehouse, err error) {
+	warehouse, err = s.rp.GetById(id)
+	return
+}

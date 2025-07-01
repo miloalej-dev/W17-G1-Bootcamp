@@ -37,3 +37,9 @@ func (r *WarehouseMap) GetAll() (warehouses map[int]models.Warehouse, err error)
 	}
 	return
 }
+
+
+func (r *WarehouseMap) GetById(id int) (warehouse models.Warehouse, err error) {
+	warehouse =  r.db[id]
+	return
+}
