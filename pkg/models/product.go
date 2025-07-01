@@ -24,7 +24,7 @@ type Product struct {
 	// Un Tipo de producto(ProductType) asociado
 	ProductTypeID int `json:"product_type_id"`
 	// Un Proveedor (Seller) asociado (NO es OBLIGATORIA)
-	SellerID int `json:"seller_id"`
+	SellerID int `json:"seller_id,omitempty"`
 }
 type ProductType struct {
 	ID          int
