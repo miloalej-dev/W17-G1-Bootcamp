@@ -75,6 +75,7 @@ func (a *ServerChi) Run() (err error) {
 
 		// - GET /
 		rt.Get("/", hdBuyer.GetAll())
+		rt.Get("/{id}", hdBuyer.GetById())
 
 		// - POST /
 		rt.Post("/", hdBuyer.Post())

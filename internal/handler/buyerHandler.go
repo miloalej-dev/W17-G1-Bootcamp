@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"net/http"
+	"strconv"
 )
 
 func NewBuyerDefault(sv buyerService.BuyerService) *BuyerDefault {
@@ -47,6 +49,24 @@ func (h *BuyerDefault) GetAll() http.HandlerFunc {
 
 	}
 
+}
+
+func (h *BuyerDefault) GetById() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+		value, err := h.sv.FindById(id)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, nil)
+			return
+		}
+		response.JSON(w, http.StatusOK, BuyerToDoc(value))
+
+	}
 }
 
 func (h *BuyerDefault) Post() http.HandlerFunc {
