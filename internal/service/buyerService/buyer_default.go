@@ -21,3 +21,11 @@ func (s *BuyerDefault) FindAll() (v map[int]models.Buyer, err error) {
 	v, err = s.rp.FindAll()
 	return
 }
+
+func (s *BuyerDefault) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err error) {
+	v, err = s.rp.Create(buyer)
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
+}

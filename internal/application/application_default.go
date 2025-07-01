@@ -73,7 +73,11 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 	rt.Route("/buyers", func(rt chi.Router) {
 
+		// - GET /
 		rt.Get("/", hdBuyer.GetAll())
+
+		// - POST /
+		rt.Post("/", hdBuyer.Post())
 	})
 
 	// run server
