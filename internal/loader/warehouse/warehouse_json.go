@@ -38,13 +38,15 @@ func (l *JsonFile) Load() (warehouses map[int]models.Warehouse, err error) {
 	// serialize warehouses
 	warehouses = make(map[int]models.Warehouse)
 	for _,warehouse := range warehousesDoc {
-		warehouses[warehouse.ID] = models.WarehouseDoc{
+		warehouses[warehouse.ID] = models.Warehouse {
 			ID: warehouse.ID,
-			Code: warehouse.Code,
-			Address: warehouse.Address,
-			Telephone: warehouse.Telephone,
-			MinimunCapacity: warehouse.MinimunCapacity,
-			MinimumTemperature: warehouse.MinimumTemperature,
+			WarehouseAttributes: models.WarehouseAttributes {
+				Code: warehouse.Code,
+				Address: warehouse.Address,
+				Telephone: warehouse.Telephone,
+				MinimunCapacity: warehouse.MinimunCapacity,
+				MinimumTemperature: warehouse.MinimumTemperature,
+			},
 		}
 	}
 
