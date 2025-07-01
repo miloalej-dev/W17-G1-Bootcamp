@@ -95,6 +95,21 @@ func (h *BuyerDefault) Post() http.HandlerFunc {
 
 }
 
+func (h *BuyerDefault) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+		value, err := h.sv.Delete(id)
+		if err != nil {
+			response.JSON(w, http.StatusNotFound, nil)
+		}
+		response.JSON(w, http.StatusNoContent, BuyerToDoc(value))
+
+	}
+}
+
 func PostValidator(buyer models.BuyerAtributtes) error {
 	if buyer.FirstName == "" || buyer.LastName == "" || buyer.CardNumberId == "" {
 		return errors.New("First name or Last name is empty")

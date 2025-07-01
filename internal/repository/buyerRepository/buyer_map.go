@@ -2,7 +2,6 @@ package buyerRepository
 
 import (
 	"errors"
-	"fmt"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -47,7 +46,7 @@ func (r *BuyerMap) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err er
 
 	newId := len(r.db)
 	for {
-		fmt.Println(newId)
+
 		_, err = r.FindById(newId)
 		if err == nil {
 			newId++
@@ -63,4 +62,15 @@ func (r *BuyerMap) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err er
 	r.db[newId] = b
 	return &b, nil
 
+}
+
+func (r *BuyerMap) Delete(id int) (*models.Buyer, error) {
+	b, err := r.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	delete(r.db, id)
+
+	return b, nil
 }

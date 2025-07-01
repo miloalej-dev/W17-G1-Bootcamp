@@ -8,5 +8,5 @@ type BuyerRepository interface {
 	FindAll() (v map[int]models.Buyer, err error)
 	FindById(id int) (v *models.Buyer, err error)
 	//Update(buyer models.Buyer) (*models.Buyer, error)
-	//Delete(id int) (*models.Buyer, error)
+	Delete(id int) (*models.Buyer, error)
 }

@@ -79,6 +79,10 @@ func (a *ServerChi) Run() (err error) {
 
 		// - POST /
 		rt.Post("/", hdBuyer.Post())
+
+		// - DELETE/
+		rt.Delete("/{id}", hdBuyer.Delete())
+
 	})
 
 	// run server
