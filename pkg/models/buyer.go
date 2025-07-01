@@ -1,19 +1,19 @@
 package models
 
 type BuyerAtributtes struct {
-	cardNumberId string
-	firstName    string
+	CardNumberId string
+	FirstName    string
 	LastName     string
 }
 
 type Buyer struct {
-	id int
+	Id int
 	BuyerAtributtes
 }
 
 type BuyerDoc struct {
-	id           int    `json:"id"`
-	cardNumberId string `json:"card_number_id"`
-	firstName    string `json:"first_name"`
+	Id           int    `json:"id"`
+	CardNumberId string `json:"card_number_id"`
+	FirstName    string `json:"first_name"`
 	LastName     string `json:"Last_name"`
 }

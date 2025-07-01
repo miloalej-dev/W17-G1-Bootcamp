@@ -1,6 +1,10 @@
 package application
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,7 +16,7 @@ type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
 	// LoaderFilePath is the path to the file that contains the vehicles
-	LoaderFilePath string
+	LoaderFilePathBuyer string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -25,14 +29,14 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		if cfg.LoaderFilePathBuyer != "" {
+			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
 		}
 	}
 
 	return &ServerChi{
-		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		serverAddress:       defaultConfig.ServerAddress,
+		loaderFilePathBuyer: defaultConfig.LoaderFilePathBuyer,
 	}
 }
 
@@ -41,7 +45,7 @@ type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
 	// loaderFilePath is the path to the file that contains the vehicles
-	loaderFilePath string
+	loaderFilePathBuyer string
 }
 
 // Run is a method that runs the server
@@ -49,13 +53,16 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - loader
+	ldBuyer := buyerLoader.NewBuyerJSONFile(a.loaderFilePathBuyer)
+	dbBuyer, err := ldBuyer.Load()
 
 	// - repositories
 
+	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
 	// - services
-
+	svBuyer := buyerService.NewBuyerDefault(rpBuyer)
 	// - handlers
-
+	hdBuyer := handler.NewBuyerDefault(svBuyer)
 	// router
 	rt := chi.NewRouter()
 
@@ -64,6 +71,10 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
+	rt.Route("/buyers", func(rt chi.Router) {
+
+		rt.Get("/", hdBuyer.GetAll())
+	})
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
