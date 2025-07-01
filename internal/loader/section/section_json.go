@@ -1,4 +1,4 @@
-package loader
+package sectionLoader
 
 import (
 	"encoding/json"
