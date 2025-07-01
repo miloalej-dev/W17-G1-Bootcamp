@@ -40,6 +40,7 @@ func (h *WarehouseDefault) GetAll() http.HandlerFunc {
 		warehousesJson := make(map[int]models.WarehouseDoc)
 		for id,warehouse := range warehouses {
 			warehousesJson[id] = models.WarehouseDoc {
+				ID:	warehouse.ID,
 				Code: warehouse.Code,
 				Address: warehouse.Address,
 				Telephone: warehouse.Telephone,
