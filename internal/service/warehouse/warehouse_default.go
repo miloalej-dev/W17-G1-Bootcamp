@@ -35,3 +35,8 @@ func (s *WarehouseDefault) Update(warehouse models.Warehouse) (err error) {
 	err = s.rp.Update(warehouse)
 	return
 }
+
+func (s *WarehouseDefault) Delete(id int) (err error) {
+	err = s.rp.Delete(id)
+	return
+}

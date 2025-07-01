@@ -18,9 +18,9 @@ type WarehouseAttributes struct {
 // WharehouseDoc is a struct that represents a wharehouse in JSON format
 type WarehouseDoc struct {
 	ID   				int		`json:"id"`
-	Code 				string	`json:"code"`
-	Address 			string	`json:"address"`
-	Telephone 			string	`json:"telephone"`
-	MinimunCapacity 	int		`json:"minimun_capacity"`
-	MinimumTemperature	int		`json:"minimun_temperature"`
+	Code 				string	`json:"code" validate:"required"`
+	Address 			string	`json:"address" validate:"required"`
+	Telephone 			string	`json:"telephone" validate:"required"`
+	MinimunCapacity 	int		`json:"minimun_capacity" validate:"required"`
+	MinimumTemperature	int		`json:"minimun_temperature" validate:"required"`
 }

@@ -10,6 +10,8 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+
 )
 
 // WarehouseDefault is a struct with methods that represent handlers for warehouses
@@ -67,8 +69,8 @@ func (h *WarehouseDefault) GetById() http.HandlerFunc {
 
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, "Internal error")
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err.Error())
 			return
 		}
 
@@ -97,8 +99,8 @@ func (h *WarehouseDefault) Create() http.HandlerFunc {
 
 		warehouse, err := h.sv.Create(warehouseJson)
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, "Internal error")
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err.Error())
 			return
 		}
 
@@ -126,8 +128,8 @@ func (h *WarehouseDefault) Update() http.HandlerFunc {
 
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, "Internal error")
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err.Error())
 			return
 		}
 
@@ -143,12 +145,34 @@ func (h *WarehouseDefault) Update() http.HandlerFunc {
 
 		err = h.sv.Update(warehouse)
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, "Internal error")
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err.Error())
 			return
 		}
 
 		render.Status(r, http.StatusCreated)
 		render.JSON(w, r, warehouse)
+	}
+}
+
+func (h *WarehouseDefault) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idRequest := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idRequest)
+		if err != nil {
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, "Invalid id")
+			return
+		}
+
+		err = h.sv.Delete(id)
+		if err != nil {
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err.Error())
+			return
+		}
+
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, nil)
 	}
 }

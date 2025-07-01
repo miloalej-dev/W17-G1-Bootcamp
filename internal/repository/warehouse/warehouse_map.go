@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 )
@@ -10,7 +11,7 @@ type WarehouseMap struct {
 	db	map[int]models.Warehouse
 }
 
-// Creates a new Warehouse
+// Creates a new Warehouse repository
 func NewWarehouseMap() *WarehouseMap {
 	defaultDB := make(map[int]models.Warehouse)
 
@@ -38,9 +39,12 @@ func (r *WarehouseMap) GetAll() (warehouses map[int]models.Warehouse, err error)
 	return
 }
 
-
+// Return a warehouse By its Id
 func (r *WarehouseMap) GetById(id int) (warehouse models.Warehouse, err error) {
-	warehouse =  r.db[id]
+	warehouse, found := r.db[id]
+	if !found {
+		err = errors.New("Warehouse Not Found")
+	}
 	return
 }
 
@@ -62,6 +66,22 @@ func (r *WarehouseMap) Create(warehouseJson models.WarehouseDoc) (warehouse mode
 }
 
 func (r *WarehouseMap) Update(warehouse models.Warehouse) (err error) {
+	_, found := r.db[warehouse.ID]
+	if !found {
+		err = errors.New("Warehouse Not Found")
+		return
+	}
+
 	r.db[warehouse.ID] = warehouse
+	return
+}
+
+func (r *WarehouseMap) Delete(id int) (err error) {
+	_, found := r.db[id]
+	if !found {
+		err = errors.New("Warehouse Not Found")
+		return
+	}
+	delete(r.db, id)
 	return
 }

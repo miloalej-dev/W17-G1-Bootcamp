@@ -9,4 +9,5 @@ type WarehouseRepository interface {
 	GetById(id int) (warehouse models.Warehouse, err error)
 	Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error)
 	Update(warehouse models.Warehouse) (err error)
+	Delete(id int) (err error)
 }
