@@ -1,4 +1,4 @@
-package repository
+package sectionRepository
 
 import (
 	sectionLoader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/section"
