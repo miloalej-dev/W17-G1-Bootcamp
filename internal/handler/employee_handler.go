@@ -105,3 +105,19 @@ func (he *EmployeeHandler) UpdateEmployee(w http.ResponseWriter, r *http.Request
 	}
 	render.Render(w, r, response.NewResponse(employeeRes, http.StatusOK))
 }
+func (he *EmployeeHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+	idRequest := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idRequest)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse("Invalid ID", http.StatusBadRequest))
+		return
+	}
+
+	err = he.sr.DeleteEmployee(id)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse("Internal error", http.StatusInternalServerError))
+		return
+	}
+
+	render.Render(w, r, response.NewResponse(nil, http.StatusOK))
+}

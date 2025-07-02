@@ -33,3 +33,7 @@ func (sv *EmployeeService) ModifyEmployee(emp models.Employee) (models.Employee,
 func (sv *EmployeeService) UpdateEmployeeFields(id int, fields map[string]interface{}) (models.Employee, error) {
 	return sv.rp.PartialUpdate(id, fields)
 }
+
+func (sv *EmployeeService) DeleteEmployee(id int) error {
+	return sv.rp.Delete(id)
+}

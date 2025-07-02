@@ -13,5 +13,6 @@ func EmployeeRoutes(router chi.Router, handler *handler.EmployeeHandler) {
 		r.Get("/{id}", handler.GetEmployee)
 		r.Post("/", handler.CreateEmployee)
 		r.Patch("/{id}", handler.UpdateEmployee)
+		r.Delete("/{id}", handler.DeleteEmployee)
 	})
 }

@@ -70,7 +70,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 		employee.LastName = val.(string)
 	}
 	if val, ok := fields["warehouse_id"]; ok {
-		idWarehouse,_ := strconv.Atoi(val.(string))
+		idWarehouse, _ := strconv.Atoi(val.(string))
 		employee.WarehouseId = idWarehouse
 	}
 
@@ -79,6 +79,10 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 }
 
 func (e *EmployeeMap) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	_, exists := e.db[id]
+	if !exists {
+		return errors.New("employee not fount")
+	}
+	delete(e.db, id)
+	return nil
 }
