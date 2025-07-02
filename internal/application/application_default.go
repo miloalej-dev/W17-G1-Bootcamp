@@ -4,7 +4,6 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
 	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
 	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
@@ -31,8 +30,6 @@ type ConfigServerChi struct {
 	LoaderFilePathBuyer string
 	// LoaderFilePath is the path to the file that contains the products
 	LoaderFilePathProducts string
-	//
-	LoaderFilePathSeller string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathWarehouse string
 }
@@ -42,7 +39,6 @@ type ServerChi struct {
 	// loaderFilePathProducts is the path to the file that contains the buyers
 	loaderFilePathBuyer     string
 	loaderFilePathProducts  string
-	loaderFilePathSeller    string
 	loaderFilePathWarehouse string
 }
 
@@ -67,17 +63,12 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
-		if cfg.LoaderFilePathSeller != "" {
-			defaultConfig.LoaderFilePathSeller = cfg.LoaderFilePathSeller
-
-		}
 	}
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
 		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
-		loaderFilePathSeller:    defaultConfig.LoaderFilePathSeller,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 	}
 }
@@ -93,9 +84,6 @@ func (a *ServerChi) Run() (err error) {
 	ldProduct := loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
 
-	ldSeller := seller.NewJSONFile(a.loaderFilePathSeller)
-	dbSeller, err := ldSeller.Load()
-
 	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
@@ -106,7 +94,7 @@ func (a *ServerChi) Run() (err error) {
 	rpProduct := productRepository.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
 	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
-	sellerRepository := memory.NewSellerMap(dbSeller)
+	sellerRepository := memory.NewSellerMap()
 	sectionRepository := memory.NewSectionMap()
 
 	// - services
