@@ -5,8 +5,8 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 )
 
-// SellerRoutes sets up the routes for product-related operations.
-func SectionrRoutes(router chi.Router, handler *handler.SectionDefault) {
+// SectionRoutes sets up the routes for product-related operations.
+func SectionRoutes(router chi.Router, handler *handler.SectionDefault) {
 	router.Route("/api/v1/sections", func(r chi.Router) {
 		r.Get("/", handler.GetAll())
 		r.Get("/{id}", handler.FindByID())

@@ -137,7 +137,7 @@ func (a *ServerChi) Run() (err error) {
 	route.BuyerRoutes(rt, hdBuyer)
 	route.SellerRoutes(rt, sellerHandler)
 	route.WarehouseRoutes(rt, warehouseHand)
-	route.SectionrRoutes(rt, sectionHandler)
+	route.SectionRoutes(rt, sectionHandler)
 
 	/*
 		rt.Route("/foo", func(rt chi.Router) {
