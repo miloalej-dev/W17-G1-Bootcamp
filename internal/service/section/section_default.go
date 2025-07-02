@@ -22,7 +22,7 @@ func (s *SectionDefault) FindByID(id int) (models.Section, error) {
 	return s.rp.FindById(id)
 }
 
-func (s *SectionDefault) Add(ss models.Section) (models.Section, error) {
+func (s *SectionDefault) Create(ss models.Section) (models.Section, error) {
 
 	return s.rp.Create(ss)
 }

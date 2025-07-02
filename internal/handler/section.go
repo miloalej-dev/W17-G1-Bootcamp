@@ -67,8 +67,12 @@ func (s *SectionDefault) Create() http.HandlerFunc {
 			return
 		}
 
-		createdSecton, err := s.sv.Add(section)
-
+		createdSecton, err := s.sv.Create(section)
+		if err.Error() == "Section already exists" {
+			render.Status(r, http.StatusConflict)
+			render.JSON(w, r, err)
+			return
+		}
 		if err != nil {
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, err)
@@ -98,6 +102,11 @@ func (s *SectionDefault) Update() http.HandlerFunc {
 			return
 		}
 		updatedSecton, err := s.sv.Update(section)
+		if err.Error() == "section not found" {
+			render.Status(r, http.StatusNotFound)
+			render.JSON(w, r, err)
+			return
+		}
 		if err != nil {
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, err)
@@ -123,7 +132,7 @@ func (s *SectionDefault) Delete() http.HandlerFunc {
 			render.JSON(w, r, err)
 			return
 		}
-		render.Status(r, http.StatusOK)
+		render.Status(r, http.StatusNoContent)
 		render.JSON(w, r, nil)
 
 	}

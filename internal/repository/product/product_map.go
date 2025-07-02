@@ -51,7 +51,7 @@ func (r *ProductMap) Create(P models.Product) (err error) {
 		err = errors.New("1")
 		return
 	}
-	// Add the new product to the map.
+	// Create the new product to the map.
 	r.db[P.ID] = P
 	return
 }
