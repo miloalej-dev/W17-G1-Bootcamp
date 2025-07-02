@@ -2,6 +2,7 @@ package memory
 
 import (
 	"errors"
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -14,8 +15,21 @@ type SellerMap struct {
 
 // NewSellerMap is a constructor that creates and returns a new instance of SellerMap.
 // It can be initialized with a pre-existing map of seller.
-func NewSellerMap(db map[int]models.Seller) *SellerMap {
-	return &SellerMap{db: db}
+func NewSellerMap() *SellerMap {
+
+	// defaultDb is an empty map
+	defaultDB := make(map[int]models.Seller)
+
+	ld := loader.NewJSONFile("docs/db/sellers.json")
+	db, err := ld.Load()
+
+	if err != nil {
+		return nil
+	}
+	if db != nil {
+		defaultDB = db
+	}
+	return &SellerMap{db: defaultDB}
 }
 
 func (s *SellerMap) FindAll() ([]models.Seller, error) {
