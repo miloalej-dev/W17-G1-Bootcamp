@@ -4,10 +4,8 @@ import (
 	"net/http"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-	sectionRepository "github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/section"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
-	sectionService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/section"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,8 +14,7 @@ import (
 // ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
-	ServerAddress  string
-	LoaderFilePath string
+	ServerAddress string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -57,16 +54,14 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repositories
 	warehouseRepo := repository.NewWarehouseMap()
-	sectionRepo := sectionRepository.NewSectionMap()
 
 	// - services
 	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
-	sectionServ := sectionService.NewSectionDefault(sectionRepo)
 
 	// - handlers
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
-	sectionHand := handler.NewSectionDefault(sectionServ)
 
+	hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -74,6 +69,11 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Logger)
 	rt.Use(middleware.Recoverer)
 
+	// - endpoints
+	rt.Route("/foo", func(rt chi.Router) {
+		rt.Get("/", hd.GetAllFoo)
+		rt.Post("/", hd.PostFoo)
+	})
 	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
 		rt.Get("/", warehouseHand.GetAll())
 		rt.Get("/{id}", warehouseHand.GetById())
@@ -82,14 +82,6 @@ func (a *ServerChi) Run() (err error) {
 		rt.Delete("/{id}", warehouseHand.Delete())
 	})
 
-	rt.Route("/api/v1/section", func(rt chi.Router) {
-		rt.Get("/", sectionHand.GetAll())
-		rt.Get("/{id}", sectionHand.FindByID())
-		rt.Post("/", sectionHand.Create())
-		rt.Patch("/{id}", sectionHand.Update())
-		rt.Delete("/{id}", sectionHand.Delete())
-
-	})
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

@@ -1,16 +1,17 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
+	"encoding/json"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	_ "github.com/go-playground/validator/v10"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+
 )
 
 // WarehouseDefault is a struct with methods that represent handlers for warehouses
@@ -25,8 +26,8 @@ func NewWarehouseDefault(sv service.WarehouseService) *WarehouseDefault {
 }
 
 func (h *WarehouseDefault) GetAll() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		warehouses, err := h.sv.GetAll()
+	return func (w http.ResponseWriter, r *http.Request) {
+		warehouses,err := h.sv.GetAll()
 		if err != nil {
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, nil)
@@ -40,13 +41,13 @@ func (h *WarehouseDefault) GetAll() http.HandlerFunc {
 		}
 
 		warehousesJson := make(map[int]models.WarehouseDoc)
-		for id, warehouse := range warehouses {
-			warehousesJson[id] = models.WarehouseDoc{
-				ID:                 warehouse.ID,
-				Code:               warehouse.Code,
-				Address:            warehouse.Address,
-				Telephone:          warehouse.Telephone,
-				MinimunCapacity:    warehouse.MinimunCapacity,
+		for id,warehouse := range warehouses {
+			warehousesJson[id] = models.WarehouseDoc {
+				ID:	warehouse.ID,
+				Code: warehouse.Code,
+				Address: warehouse.Address,
+				Telephone: warehouse.Telephone,
+				MinimunCapacity: warehouse.MinimunCapacity,
 				MinimumTemperature: warehouse.MinimumTemperature,
 			}
 		}
@@ -73,12 +74,12 @@ func (h *WarehouseDefault) GetById() http.HandlerFunc {
 			return
 		}
 
-		warehouseJson := models.WarehouseDoc{
-			ID:                 warehouse.ID,
-			Code:               warehouse.Code,
-			Address:            warehouse.Address,
-			Telephone:          warehouse.Telephone,
-			MinimunCapacity:    warehouse.MinimunCapacity,
+		warehouseJson := models.WarehouseDoc {
+			ID:	warehouse.ID,
+			Code: warehouse.Code,
+			Address: warehouse.Address,
+			Telephone: warehouse.Telephone,
+			MinimunCapacity: warehouse.MinimunCapacity,
 			MinimumTemperature: warehouse.MinimumTemperature,
 		}
 
