@@ -8,10 +8,10 @@ import (
 )
 
 type EmployeeHandler struct {
-	sr service.EmployeeService
+	sr *service.EmployeeService
 }
 
-func NewEmployeeHandler(service service.EmployeeService) *EmployeeHandler {
+func NewEmployeeHandler(service *service.EmployeeService) *EmployeeHandler {
 	return &EmployeeHandler{
 		sr: service,
 	}
