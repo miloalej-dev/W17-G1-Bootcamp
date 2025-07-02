@@ -1,0 +1,31 @@
+### GET request to get all warehouses
+GET http://localhost:8080/api/v1/warehouses
+Content-Type: application/json
+
+### GET request to get an specific warehouse
+GET http://localhost:8080/api/v1/warehouses/100
+Content-Type: application/json
+
+### POST request to create a new warehouse
+POST localhost:8080/api/v1/warehouses
+Content-Type: application/json
+
+{
+  "code": "Code123",
+  "address": "EcoTower",
+  "telephone": "123-456-789",
+  "minimum_capacity": 34,
+  "minimum_temperature": 88
+}
+
+### PATCH request to update an specific warehouse
+PATCH localhost:8080/api/v1/warehouses/101
+Content-Type: application/json
+
+{
+  "code": "Code123423232"
+}
+
+### DELETE request to delete an specific warehouse
+DELETE localhost:8080/api/v1/warehouses/101
+Content-Type: application/json
