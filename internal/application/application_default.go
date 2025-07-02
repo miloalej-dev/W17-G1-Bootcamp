@@ -2,16 +2,19 @@ package application
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
 	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
+	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/section"
 	warehouseService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"net/http"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-	//"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -24,6 +27,8 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
+	// LoaderFilePath is the path to the file that contains the Buyers
+	LoaderFilePathBuyer string
 	// LoaderFilePath is the path to the file that contains the products
 	LoaderFilePathProducts string
 	//
@@ -34,7 +39,8 @@ type ConfigServerChi struct {
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
-	// loaderFilePathProducts is the path to the file that contains the products
+	// loaderFilePathProducts is the path to the file that contains the buyers
+	loaderFilePathBuyer     string
 	loaderFilePathProducts  string
 	loaderFilePathSeller    string
 	loaderFilePathWarehouse string
@@ -50,20 +56,26 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
+		if cfg.LoaderFilePathWarehouse != "" {
+			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
+		}
+
+		if cfg.LoaderFilePathBuyer != "" {
+			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
+		}
 
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
 		if cfg.LoaderFilePathSeller != "" {
 			defaultConfig.LoaderFilePathSeller = cfg.LoaderFilePathSeller
-		}
-		if cfg.LoaderFilePathWarehouse != "" {
-			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
+
 		}
 	}
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
+		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathSeller:    defaultConfig.LoaderFilePathSeller,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
@@ -75,6 +87,9 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - loader
+	ldBuyer := buyerLoader.NewBuyerJSONFile(a.loaderFilePathBuyer)
+	dbBuyer, err := ldBuyer.Load()
+
 	ldProduct := loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
 
@@ -90,17 +105,23 @@ func (a *ServerChi) Run() (err error) {
 	// - repositories
 	rpProduct := productRepository.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
+	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
 	sellerRepository := memory.NewSellerMap(dbSeller)
+	sectionRepository := memory.NewSectionMap()
 
 	// - services
+	svBuyer := buyerService.NewBuyerDefault(rpBuyer)
 	svProduct := productService.NewProductDefault(rpProduct)
 	warehouseServ := warehouseService.NewWarehouseDefault(warehouseRepo)
 	sellerService := service.NewSellerService(sellerRepository)
+	sectionService := section.NewSectionDefault(sectionRepository)
 
 	// - handlers
+	hdBuyer := handler.NewBuyerHandler(svBuyer)
 	hdProduct := productHandler.NewProductDefault(svProduct)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
+	sectionHandler := handler.NewSectionDefault(sectionService)
 
 	//hd := handler.NewFooHandler()
 	// router
@@ -113,6 +134,16 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 
 	route.DefaultRoutes(rt)
+	route.BuyerRoutes(rt, hdBuyer)
+	route.SellerRoutes(rt, sellerHandler)
+	route.WarehouseRoutes(rt, warehouseHand)
+	route.SectionrRoutes(rt, sectionHandler)
+
+	/*
+		rt.Route("/foo", func(rt chi.Router) {
+			rt.Get("/", hd.GetAllFoo)
+			rt.Post("/", hd.PostFoo)
+		})*/
 
 	rt.Route("/api/v1/", func(rt chi.Router) {
 		// - GET /products
@@ -122,13 +153,6 @@ func (a *ServerChi) Run() (err error) {
 		rt.Patch("/products/{ID}", hdProduct.UpdateProduct())
 		rt.Delete("/products/{ID}", hdProduct.Delete())
 	})
-	//rt.Route("/foo", func(rt chi.Router) {
-	//rt.Get("/", hd.GetAllFoo)
-	//rt.Post("/", hd.PostFoo)
-	//})
-
-	route.WarehouseRoutes(rt, warehouseHand)
-	route.SellerRoutes(rt, sellerHandler)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

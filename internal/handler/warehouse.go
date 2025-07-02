@@ -7,8 +7,8 @@ import (
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -86,12 +86,12 @@ func (h *WarehouseDefault) Create() http.HandlerFunc {
 			return
 		}
 
-		warehouse := models.Warehouse {
-			WarehouseAttributes: models.WarehouseAttributes {
-				Code: *warehouseJson.Code,
-				Address: *warehouseJson.Address,
-				Telephone: *warehouseJson.Telephone,
-				MinimumCapacity: *warehouseJson.MinimumCapacity,
+		warehouse := models.Warehouse{
+			WarehouseAttributes: models.WarehouseAttributes{
+				Code:               *warehouseJson.Code,
+				Address:            *warehouseJson.Address,
+				Telephone:          *warehouseJson.Telephone,
+				MinimumCapacity:    *warehouseJson.MinimumCapacity,
 				MinimumTemperature: *warehouseJson.MinimumTemperature,
 			},
 		}
@@ -148,7 +148,7 @@ func (h *WarehouseDefault) Update() http.HandlerFunc {
 			warehouse.MinimumTemperature = *warehouseJson.MinimumTemperature
 		}
 
-		warehouseResponse,err := h.sv.Update(warehouse)
+		warehouseResponse, err := h.sv.Update(warehouse)
 		if err != nil {
 			render.Render(w, r, response.NewErrorResponse("Internal error", http.StatusInternalServerError))
 			return
