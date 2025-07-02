@@ -1,8 +1,7 @@
-package repository
+package memory
 
 import (
 	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -12,19 +11,7 @@ type WarehouseMap struct {
 }
 
 // Creates a new Warehouse repository
-func NewWarehouseMap() *WarehouseMap {
-	defaultDB := make(map[int]models.Warehouse)
-
-	ld := loaderWarehouse.NewWarehouseJSONFile("docs/db/warehouse.json")
-	db, err := ld.Load()
-	if err != nil {
-		return nil
-	}
-
-	if db != nil {
-		defaultDB = db
-	}
-
+func NewWarehouseMap(defaultDB map[int]models.Warehouse) *WarehouseMap {
 	return &WarehouseMap{
 		db: defaultDB,
 	}
