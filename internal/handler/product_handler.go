@@ -1,4 +1,4 @@
-package productHandler
+package handler
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ type ProductDefault struct {
 }
 
 // GetAll is a method that returns a handler for the route GET /products
-func (h *ProductDefault) GetAll() http.HandlerFunc {
+func (h *ProductDefault) GetAllProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		// ...
@@ -60,7 +60,7 @@ func (h *ProductDefault) GetAll() http.HandlerFunc {
 }
 
 // Create is a method that returns a handler for the route CREATE /product/{ID}
-func (h *ProductDefault) Create() http.HandlerFunc {
+func (h *ProductDefault) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var Body models.Product
 		json.NewDecoder(r.Body).Decode(&Body)
@@ -82,7 +82,7 @@ func (h *ProductDefault) Create() http.HandlerFunc {
 }
 
 // FindByID
-func (h *ProductDefault) FindyByID() http.HandlerFunc {
+func (h *ProductDefault) FindyByIDProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
@@ -138,7 +138,7 @@ func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
 		return
 	}
 }
-func (h *ProductDefault) Delete() http.HandlerFunc {
+func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 

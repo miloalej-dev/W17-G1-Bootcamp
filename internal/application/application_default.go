@@ -17,7 +17,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
 )
@@ -106,7 +105,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - handlers
 	hdBuyer := handler.NewBuyerHandler(svBuyer)
-	hdProduct := productHandler.NewProductDefault(svProduct)
+	hdProduct := handler.NewProductDefault(svProduct)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
@@ -126,21 +125,12 @@ func (a *ServerChi) Run() (err error) {
 	route.SellerRoutes(rt, sellerHandler)
 	route.WarehouseRoutes(rt, warehouseHand)
 	route.SectionRoutes(rt, sectionHandler)
-
+	route.ProductRoutes(rt, hdProduct)
 	/*
 		rt.Route("/foo", func(rt chi.Router) {
 			rt.Get("/", hd.GetAllFoo)
 			rt.Post("/", hd.PostFoo)
 		})*/
-
-	rt.Route("/api/v1/", func(rt chi.Router) {
-		// - GET /products
-		rt.Get("/products", hdProduct.GetAll())
-		rt.Post("/products", hdProduct.Create())
-		rt.Get("/products/{ID}", hdProduct.FindyByID())
-		rt.Patch("/products/{ID}", hdProduct.UpdateProduct())
-		rt.Delete("/products/{ID}", hdProduct.Delete())
-	})
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
