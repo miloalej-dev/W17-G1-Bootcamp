@@ -1,4 +1,4 @@
-package sectionRepository
+package repository
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 
@@ -7,5 +7,5 @@ type SectionRepository interface {
 	FindByID(id int) (models.Section, error)
 	Add(s models.Section) (models.Section, error)
 	Update(s models.Section) (models.Section, error)
-	Delete(s models.Section) (models.Section, error)
+	Delete(id int) (models.Section, error)
 }

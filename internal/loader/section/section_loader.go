@@ -1,4 +1,4 @@
-package sectionLoader
+package loader
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 

@@ -1,8 +1,8 @@
-package sectionRepository
+package repository
 
 import (
 	"errors"
-	sectionLoader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/section"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/section"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -10,14 +10,18 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
-func NewSectionMap(db map[int]models.Section) *SectionMap {
+func NewSectionMap() *SectionMap {
 	// defaultDb is an empty map
-	sectionLoader.NewSectionJson("")
-	defaultDb := make(map[int]models.Section)
-	if db != nil {
-		defaultDb = db
+	defaultDB := make(map[int]models.Section)
+	ld := loader.NewSectionJson("docs/db/sections.json")
+	db, err := ld.Load()
+	if err != nil {
+		return nil
 	}
-	return &SectionMap{db: defaultDb}
+	if db != nil {
+		defaultDB = db
+	}
+	return &SectionMap{db: defaultDB}
 }
 
 func (r *SectionMap) FindAll() (v map[int]models.Section, err error) {
@@ -38,10 +42,26 @@ func (r *SectionMap) FindByID(id int) (models.Section, error) {
 
 }
 
+func (r *SectionMap) FindBySection(section int) (models.Section, error) {
+	for _, v := range r.db {
+		if v.SectionNumber == section {
+			return v, nil
+		}
+	}
+	return models.Section{}, errors.New("Section not found")
+}
+
 func (r *SectionMap) Add(s models.Section) (models.Section, error) {
+	if s.Id == 0 {
+		s.Id = len(r.db) + 1
+	}
 	v, exist := r.db[s.Id]
 	if exist {
 		return v, errors.New("Section already exists")
+	}
+	sc, err := r.FindBySection(s.SectionNumber)
+	if err == nil {
+		return sc, errors.New("Section already exists")
 	}
 	r.db[s.Id] = s
 	return s, nil
@@ -82,8 +102,8 @@ func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 	return v, nil
 }
 
-func (r *SectionMap) Delete(s models.Section) (models.Section, error) {
-	v, exist := r.db[s.Id]
+func (r *SectionMap) Delete(id int) (models.Section, error) {
+	v, exist := r.db[id]
 	if !exist {
 		return models.Section{}, errors.New("Section not found")
 	}

@@ -1,17 +1,16 @@
 package section
 
 import (
-	""
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/section"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 type SectionDefault struct {
 	// rp is the repository that will be used by the service
-	rp sectionRepository.SectionRepository
+	rp repository.SectionRepository
 }
 
-func NewSectionDefault(rp sectionRepository.SectionRepository) *SectionDefault {
+func NewSectionDefault(rp repository.SectionRepository) *SectionDefault {
 	return &SectionDefault{rp: rp}
 }
 
@@ -24,11 +23,12 @@ func (s *SectionDefault) FindByID(id int) (models.Section, error) {
 }
 
 func (s *SectionDefault) Add(ss models.Section) (models.Section, error) {
+
 	return s.rp.Add(ss)
 }
 func (s *SectionDefault) Update(ss models.Section) (models.Section, error) {
 	return s.rp.Update(ss)
 }
-func (s *SectionDefault) Delete(ss models.Section) (models.Section, error) {
-	return s.rp.Delete(ss)
+func (s *SectionDefault) Delete(id int) (models.Section, error) {
+	return s.rp.Delete(id)
 }

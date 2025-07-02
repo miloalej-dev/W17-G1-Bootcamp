@@ -1,4 +1,4 @@
-package sectionLoader
+package loader
 
 import (
 	"encoding/json"
@@ -25,7 +25,7 @@ func (l *JsonFileSection) Load() (v map[int]models.Section, err error) {
 	}
 	defer file.Close()
 
-	var sections = []models.Section{}
+	var sections []models.Section
 	err = json.NewDecoder(file).Decode(&sections)
 	if err != nil {
 		return

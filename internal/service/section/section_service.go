@@ -7,5 +7,5 @@ type SectionService interface {
 	FindByID(id int) (models.Section, error)
 	Add(s models.Section) (models.Section, error)
 	Update(s models.Section) (models.Section, error)
-	Delete(s models.Section) (models.Section, error)
+	Delete(id int) (models.Section, error)
 }
