@@ -80,6 +80,8 @@ func (a *ServerChi) Run() (err error) {
 		// - POST /
 		rt.Post("/", hdBuyer.Post())
 
+		// - PATCH /
+		rt.Patch("/{id}", hdBuyer.Patch())
 		// - DELETE/
 		rt.Delete("/{id}", hdBuyer.Delete())
 

@@ -74,3 +74,13 @@ func (r *BuyerMap) Delete(id int) (*models.Buyer, error) {
 
 	return b, nil
 }
+
+func (r *BuyerMap) Update(buyer models.Buyer) (*models.Buyer, error) {
+	_, err := r.FindById(buyer.Id)
+	if err != nil {
+		return nil, err
+	}
+	r.db[buyer.Id] = buyer
+	return &buyer, nil
+
+}

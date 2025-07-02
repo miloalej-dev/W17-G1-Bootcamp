@@ -47,3 +47,12 @@ func (s *BuyerDefault) Delete(id int) (v *models.Buyer, err error) {
 	return v, nil
 
 }
+
+func (s *BuyerDefault) Update(buyer models.Buyer) (v *models.Buyer, err error) {
+	v, err = s.rp.Update(buyer)
+	if err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}

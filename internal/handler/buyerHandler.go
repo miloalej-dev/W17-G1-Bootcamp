@@ -110,6 +110,80 @@ func (h *BuyerDefault) Delete() http.HandlerFunc {
 	}
 }
 
+func (h *BuyerDefault) Patch() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+
+		var bodyRequest models.BuyerDoc
+		err = json.NewDecoder(r.Body).Decode(&bodyRequest)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+
+		value, err := PutValidator(DocToAttributes(bodyRequest), id, h)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+
+		buyer, err := h.sv.Update(value)
+		if err != nil {
+			response.JSON(w, http.StatusInternalServerError, nil)
+		}
+		response.JSON(w, http.StatusOK, BuyerToDoc(buyer))
+	}
+
+}
+func PutValidator(buyer models.BuyerAtributtes, id int, h *BuyerDefault) (b models.Buyer, err error) {
+
+	value, err := h.sv.FindById(id)
+	if err != nil {
+		return models.Buyer{}, err
+	}
+
+	if buyer.CardNumberId != "" && buyer.FirstName != "" && buyer.LastName != "" {
+		return models.Buyer{}, errors.New("<UNK>")
+	}
+
+	switch {
+
+	case buyer.FirstName != "":
+		b = models.Buyer{
+			Id: id,
+			BuyerAtributtes: models.BuyerAtributtes{
+				CardNumberId: value.CardNumberId,
+				FirstName:    buyer.FirstName,
+				LastName:     value.LastName,
+			},
+		}
+	case buyer.LastName != "":
+		b = models.Buyer{
+			Id: id,
+			BuyerAtributtes: models.BuyerAtributtes{
+				CardNumberId: value.CardNumberId,
+				FirstName:    value.FirstName,
+				LastName:     buyer.LastName,
+			},
+		}
+
+	case buyer.CardNumberId != "":
+		b = models.Buyer{
+			Id: id,
+			BuyerAtributtes: models.BuyerAtributtes{
+				CardNumberId: buyer.CardNumberId,
+				FirstName:    value.FirstName,
+				LastName:     value.LastName,
+			},
+		}
+
+	}
+
+	return b, nil
+
+}
+
 func PostValidator(buyer models.BuyerAtributtes) error {
 	if buyer.FirstName == "" || buyer.LastName == "" || buyer.CardNumberId == "" {
 		return errors.New("First name or Last name is empty")
