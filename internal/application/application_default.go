@@ -1,18 +1,30 @@
 package application
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
+	"net/http"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the vehicles
-	LoaderFilePath string
+	// LoaderFilePath is the path to the file that contains the products
+	LoaderFilePathProducts string
+	//
+	LoaderFilePathSeller string
+}
+type ServerChi struct {
+	// serverAddress is the address where the server will be listening
+	serverAddress string
+	// loaderFilePathProducts is the path to the file that contains the products
+	loaderFilePathProducts string
+	LoaderFilePathSeller   string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -25,36 +37,36 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+
+		if cfg.LoaderFilePathProducts != "" {
+			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
 	}
 
 	return &ServerChi{
-		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		serverAddress:          defaultConfig.ServerAddress,
+		loaderFilePathProducts: defaultConfig.LoaderFilePathProducts,
 	}
 }
 
 // ServerChi is a struct that implements the Application interface
-type ServerChi struct {
-	// serverAddress is the address where the server will be listening
-	serverAddress string
-	// loaderFilePath is the path to the file that contains the vehicles
-	loaderFilePath string
-}
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
-
 	// - loader
+	ldProduct := productLoader.NewProductJSONFile(a.loaderFilePathProducts)
+	dbProduct, err := ldProduct.Load()
 
+	if err != nil {
+		return
+	}
 	// - repositories
-
+	rpProduct := productRepository.NewProductMap(dbProduct)
 	// - services
-
+	svProduct := productService.NewProductDefault(rpProduct)
 	// - handlers
+	hdProduct := productHandler.NewProductDefault(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -64,6 +76,14 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
+	rt.Route("/api/v1/", func(rt chi.Router) {
+		// - GET /products
+		rt.Get("/products", hdProduct.GetAll())
+		rt.Post("/products", hdProduct.Create())
+		rt.Get("/products/{ID}", hdProduct.FindyByID())
+		rt.Patch("/products/{ID}", hdProduct.UpdateProduct())
+		rt.Delete("/products/{ID}", hdProduct.Delete())
+	})
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
