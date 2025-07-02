@@ -3,6 +3,7 @@ package application
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/employee"
 	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
@@ -31,6 +32,8 @@ type ConfigServerChi struct {
 	LoaderFilePathProducts string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathWarehouse string
+	// LoaderFilePath is the path to the file that contains the warehouses
+	LoaderFilePathEmployee string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
@@ -39,6 +42,7 @@ type ServerChi struct {
 	loaderFilePathBuyer     string
 	loaderFilePathProducts  string
 	loaderFilePathWarehouse string
+	LoaderFilePathEmployee  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -62,6 +66,9 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
+		if cfg.LoaderFilePathEmployee != "" {
+			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
+		}
 	}
 
 	return &ServerChi{
@@ -69,6 +76,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
+		LoaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
 }
 
@@ -86,14 +94,18 @@ func (a *ServerChi) Run() (err error) {
 	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
+	ldEmployee := employee.NewJSONFile(a.LoaderFilePathEmployee)
+	dbEmployee, err := ldEmployee.Load()
+
 	if err != nil {
 		return
 	}
 	// - repositories
 	rpProduct := productRepository.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
+	sellerRepository := memory.NewSellerMap(dbSeller)
+	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
-	sellerRepository := memory.NewSellerMap()
 	sectionRepository := memory.NewSectionMap()
 
 	// - services
@@ -102,12 +114,14 @@ func (a *ServerChi) Run() (err error) {
 	warehouseServ := warehouseService.NewWarehouseDefault(warehouseRepo)
 	sellerService := service.NewSellerService(sellerRepository)
 	sectionService := section.NewSectionDefault(sectionRepository)
+	employeeService := service.NewEmployeeService(employeeRepository)
 
 	// - handlers
 	hdBuyer := handler.NewBuyerHandler(svBuyer)
 	hdProduct := handler.NewProductDefault(svProduct)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
+	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
 
 	//hd := handler.NewFooHandler()
@@ -122,8 +136,9 @@ func (a *ServerChi) Run() (err error) {
 
 	route.DefaultRoutes(rt)
 	route.BuyerRoutes(rt, hdBuyer)
-	route.SellerRoutes(rt, sellerHandler)
 	route.WarehouseRoutes(rt, warehouseHand)
+	route.SellerRoutes(rt, sellerHandler)
+	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, hdProduct)
 	/*
