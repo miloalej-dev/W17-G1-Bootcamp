@@ -3,6 +3,10 @@ package application
 import (
 	"net/http"
 
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -11,8 +15,6 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the vehicles
-	LoaderFilePath string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -51,11 +53,15 @@ func (a *ServerChi) Run() (err error) {
 	// - loader
 
 	// - repositories
+	warehouseRepo := repository.NewWarehouseMap()
 
 	// - services
+	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
 
 	// - handlers
+	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 
+	hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -64,6 +70,18 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
+	rt.Route("/foo", func(rt chi.Router) {
+		rt.Get("/", hd.GetAllFoo)
+		rt.Post("/", hd.PostFoo)
+	})
+	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
+		rt.Get("/", warehouseHand.GetAll())
+		rt.Get("/{id}", warehouseHand.GetById())
+		rt.Post("/", warehouseHand.Create())
+		rt.Patch("/{id}", warehouseHand.Update())
+		rt.Delete("/{id}", warehouseHand.Delete())
+	})
+
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
