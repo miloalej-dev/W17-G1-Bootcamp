@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
-	"encoding/json"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
