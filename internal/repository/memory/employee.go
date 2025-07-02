@@ -2,6 +2,8 @@ package memory
 
 import (
 	"errors"
+	"strconv"
+
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -52,7 +54,28 @@ func (e *EmployeeMap) Update(emp models.Employee) (models.Employee, error) {
 }
 
 func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (models.Employee, error) {
-	panic("implement me")
+	employee, exists := e.db[id]
+
+	if !exists {
+		return models.Employee{}, errors.New("employee Not Found")
+	}
+
+	if val, ok := fields["card_number_id"]; ok {
+		employee.CardNumberId = val.(string)
+	}
+	if val, ok := fields["first_name"]; ok {
+		employee.FirstName = val.(string)
+	}
+	if val, ok := fields["last_name"]; ok {
+		employee.LastName = val.(string)
+	}
+	if val, ok := fields["warehouse_id"]; ok {
+		idWarehouse,_ := strconv.Atoi(val.(string))
+		employee.WarehouseId = idWarehouse
+	}
+
+	e.db[id] = employee
+	return employee, nil
 }
 
 func (e *EmployeeMap) Delete(id int) error {

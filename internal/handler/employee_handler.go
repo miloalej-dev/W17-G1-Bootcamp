@@ -70,7 +70,7 @@ func (he *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request
 	render.Render(w, r, response.NewResponse(employeeRes, http.StatusCreated))
 }
 
-func (he *EmployeeHandler) PutEmployee(w http.ResponseWriter, r *http.Request) {
+func (he *EmployeeHandler) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {

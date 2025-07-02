@@ -29,3 +29,7 @@ func (sv *EmployeeService) CreateEmployee(emp models.Employee) (models.Employee,
 func (sv *EmployeeService) ModifyEmployee(emp models.Employee) (models.Employee, error) {
 	return sv.rp.Update(emp)
 }
+
+func (sv *EmployeeService) UpdateEmployeeFields(id int, fields map[string]interface{}) (models.Employee, error) {
+	return sv.rp.PartialUpdate(id, fields)
+}
