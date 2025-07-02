@@ -8,8 +8,10 @@ import (
 	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
+	productRepository "github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
+	productService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/section"
 	warehouseService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"net/http"
@@ -18,8 +20,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -42,7 +42,7 @@ type ServerChi struct {
 	loaderFilePathBuyer     string
 	loaderFilePathProducts  string
 	loaderFilePathWarehouse string
-	LoaderFilePathEmployee  string
+	loaderFilePathEmployee  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -76,7 +76,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
-		LoaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
+		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
 }
 
@@ -94,7 +94,7 @@ func (a *ServerChi) Run() (err error) {
 	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
-	ldEmployee := employee.NewJSONFile(a.LoaderFilePathEmployee)
+	ldEmployee := employee.NewJSONFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
 	if err != nil {
@@ -103,7 +103,7 @@ func (a *ServerChi) Run() (err error) {
 	// - repositories
 	rpProduct := productRepository.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
-	sellerRepository := memory.NewSellerMap(dbSeller)
+	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
 	sectionRepository := memory.NewSectionMap()
