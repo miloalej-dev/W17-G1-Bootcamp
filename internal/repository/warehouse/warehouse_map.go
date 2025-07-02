@@ -2,13 +2,13 @@ package repository
 
 import (
 	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 // Warehouse repository
 type WarehouseMap struct {
-	db	map[int]models.Warehouse
+	db map[int]models.Warehouse
 }
 
 // Creates a new Warehouse repository
@@ -30,58 +30,81 @@ func NewWarehouseMap() *WarehouseMap {
 	}
 }
 
-// Returns all the warehouses
-func (r *WarehouseMap) GetAll() (warehouses map[int]models.Warehouse, err error) {
-	warehouses = make(map[int]models.Warehouse)
-	for id,warehouse := range r.db {
-		warehouses[id] = warehouse
+func (r *WarehouseMap) FindAll() ([]models.Warehouse, error) {
+	warehouses := make([]models.Warehouse, 0)
+	for _, warehouse := range r.db {
+		warehouses = append(warehouses, warehouse)
 	}
-	return
+	return warehouses, nil
 }
 
-// Return a warehouse By its Id
-func (r *WarehouseMap) GetById(id int) (warehouse models.Warehouse, err error) {
+func (r *WarehouseMap) FindById(id int) (models.Warehouse, error) {
 	warehouse, found := r.db[id]
 	if !found {
-		err = errors.New("Warehouse Not Found")
+		return models.Warehouse{}, errors.New("Warehouse Not Found")
 	}
-	return
+	return warehouse, nil
 }
 
-func (r *WarehouseMap) Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error) {
+func (r *WarehouseMap) Create(warehouse models.Warehouse) (models.Warehouse, error) {
 	id := len(r.db) + 1
-	warehouse = models.Warehouse {
-		ID:	id,
-		WarehouseAttributes: models.WarehouseAttributes {
-			Code: warehouseJson.Code,
-			Address: warehouseJson.Address,
-			Telephone: warehouseJson.Telephone,
-			MinimunCapacity: warehouseJson.MinimunCapacity,
-			MinimumTemperature: warehouseJson.MinimumTemperature,
+	warehouse = models.Warehouse{
+		ID: id,
+		WarehouseAttributes: models.WarehouseAttributes{
+			Code:               warehouse.Code,
+			Address:            warehouse.Address,
+			Telephone:          warehouse.Telephone,
+			MinimumCapacity:    warehouse.MinimumCapacity,
+			MinimumTemperature: warehouse.MinimumTemperature,
 		},
 	}
 
 	r.db[id] = warehouse
-	return
+	return warehouse, nil
 }
 
-func (r *WarehouseMap) Update(warehouse models.Warehouse) (err error) {
+func (r *WarehouseMap) Update(warehouse models.Warehouse) (models.Warehouse, error) {
 	_, found := r.db[warehouse.ID]
 	if !found {
-		err = errors.New("Warehouse Not Found")
-		return
+		return models.Warehouse{}, errors.New("Warehouse Not Found")
 	}
 
 	r.db[warehouse.ID] = warehouse
-	return
+	return warehouse, nil
 }
 
-func (r *WarehouseMap) Delete(id int) (err error) {
+func (r *WarehouseMap) PartialUpdate(id int, fields map[string]interface{}) (models.Warehouse, error) {
+	warehouse, found := r.db[id]
+
+	if !found {
+		return models.Warehouse{}, errors.New("Warehouse Not Found")
+	}
+
+	if val, ok := fields["code"]; ok {
+		warehouse.Code = val.(string)
+	}
+	if val, ok := fields["address"]; ok {
+		warehouse.Code = val.(string)
+	}
+	if val, ok := fields["telephone"]; ok {
+		warehouse.Code = val.(string)
+	}
+	if val, ok := fields["minimum_capacity"]; ok {
+		warehouse.Code = val.(string)
+	}
+	if val, ok := fields["minimum_temperature"]; ok {
+		warehouse.Code = val.(string)
+	}
+
+	r.db[id] = warehouse
+	return warehouse, nil
+}
+
+func (r *WarehouseMap) Delete(id int) error {
 	_, found := r.db[id]
 	if !found {
-		err = errors.New("Warehouse Not Found")
-		return
+		return errors.New("Warehouse Not Found")
 	}
 	delete(r.db, id)
-	return
+	return nil
 }

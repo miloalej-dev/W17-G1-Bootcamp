@@ -44,7 +44,7 @@ func (l *JsonFile) Load() (warehouses map[int]models.Warehouse, err error) {
 				Code: warehouse.Code,
 				Address: warehouse.Address,
 				Telephone: warehouse.Telephone,
-				MinimunCapacity: warehouse.MinimunCapacity,
+				MinimumCapacity: warehouse.MinimumCapacity,
 				MinimumTemperature: warehouse.MinimumTemperature,
 			},
 		}

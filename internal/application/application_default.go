@@ -23,18 +23,18 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	defaultConfig := &ConfigServerChi{
 		ServerAddress: ":8080",
 	}
-	if cfg != nil {
-		if cfg.ServerAddress != "" {
-			defaultConfig.ServerAddress = cfg.ServerAddress
-		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
-		}
-	}
+	//if cfg != nil {
+		//if cfg.ServerAddress != "" {
+			//defaultConfig.ServerAddress = cfg.ServerAddress
+		//}
+		//if cfg.LoaderFilePath != "" {
+			//defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		//}
+	//}
 
 	return &ServerChi{
 		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		//loaderFilePath: defaultConfig.LoaderFilePath,
 	}
 }
 
@@ -61,7 +61,7 @@ func (a *ServerChi) Run() (err error) {
 	// - handlers
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 
-	hd := handler.NewFooHandler()
+	//hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -69,14 +69,14 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Logger)
 	rt.Use(middleware.Recoverer)
 
-	// - endpoints
-	rt.Route("/foo", func(rt chi.Router) {
-		rt.Get("/", hd.GetAllFoo)
-		rt.Post("/", hd.PostFoo)
-	})
+	//// - endpoints
+	//rt.Route("/foo", func(rt chi.Router) {
+	//    rt.Get("/", hd.GetAllFoo)
+	//    rt.Post("/", hd.PostFoo)
+	//})
 	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
-		rt.Get("/", warehouseHand.GetAll())
-		rt.Get("/{id}", warehouseHand.GetById())
+		rt.Get("/", warehouseHand.FindAll())
+		rt.Get("/{id}", warehouseHand.FindById())
 		rt.Post("/", warehouseHand.Create())
 		rt.Patch("/{id}", warehouseHand.Update())
 		rt.Delete("/{id}", warehouseHand.Delete())
