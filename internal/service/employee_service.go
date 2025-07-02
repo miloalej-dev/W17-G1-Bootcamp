@@ -25,3 +25,7 @@ func (sv *EmployeeService) GetEmployeeById(id int) (models.Employee, error) {
 func (sv *EmployeeService) CreateEmployee(emp models.Employee) (models.Employee, error) {
 	return sv.rp.Create(emp)
 }
+
+func (sv *EmployeeService) ModifyEmployee(emp models.Employee) (models.Employee, error) {
+	return sv.rp.Update(emp)
+}

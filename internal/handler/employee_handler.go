@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
@@ -50,6 +51,7 @@ func (he *EmployeeHandler) GetEmployee(w http.ResponseWriter, r *http.Request) {
 }
 
 func (he *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	employeeJson := &request.EmployeeRequest{}
 	if err := render.Bind(r, employeeJson); err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
@@ -66,4 +68,40 @@ func (he *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 	render.Render(w, r, response.NewResponse(employeeRes, http.StatusCreated))
+}
+
+func (he *EmployeeHandler) PutEmployee(w http.ResponseWriter, r *http.Request) {
+	idRequest := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idRequest)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse("Invalid ID", http.StatusBadRequest))
+		return
+	}
+	employeeJson := &request.EmployeeRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&employeeJson); err != nil {
+		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
+	}
+	employee, err := he.sr.GetEmployeeById(id)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
+		return
+	}
+	if employeeJson.CardNumberId != nil && *employeeJson.CardNumberId != employee.CardNumberId {
+		employee.CardNumberId = *employeeJson.CardNumberId
+	}
+	if employeeJson.FirstName != nil && *employeeJson.FirstName != employee.FirstName {
+		employee.FirstName = *employeeJson.FirstName
+	}
+	if employeeJson.LastName != nil && *employeeJson.LastName != employee.LastName {
+		employee.LastName = *employeeJson.LastName
+	}
+	if employeeJson.WarehouseId != nil && *employeeJson.WarehouseId != employee.WarehouseId {
+		employee.WarehouseId = *employeeJson.WarehouseId
+	}
+	employeeRes, err := he.sr.ModifyEmployee(employee)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse("Internal error", http.StatusInternalServerError))
+		return
+	}
+	render.Render(w, r, response.NewResponse(employeeRes, http.StatusOK))
 }

@@ -42,13 +42,16 @@ func (e *EmployeeMap) Create(emp models.Employee) (models.Employee, error) {
 	return newEmployee, nil
 }
 
-func (e *EmployeeMap) Update(models.Employee) (models.Employee, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *EmployeeMap) Update(emp models.Employee) (models.Employee, error) {
+	_, exists := e.db[emp.Id]
+	if !exists {
+		return models.Employee{}, errors.New("employee does not exists")
+	}
+	e.db[emp.Id] = emp
+	return emp, nil
 }
 
 func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (models.Employee, error) {
-	//TODO implement me
 	panic("implement me")
 }
 
