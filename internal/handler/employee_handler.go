@@ -4,6 +4,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
@@ -45,4 +47,23 @@ func (he *EmployeeHandler) GetEmployee(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, response.NewResponse(employee, http.StatusOK))
+}
+
+func (he *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
+	employeeJson := &request.EmployeeRequest{}
+	if err := render.Bind(r, employeeJson); err != nil {
+		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	}
+	empoyee := models.Employee{
+		CardNumberId: *employeeJson.CardNumberId,
+		FirstName:    *employeeJson.FirstName,
+		LastName:     *employeeJson.LastName,
+		WarehouseId:  *employeeJson.WarehouseId,
+	}
+	employeeRes, err := he.sr.CreateEmployee(empoyee)
+	if err != nil {
+		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	render.Render(w, r, response.NewResponse(employeeRes, http.StatusCreated))
 }

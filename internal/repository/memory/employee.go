@@ -29,9 +29,17 @@ func (e *EmployeeMap) FindById(id int) (models.Employee, error) {
 	return employee, nil
 }
 
-func (e *EmployeeMap) Create(models.Employee) (models.Employee, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *EmployeeMap) Create(emp models.Employee) (models.Employee, error) {
+	id := len(e.db) + 1
+	newEmployee := models.Employee{
+		Id:           id,
+		CardNumberId: emp.CardNumberId,
+		FirstName:    emp.FirstName,
+		LastName:     emp.LastName,
+		WarehouseId:  emp.WarehouseId,
+	}
+	e.db[id] = newEmployee
+	return newEmployee, nil
 }
 
 func (e *EmployeeMap) Update(models.Employee) (models.Employee, error) {
