@@ -1,16 +1,16 @@
 package application
 
 import (
+	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
+	service "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"net/http"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
 
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler/product"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
 )
@@ -59,7 +59,7 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - loader
-	ldProduct := productLoader.NewProductJSONFile(a.loaderFilePathProducts)
+	ldProduct := loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
 
 	if err != nil {

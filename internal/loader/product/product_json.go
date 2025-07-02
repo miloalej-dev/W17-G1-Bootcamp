@@ -1,4 +1,4 @@
-package productLoader
+package loaderProduct
 
 import (
 	"encoding/json"

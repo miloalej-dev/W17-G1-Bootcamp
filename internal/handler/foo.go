@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -11,7 +10,6 @@ import (
 
 // Structure that represents a foo handler
 type FooHandler struct {
-	sv service.FooService
 }
 
 // NewFooHandler is a function that returns a new instance of the foo handler
@@ -49,7 +47,6 @@ func (h *FooHandler) PostFoo(w http.ResponseWriter, r *http.Request) {
 	data := &request.FooRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Status(r, http.StatusBadRequest)
-		render.Render(w, r, &response.ErrorResponse{Code: 1, Message: err.Error()})
 		return
 	}
 

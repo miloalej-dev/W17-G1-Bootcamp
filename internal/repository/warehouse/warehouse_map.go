@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
-	
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 // Warehouse repository
@@ -15,7 +15,7 @@ type WarehouseMap struct {
 func NewWarehouseMap() *WarehouseMap {
 	defaultDB := make(map[int]models.Warehouse)
 
-	ld := loader.NewWarehouseJSONFile("docs/db/warehouse.json")
+	ld := loaderWarehouse.NewWarehouseJSONFile("docs/db/warehouse.json")
 	db, err := ld.Load()
 	if err != nil {
 		return nil
