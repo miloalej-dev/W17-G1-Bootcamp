@@ -11,10 +11,10 @@ import (
 )
 
 type SellerHandler struct {
-	service service.SellerService
+	service *service.SellerService
 }
 
-func NewSellerHandler(service service.SellerService) *SellerHandler {
+func NewSellerHandler(service *service.SellerService) *SellerHandler {
 	return &SellerHandler{
 		service: service,
 	}
