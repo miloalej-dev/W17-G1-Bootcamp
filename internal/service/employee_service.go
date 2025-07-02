@@ -17,3 +17,7 @@ func (sv *EmployeeService) GetEmployees() (e []models.Employee, err error) {
 	e, err = sv.rp.FindAll()
 	return
 }
+
+func (sv *EmployeeService) GetEmployeeById(id int) (models.Employee, error) {
+	return sv.rp.FindById(id)
+}

@@ -1,6 +1,9 @@
 package memory
 
-import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+import (
+	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+)
 
 type EmployeeMap struct {
 	db map[int]models.Employee
@@ -11,7 +14,6 @@ func NewEmployeeMap(db map[int]models.Employee) *EmployeeMap {
 }
 
 func (r *EmployeeMap) FindAll() ([]models.Employee, error) {
-	//TODO implement me
 	employees := make([]models.Employee, 0)
 	for _, e := range r.db {
 		employees = append(employees, e)
@@ -20,8 +22,11 @@ func (r *EmployeeMap) FindAll() ([]models.Employee, error) {
 }
 
 func (e *EmployeeMap) FindById(id int) (models.Employee, error) {
-	//TODO implement me
-	panic("implement me")
+	employee, exists := e.db[id]
+	if !exists {
+		return models.Employee{}, errors.New("employee no found")
+	}
+	return employee, nil
 }
 
 func (e *EmployeeMap) Create(models.Employee) (models.Employee, error) {
