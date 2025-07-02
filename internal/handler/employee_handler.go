@@ -119,5 +119,5 @@ func (he *EmployeeHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(nil, http.StatusOK))
+	render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 }
