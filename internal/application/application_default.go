@@ -1,7 +1,10 @@
 package application
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -52,11 +55,13 @@ func (a *ServerChi) Run() (err error) {
 	// - loader
 
 	// - repositories
-
+	repoEmployee := memory.NewEmployeeRepo()
 	// - services
+	servEmployee := service.NewEmployeeService(repoEmployee)
 
 	// - handlers
-	hd := handler.NewFooHandler()
+	//hd := handler.NewFooHandler()
+	handlerEmployee := handler.NewEmployeeHandler(*servEmployee)
 	// router
 	rt := chi.NewRouter()
 	// - middlewares
@@ -64,10 +69,12 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/foo", func(rt chi.Router) {
-		rt.Get("/", hd.GetAllFoo)
-		rt.Post("/", hd.PostFoo)
-	})
+	//rt.Route("/foo", func(rt chi.Router) {
+	//rt.Get("/", hd.GetAllFoo)
+	//rt.Post("/", hd.PostFoo)
+	//})
+
+	route.EmployeeRoutes(rt, handlerEmployee)
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
