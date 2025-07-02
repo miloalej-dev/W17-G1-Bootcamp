@@ -19,10 +19,10 @@ func NewSellerMap(db map[int]models.Seller) *SellerMap {
 }
 
 func (s *SellerMap) FindAll() ([]models.Seller, error) {
-	sellers := make([]models.Seller, 0)
+	var sellers []models.Seller
 
-	for key, seller := range s.db {
-		sellers[key] = seller
+	for _, seller := range s.db {
+		sellers = append(sellers, seller)
 	}
 
 	return sellers, nil
@@ -64,15 +64,15 @@ func (s *SellerMap) PartialUpdate(id int, fields map[string]interface{}) (models
 	// Update only the fields that are provided
 	for key, value := range fields {
 		switch key {
-		case "name":
+		case "Name":
 			if name, ok := value.(string); ok {
 				seller.Name = name
 			}
-		case "address":
+		case "Address":
 			if address, ok := value.(string); ok {
 				seller.Address = address
 			}
-		case "telephone":
+		case "Telephone":
 			if telephone, ok := value.(string); ok {
 				seller.Telephone = telephone
 			}
