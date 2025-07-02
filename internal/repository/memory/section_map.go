@@ -1,4 +1,4 @@
-package repository
+package memory
 
 import (
 	"errors"
@@ -10,31 +10,18 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
-func NewSectionMap() *SectionMap {
-	// defaultDb is an empty map
-	defaultDB := make(map[int]models.Section)
-	ld := loader.NewSectionJson("docs/db/sections.json")
-	db, err := ld.Load()
-	if err != nil {
-		return nil
-	}
-	if db != nil {
-		defaultDB = db
-	}
-	return &SectionMap{db: defaultDB}
-}
-
-func (r *SectionMap) FindAll() (v map[int]models.Section, err error) {
-	v = make(map[int]models.Section)
+func (r *SectionMap) FindAll() ([]models.Section, error) {
+	v := make([]models.Section, 0)
 	// copy db
-	for key, value := range r.db {
-		v[key] = value
+	for _, value := range r.db {
+		v = append(v, value)
 	}
-	return
+	return v, nil
 }
 
-func (r *SectionMap) FindByID(id int) (models.Section, error) {
+func (r *SectionMap) FindById(id int) (models.Section, error) {
 	v, exist := r.db[id]
+
 	if !exist {
 		return models.Section{}, errors.New("Section not found")
 	}
@@ -42,16 +29,7 @@ func (r *SectionMap) FindByID(id int) (models.Section, error) {
 
 }
 
-func (r *SectionMap) FindBySection(section int) (models.Section, error) {
-	for _, v := range r.db {
-		if v.SectionNumber == section {
-			return v, nil
-		}
-	}
-	return models.Section{}, errors.New("Section not found")
-}
-
-func (r *SectionMap) Add(s models.Section) (models.Section, error) {
+func (r *SectionMap) Create(s models.Section) (models.Section, error) {
 	if s.Id == 0 {
 		s.Id = len(r.db) + 1
 	}
@@ -102,11 +80,38 @@ func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 	return v, nil
 }
 
-func (r *SectionMap) Delete(id int) (models.Section, error) {
+func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (models.Section, error) {
+	return models.Section{}, nil
+}
+
+func (r *SectionMap) Delete(id int) error {
 	v, exist := r.db[id]
 	if !exist {
-		return models.Section{}, errors.New("Section not found")
+		return errors.New("Section not found")
 	}
 	delete(r.db, v.Id)
-	return v, nil
+	return nil
+}
+
+func NewSectionMap() *SectionMap {
+	// defaultDb is an empty map
+	defaultDB := make(map[int]models.Section)
+	ld := loader.NewSectionJson("docs/db/sections.json")
+	db, err := ld.Load()
+	if err != nil {
+		return nil
+	}
+	if db != nil {
+		defaultDB = db
+	}
+	return &SectionMap{db: defaultDB}
+}
+
+func (r *SectionMap) FindBySection(section int) (models.Section, error) {
+	for _, v := range r.db {
+		if v.SectionNumber == section {
+			return v, nil
+		}
+	}
+	return models.Section{}, errors.New("Section not found")
 }
