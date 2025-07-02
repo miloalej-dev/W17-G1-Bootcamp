@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/employee"
 	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
@@ -30,6 +31,8 @@ type ConfigServerChi struct {
 	LoaderFilePathSeller string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathWarehouse string
+	// LoaderFilePath is the path to the file that contains the warehouses
+	LoaderFilePathEmployee string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
@@ -38,6 +41,7 @@ type ServerChi struct {
 	loaderFilePathProducts  string
 	loaderFilePathSeller    string
 	loaderFilePathWarehouse string
+	LoaderFilePathEmployee  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -60,6 +64,9 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.LoaderFilePathWarehouse != "" {
 			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
 		}
+		if cfg.LoaderFilePathEmployee != "" {
+			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
+		}
 	}
 
 	return &ServerChi{
@@ -67,6 +74,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathSeller:    defaultConfig.LoaderFilePathSeller,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
+		LoaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
 }
 
@@ -84,6 +92,9 @@ func (a *ServerChi) Run() (err error) {
 	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
+	ldEmployee := employee.NewJSONFile(a.LoaderFilePathEmployee)
+	dbEmployee, err := ldEmployee.Load()
+
 	if err != nil {
 		return
 	}
@@ -91,16 +102,19 @@ func (a *ServerChi) Run() (err error) {
 	rpProduct := productRepository.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
 	sellerRepository := memory.NewSellerMap(dbSeller)
+	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 
 	// - services
 	svProduct := productService.NewProductDefault(rpProduct)
 	warehouseServ := warehouseService.NewWarehouseDefault(warehouseRepo)
 	sellerService := service.NewSellerService(sellerRepository)
+	employeeService := service.NewEmployeeService(employeeRepository)
 
 	// - handlers
 	hdProduct := productHandler.NewProductDefault(svProduct)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
+	employeeHandler := handler.NewEmployeeHandler(employeeService)
 
 	//hd := handler.NewFooHandler()
 	// router
@@ -129,6 +143,7 @@ func (a *ServerChi) Run() (err error) {
 
 	route.WarehouseRoutes(rt, warehouseHand)
 	route.SellerRoutes(rt, sellerHandler)
+	route.EmployeeRoutes(rt, employeeHandler)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

@@ -12,8 +12,8 @@ type JsonFile struct {
 	path string
 }
 
-// NewVehicleJSONFile is a function that returns a new instance of JsonFile
-func NewVehicleJSONFile(path string) *JsonFile {
+// NewJSONFile is a function that returns a new instance of JsonFile
+func NewJSONFile(path string) *JsonFile {
 	return &JsonFile{
 		path: path,
 	}
