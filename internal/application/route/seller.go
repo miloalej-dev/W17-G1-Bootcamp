@@ -7,7 +7,7 @@ import (
 
 // SellerRoutes sets up the routes for product-related operations.
 func SellerRoutes(router chi.Router, handler *handler.SellerHandler) {
-	router.Route("/products", func(r chi.Router) {
+	router.Route("/api/v1/sellers", func(r chi.Router) {
 		r.Get("/", handler.GetSellers)
 		r.Get("/{id}", handler.GetSeller)
 		r.Post("/", handler.PostSeller)
