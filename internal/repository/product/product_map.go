@@ -70,3 +70,67 @@ func (r *ProductMap) FindByID(ID int) (P models.Product, err error) {
 	P = value
 	return
 }
+func (r *ProductMap) UpdateProduct(ID int, Body models.Product) (P models.Product, err error) {
+	value, exists := r.db[ID]
+	if !exists {
+		// Return a descriptive error if the product is not found.
+		err = errors.New("1")
+		return
+	}
+
+	// Modify only the filds that cointains data, otherwise will be ignored.
+	if Body.ID != 0 {
+		value.ID = Body.ID
+	}
+	if Body.ProductCode != "" {
+		value.ProductCode = Body.ProductCode
+	}
+	if Body.Description != "" {
+		value.Description = Body.Description
+	}
+
+	if Body.Width != 0 {
+		value.Width = Body.Width
+	}
+
+	if Body.Height != 0 {
+		value.Height = Body.Height
+	}
+	if Body.Length != 0 {
+		value.Length = Body.Length
+	}
+
+	if Body.NetWeight != 0 {
+		value.NetWeight = Body.NetWeight
+	}
+	if Body.ExpirationRate != 0 {
+		value.ExpirationRate = Body.ExpirationRate
+	}
+	if Body.RecommendedFreezingTemperature != 0 {
+		value.RecommendedFreezingTemperature = Body.RecommendedFreezingTemperature
+	}
+	if Body.FreezingRate != 0 {
+		value.FreezingRate = Body.FreezingRate
+	}
+	if Body.ProductTypeID != 0 {
+		value.ProductTypeID = Body.ProductTypeID
+	}
+	if Body.SellerID != 0 {
+		value.SellerID = Body.SellerID
+	}
+	// Overwrite Product in map with new values
+	r.db[ID] = value
+	P = r.db[ID]
+	return
+}
+func (r *ProductMap) Delete(ID int) (err error) {
+	_, exists := r.db[ID]
+	if !exists {
+		// Return a descriptive error if the product is not found.
+		err = errors.New("1")
+		return
+	}
+	// Deletes product from the map
+	delete(r.db, ID)
+	return
+}

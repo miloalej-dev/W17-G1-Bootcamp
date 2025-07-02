@@ -20,4 +20,6 @@ type ProductRepository interface {
 	// FindByID looks for a single product by its unique integer ID.
 	// It returns the found product or an error if no product with that ID exists.
 	FindByID(ID int) (P models.Product, err error)
+	UpdateProduct(ID int, Body models.Product) (P models.Product, err error)
+	Delete(ID int) (err error)
 }

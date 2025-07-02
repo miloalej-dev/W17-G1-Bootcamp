@@ -81,6 +81,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/products", hdProduct.GetAll())
 		rt.Post("/products", hdProduct.Create())
 		rt.Get("/products/{ID}", hdProduct.FindyByID())
+		rt.Patch("/products/{ID}", hdProduct.UpdateProduct())
+		rt.Delete("/products/{ID}", hdProduct.Delete())
 	})
 
 	// run server
