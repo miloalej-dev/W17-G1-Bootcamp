@@ -127,14 +127,7 @@ func (a *ServerChi) Run() (err error) {
 	//rt.Post("/", hd.PostFoo)
 	//})
 
-	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
-		rt.Get("/", warehouseHand.FindAll())
-		rt.Get("/{id}", warehouseHand.FindById())
-		rt.Post("/", warehouseHand.Create())
-		rt.Patch("/{id}", warehouseHand.Update())
-		rt.Delete("/{id}", warehouseHand.Delete())
-	})
-
+	route.WarehouseRoutes(rt, warehouseHand)
 	route.SellerRoutes(rt, sellerHandler)
 
 	// run server
