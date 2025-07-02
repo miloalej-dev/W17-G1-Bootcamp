@@ -1,14 +1,17 @@
 package application
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -57,12 +60,18 @@ func (a *ServerChi) Run() (err error) {
 	dbBuyer, err := ldBuyer.Load()
 
 	// - repositories
+	warehouseRepo := repository.NewWarehouseMap()
 
 	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
 	// - services
 	svBuyer := buyerService.NewBuyerDefault(rpBuyer)
+	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
+
 	// - handlers
 	hdBuyer := handler.NewBuyerDefault(svBuyer)
+	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
+
+	//hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -71,20 +80,30 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/buyers", func(rt chi.Router) {
+	rt.Route("/api/v1/buyers", func(rt chi.Router) {
 
 		// - GET /
 		rt.Get("/", hdBuyer.GetAll())
 		rt.Get("/{id}", hdBuyer.GetById())
-
 		// - POST /
 		rt.Post("/", hdBuyer.Post())
-
 		// - PATCH /
 		rt.Patch("/{id}", hdBuyer.Patch())
 		// - DELETE/
 		rt.Delete("/{id}", hdBuyer.Delete())
 
+	})
+	/*
+		rt.Route("/foo", func(rt chi.Router) {
+			rt.Get("/", hd.GetAllFoo)
+			rt.Post("/", hd.PostFoo)
+		})*/
+	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
+		rt.Get("/", warehouseHand.GetAll())
+		rt.Get("/{id}", warehouseHand.GetById())
+		rt.Post("/", warehouseHand.Create())
+		rt.Patch("/{id}", warehouseHand.Update())
+		rt.Delete("/{id}", warehouseHand.Delete())
 	})
 
 	// run server
