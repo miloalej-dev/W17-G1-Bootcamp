@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 // WarehouseDefault is a struct that represents the default service for warehouses
@@ -16,27 +16,26 @@ func NewWarehouseDefault(rp repository.WarehouseRepository) *WarehouseDefault {
 	return &WarehouseDefault{rp: rp}
 }
 
-func (s *WarehouseDefault) GetAll() (warehouses map[int]models.Warehouse, err error) {
-	warehouses,err = s.rp.GetAll()
-	return
+func (s *WarehouseDefault) FindAll() ([]models.Warehouse, error) {
+	return s.rp.FindAll()
 }
 
-func (s *WarehouseDefault) GetById(id int) (warehouse models.Warehouse, err error) {
-	warehouse, err = s.rp.GetById(id)
-	return
+func (s *WarehouseDefault) FindById(id int) (models.Warehouse, error) {
+	return s.rp.FindById(id)
 }
 
-func (s *WarehouseDefault) Create(warehouseJson models.WarehouseDoc) (warehouse models.Warehouse, err error) {
-	warehouse, err = s.rp.Create(warehouseJson)
-	return
+func (s *WarehouseDefault) Create(entity models.Warehouse) (models.Warehouse, error) {
+	return s.rp.Create(entity)
 }
 
-func (s *WarehouseDefault) Update(warehouse models.Warehouse) (err error) {
-	err = s.rp.Update(warehouse)
-	return
+func (s *WarehouseDefault) Update(entity models.Warehouse) (models.Warehouse, error) {
+	return s.rp.Update(entity)
 }
 
-func (s *WarehouseDefault) Delete(id int) (err error) {
-	err = s.rp.Delete(id)
-	return
+func (s *WarehouseDefault) PartialUpdate(id int, fields map[string]interface{}) (models.Warehouse, error) {
+	return s.rp.PartialUpdate(id, fields)
+}
+
+func (s *WarehouseDefault) Delete(id int) error {
+	return s.rp.Delete(id)
 }

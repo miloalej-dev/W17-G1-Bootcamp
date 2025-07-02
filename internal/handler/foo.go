@@ -3,7 +3,6 @@ package handler
 /*
 import (
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -12,50 +11,53 @@ import (
 
 // Structure that represents a foo handler
 type FooHandler struct {
+<<<<<<< HEAD
 	sv service.Foo
+=======
+>>>>>>> 9a825a30abf3821ccb2d1348b3401a321999e58b
 }
 
-// NewFooHandler is a function that returns a new instance of the foo handler
-func NewFooHandler() *FooHandler {
-	return &FooHandler{}
-}
+//// NewFooHandler is a function that returns a new instance of the foo handler
+//func NewFooHandler() *FooHandler {
+	//return &FooHandler{}
+//}
 
-// FooHandler methods goes here
-func (h *FooHandler) GetAllFoo(w http.ResponseWriter, r *http.Request) {
+//// FooHandler methods goes here
+//func (h *FooHandler) GetAllFoo(w http.ResponseWriter, r *http.Request) {
 
-	foos := []*models.Foo{
-		{
-			ID:          1,
-			Name:        "Foo1",
-			Description: "Kind of foo",
-		},
-		{
-			ID:          2,
-			Name:        "Foo2",
-			Description: "Kind of foo",
-		},
-		{
-			ID:          3,
-			Name:        "Foo3",
-			Description: "Kind of foo",
-		},
-	}
+	//foos := []*models.Foo{
+		//{
+			//ID:          1,
+			//Name:        "Foo1",
+			//Description: "Kind of foo",
+		//},
+		//{
+			//ID:          2,
+			//Name:        "Foo2",
+			//Description: "Kind of foo",
+		//},
+		//{
+			//ID:          3,
+			//Name:        "Foo3",
+			//Description: "Kind of foo",
+		//},
+	//}
 
-	render.Status(r, http.StatusOK)
-	render.RenderList(w, r, response.NewFooListResponse(foos))
+	//render.Status(r, http.StatusOK)
+	//render.RenderList(w, r, response.NewFooListResponse(foos))
 
-}
+//}
 
 func (h *FooHandler) PostFoo(w http.ResponseWriter, r *http.Request) {
 	data := &request.FooRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Status(r, http.StatusBadRequest)
-		render.Render(w, r, &response.ErrorResponse{Code: 1, Message: err.Error()})
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
+	//render.Status(r, http.StatusCreated)
 
+<<<<<<< HEAD
 	render.Render(w, r, response.NewFooResponse(&models.Foo{
 		ID:          10,
 		Name:        *data.Name,
@@ -64,3 +66,11 @@ func (h *FooHandler) PostFoo(w http.ResponseWriter, r *http.Request) {
 	))
 }
 */
+
+//render.Render(w, r, response.NewFooResponse(&models.Foo{
+//ID:          10,
+//Name:        *data.Name,
+//Description: data.Description,
+//},
+//))
+//}
