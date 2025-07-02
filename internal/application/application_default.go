@@ -1,13 +1,18 @@
 package application
 
 import (
+	"net/http"
+
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/warehouse"
+
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
-	"net/http"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -49,11 +54,10 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	}
 }
 
-// ServerChi is a struct that implements the Application interface
-
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
+
 	// - loader
 	ldProduct := productLoader.NewProductJSONFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
@@ -63,11 +67,17 @@ func (a *ServerChi) Run() (err error) {
 	}
 	// - repositories
 	rpProduct := productRepository.NewProductMap(dbProduct)
+	warehouseRepo := repository.NewWarehouseMap()
+
 	// - services
 	svProduct := productService.NewProductDefault(rpProduct)
+	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
+
 	// - handlers
 	hdProduct := productHandler.NewProductDefault(svProduct)
+	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 
+	hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -83,6 +93,17 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/products/{ID}", hdProduct.FindyByID())
 		rt.Patch("/products/{ID}", hdProduct.UpdateProduct())
 		rt.Delete("/products/{ID}", hdProduct.Delete())
+	})
+	rt.Route("/foo", func(rt chi.Router) {
+		rt.Get("/", hd.GetAllFoo)
+		rt.Post("/", hd.PostFoo)
+	})
+	rt.Route("/api/v1/warehouses", func(rt chi.Router) {
+		rt.Get("/", warehouseHand.GetAll())
+		rt.Get("/{id}", warehouseHand.GetById())
+		rt.Post("/", warehouseHand.Create())
+		rt.Patch("/{id}", warehouseHand.Update())
+		rt.Delete("/{id}", warehouseHand.Delete())
 	})
 
 	// run server
