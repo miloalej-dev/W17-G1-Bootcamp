@@ -12,22 +12,26 @@ import (
 	"strconv"
 )
 
-func NewBuyerDefault(sv buyerService.BuyerService) *BuyerDefault {
-	return &BuyerDefault{sv: sv}
+func NewBuyerHandler(sv buyerService.BuyerService) *BuyerHandler {
+	return &BuyerHandler{
+		service: sv,
+	}
 }
 
-// BuyerDefault is a struct with methods that represent handlers for buyers
-type BuyerDefault struct {
+// BuyerHandler is a struct with methods that represent handlers for buyers
+type BuyerHandler struct {
 	// sv is the service that will be used by the handler
-	sv buyerService.BuyerService
+	service buyerService.BuyerService
 }
 
 // GetAll is a method that returns a handler for the route GET /buyers
-func (h *BuyerDefault) GetAll() http.HandlerFunc {
+func (h *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		w.Header().Set("Content-Type", "application/json")
+
 		fmt.Println("Consultando buyers")
-		v, err := h.sv.FindAll()
+		v, err := h.service.FindAll()
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 			return
@@ -51,15 +55,15 @@ func (h *BuyerDefault) GetAll() http.HandlerFunc {
 
 }
 
-func (h *BuyerDefault) GetById() http.HandlerFunc {
+func (h *BuyerHandler) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		w.Header().Set("Content-Type", "application/json")
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
-		value, err := h.sv.FindById(id)
+		value, err := h.service.FindById(id)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 			return
@@ -69,8 +73,10 @@ func (h *BuyerDefault) GetById() http.HandlerFunc {
 	}
 }
 
-func (h *BuyerDefault) Post() http.HandlerFunc {
+func (h *BuyerHandler) Post() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
 		var bodyRequest models.BuyerDoc
 
 		err := json.NewDecoder(r.Body).Decode(&bodyRequest)
@@ -85,7 +91,7 @@ func (h *BuyerDefault) Post() http.HandlerFunc {
 			return
 		}
 
-		value, err := h.sv.Create(DocToAttributes(bodyRequest))
+		value, err := h.service.Create(DocToAttributes(bodyRequest))
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
 		}
@@ -95,13 +101,15 @@ func (h *BuyerDefault) Post() http.HandlerFunc {
 
 }
 
-func (h *BuyerDefault) Delete() http.HandlerFunc {
+func (h *BuyerHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			response.JSON(w, http.StatusBadRequest, nil)
 		}
-		value, err := h.sv.Delete(id)
+		value, err := h.service.Delete(id)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 		}
@@ -110,8 +118,11 @@ func (h *BuyerDefault) Delete() http.HandlerFunc {
 	}
 }
 
-func (h *BuyerDefault) Patch() http.HandlerFunc {
+func (h *BuyerHandler) Patch() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Content-Type", "application/json")
+
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			response.JSON(w, http.StatusBadRequest, nil)
@@ -128,7 +139,7 @@ func (h *BuyerDefault) Patch() http.HandlerFunc {
 			response.JSON(w, http.StatusBadRequest, nil)
 		}
 
-		buyer, err := h.sv.Update(value)
+		buyer, err := h.service.Update(value)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
 		}
@@ -136,9 +147,9 @@ func (h *BuyerDefault) Patch() http.HandlerFunc {
 	}
 
 }
-func PutValidator(buyer models.BuyerAtributtes, id int, h *BuyerDefault) (b models.Buyer, err error) {
+func PutValidator(buyer models.BuyerAtributtes, id int, h *BuyerHandler) (b models.Buyer, err error) {
 
-	value, err := h.sv.FindById(id)
+	value, err := h.service.FindById(id)
 	if err != nil {
 		return models.Buyer{}, err
 	}

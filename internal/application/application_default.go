@@ -3,7 +3,7 @@ package application
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
@@ -61,14 +61,14 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repositories
 	warehouseRepo := repository.NewWarehouseMap()
-
 	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
+
 	// - services
 	svBuyer := buyerService.NewBuyerDefault(rpBuyer)
 	warehouseServ := service.NewWarehouseDefault(warehouseRepo)
 
 	// - handlers
-	hdBuyer := handler.NewBuyerDefault(svBuyer)
+	hdBuyer := handler.NewBuyerHandler(svBuyer)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 
 	//hd := handler.NewFooHandler()
@@ -80,19 +80,9 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/api/v1/buyers", func(rt chi.Router) {
+	route.DefaultRoutes(rt)
+	route.BuyerRoutes(rt, hdBuyer)
 
-		// - GET /
-		rt.Get("/", hdBuyer.GetAll())
-		rt.Get("/{id}", hdBuyer.GetById())
-		// - POST /
-		rt.Post("/", hdBuyer.Post())
-		// - PATCH /
-		rt.Patch("/{id}", hdBuyer.Patch())
-		// - DELETE/
-		rt.Delete("/{id}", hdBuyer.Delete())
-
-	})
 	/*
 		rt.Route("/foo", func(rt chi.Router) {
 			rt.Get("/", hd.GetAllFoo)
