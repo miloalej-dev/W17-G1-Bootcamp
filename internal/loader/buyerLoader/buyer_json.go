@@ -47,6 +47,5 @@ func (l *JsonFile) Load() (v map[int]models.Buyer, err error) {
 			},
 		}
 	}
-
 	return
 }

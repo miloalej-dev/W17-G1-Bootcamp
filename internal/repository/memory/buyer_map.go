@@ -1,4 +1,4 @@
-package buyerRepository
+package memory
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
@@ -27,7 +27,6 @@ func NewBuyerMap(db map[int]models.Buyer) *BuyerMap {
 func (r *BuyerMap) FindAll() (buyers map[int]models.Buyer, err error) {
 
 	buyers = make(map[int]models.Buyer)
-
 	for key, value := range r.db {
 		buyers[key] = value
 	}

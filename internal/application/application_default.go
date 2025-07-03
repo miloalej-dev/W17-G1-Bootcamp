@@ -6,7 +6,6 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/employee"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
@@ -86,10 +85,8 @@ func (a *ServerChi) Run() (err error) {
 	// - loader
 	ldBuyer := buyerLoader.NewBuyerJSONFile(a.loaderFilePathBuyer)
 	dbBuyer, err := ldBuyer.Load()
-
 	ldProduct := loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
-
 	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
@@ -104,7 +101,7 @@ func (a *ServerChi) Run() (err error) {
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
-	rpBuyer := buyerRepository.NewBuyerMap(dbBuyer)
+	rpBuyer := memory.NewBuyerMap(dbBuyer)
 	sectionRepository := memory.NewSectionMap()
 
 	// - services
