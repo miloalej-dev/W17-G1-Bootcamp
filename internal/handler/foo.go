@@ -1,5 +1,13 @@
 package handler
 
+import (
+	"github.com/go-chi/render"
+	//"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
+	//"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
+	"net/http"
+)
+
 // Structure that represents a foo handler
 type FooHandler struct {
 }
@@ -35,7 +43,7 @@ type FooHandler struct {
 
 //}
 
-/*func (h *FooHandler) PostFoo(w http.ResponseWriter, r *http.Request) {
+func (h *FooHandler) PostFoo(w http.ResponseWriter, r *http.Request) {
 	data := &request.FooRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Status(r, http.StatusBadRequest)
@@ -50,4 +58,4 @@ type FooHandler struct {
 	//Description: data.Description,
 	//},
 	//))
-}*/
+}
