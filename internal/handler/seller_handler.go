@@ -6,6 +6,8 @@ import (
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
 )
@@ -27,12 +29,11 @@ func (h *SellerHandler) GetSellers(w http.ResponseWriter, r *http.Request) {
 	sellers, err := h.service.GetSellers()
 
 	if err != nil {
-		http.Error(w, "Failed to retrieve sellers", http.StatusInternalServerError)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, sellers)
+	_ = render.Render(w, r, response.NewResponse(sellers, http.StatusOK))
 }
 
 // GetSeller handles GET requests to retrieve a seller by ID
@@ -42,41 +43,42 @@ func (h *SellerHandler) GetSeller(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid seller ID", http.StatusBadRequest)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
 	seller, err := h.service.GetSellerById(id)
 	if err != nil {
-		http.Error(w, "Seller not found", http.StatusNotFound)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, seller)
+	_ = render.Render(w, r, response.NewResponse(seller, http.StatusOK))
 }
 
 // PostSeller handles POST requests to create a new seller
 func (h *SellerHandler) PostSeller(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var seller models.Seller
+	data := &request.SellerRequest{}
 
-	err := json.NewDecoder(r.Body).Decode(&seller)
+	if err := render.Bind(r, data); err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	}
 
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	seller := models.Seller{
+		Name:      *data.Name,
+		Address:   *data.Address,
+		Telephone: *data.Telephone,
 	}
 
 	createdSeller, err := h.service.RegisterSeller(seller)
 	if err != nil {
-		http.Error(w, "Failed to create seller", http.StatusInternalServerError)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
-	render.JSON(w, r, createdSeller)
+	_ = render.Render(w, r, response.NewResponse(createdSeller, http.StatusCreated))
 }
 
 // PutSeller handles PUT requests to update a seller
@@ -86,26 +88,31 @@ func (h *SellerHandler) PutSeller(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid seller ID", http.StatusBadRequest)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
-	var seller models.Seller
-	err = json.NewDecoder(r.Body).Decode(&seller)
+	data := &request.SellerRequest{}
+
+	err = render.Bind(r, data)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 	}
 
-	seller.Id = id
+	seller := models.Seller{
+		Id:        id,
+		Name:      *data.Name,
+		Address:   *data.Address,
+		Telephone: *data.Telephone,
+	}
+
 	updatedSeller, err := h.service.ModifySeller(seller)
 	if err != nil {
-		http.Error(w, "Failed to update seller", http.StatusInternalServerError)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, updatedSeller)
+	_ = render.Render(w, r, response.NewResponse(updatedSeller, http.StatusOK))
 }
 
 // PatchSeller handles PATCH requests to partially update a seller
@@ -115,25 +122,25 @@ func (h *SellerHandler) PatchSeller(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid seller ID", http.StatusBadRequest)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
 	updatedSeller, err := h.service.UpdateSellerFields(id, fields)
 	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		http.Error(w, "Failed to update seller", http.StatusInternalServerError)
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, updatedSeller)
+	_ = render.Render(w, r, response.NewResponse(updatedSeller, http.StatusOK))
 }
 
 // DeleteSeller handles DELETE requests to remove a seller
@@ -143,13 +150,13 @@ func (h *SellerHandler) DeleteSeller(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid seller ID", http.StatusBadRequest)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
 	err = h.service.RemoveSeller(id)
 	if err != nil {
-		http.Error(w, "Failed to delete seller", http.StatusInternalServerError)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
