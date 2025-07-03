@@ -8,7 +8,6 @@ import (
 	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
-	productRepository "github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
 	productService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
@@ -101,7 +100,7 @@ func (a *ServerChi) Run() (err error) {
 		return
 	}
 	// - repositories
-	rpProduct := productRepository.NewProductMap(dbProduct)
+	rpProduct := memory.NewProductMap(dbProduct)
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)

@@ -2,7 +2,7 @@
 // It uses a map to store product data, making it suitable for testing or simple applications
 // where data persistence is not required.
 
-package productRepository
+package memory
 
 import (
 	"errors"

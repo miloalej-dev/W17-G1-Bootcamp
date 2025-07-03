@@ -5,7 +5,7 @@
 package productService
 
 import (
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	errorProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product/error"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
@@ -13,7 +13,7 @@ import (
 // NewProductDefault is a constructor function that creates a new instance of ProductDefault.
 // It takes a ProductRepository as a dependency, promoting loose coupling and testability.
 
-func NewProductDefault(rp productRepository.ProductRepository) *ProductDefault {
+func NewProductDefault(rp repository.ProductRepository) *ProductDefault {
 	return &ProductDefault{rp: rp}
 }
 
@@ -21,7 +21,7 @@ func NewProductDefault(rp productRepository.ProductRepository) *ProductDefault {
 type ProductDefault struct {
 	// rp is the repository dependency. By using an interface, this service
 	// is decoupled from the specific database implementation (e.g., in-memory, SQL).
-	rp productRepository.ProductRepository
+	rp repository.ProductRepository
 }
 
 // FindAll retrieves all products by calling the repository's FindAll method.
