@@ -160,5 +160,5 @@ func (h *SellerHandler) DeleteSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Status(r, http.StatusNoContent)
+	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 }
