@@ -6,21 +6,21 @@ import (
 	"os"
 )
 
-// JsonFile is a struct that implements the LoaderBuyer interface
-type JsonFile struct {
+// BuyerFile is a struct that implements the LoaderBuyer interface
+type BuyerFile struct {
 	// path is the path to the file that contains the buyers in JSON format
 	path string
 }
 
-// NewBuyerJSONFile is a function that returns a new instance of JsonFile
-func NewBuyerJSONFile(path string) *JsonFile {
-	return &JsonFile{
+// NewBuyerFile is a function that returns a new instance of EmployeeFile
+func NewBuyerFile(path string) *BuyerFile {
+	return &BuyerFile{
 		path: path,
 	}
 }
 
 // Load is a method that loads the buyers
-func (l *JsonFile) Load() (v map[int]models.Buyer, err error) {
+func (l *BuyerFile) Load() (v map[int]models.Buyer, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {

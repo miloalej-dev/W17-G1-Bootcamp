@@ -6,21 +6,21 @@ import (
 	"os"
 )
 
-// JsonFile is a struct that implements the LoaderVehicle interface
-type JsonFile struct {
+// EmployeeFile is a struct that implements the LoaderVehicle interface
+type EmployeeFile struct {
 	// path is the path to the file that contains the vehicles in JSON format
 	path string
 }
 
-// NewJSONFile is a function that returns a new instance of JsonFile
-func NewJSONFile(path string) *JsonFile {
-	return &JsonFile{
+// NewEmployeeFile is a function that returns a new instance of EmployeeFile
+func NewEmployeeFile(path string) *EmployeeFile {
+	return &EmployeeFile{
 		path: path,
 	}
 }
 
 // Load is a method that loads the employees
-func (l *JsonFile) Load() (data map[int]models.Employee, err error) {
+func (l *EmployeeFile) Load() (data map[int]models.Employee, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {

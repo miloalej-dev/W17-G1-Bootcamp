@@ -17,7 +17,7 @@ import (
 // WarehouseDefault is a struct with methods that represent handlers for warehouses
 type WarehouseDefault struct {
 	// sv is the service that will be used by the handler
-	sv service.service
+	sv service.WarehouseService
 }
 
 // NewWarehouseDefault is a function that returns a new instance of WarehouseDefault

@@ -96,7 +96,7 @@ func (r *SectionMap) Delete(id int) error {
 func NewSectionMap() *SectionMap {
 	// defaultDb is an empty map
 	defaultDB := make(map[int]models.Section)
-	ld := json.loader.NewSectionJson("docs/db/sections.json")
+	ld := json.NewSectionFile("docs/db/sections.json")
 	db, err := ld.Load()
 	if err != nil {
 		return nil

@@ -76,14 +76,14 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - loader
-	ldBuyer := json.NewBuyerJSONFile(a.loaderFilePathBuyer)
+	ldBuyer := json.NewBuyerFile(a.loaderFilePathBuyer)
 	dbBuyer, err := ldBuyer.Load()
-	ldProduct := json.loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
+	ldProduct := json.NewProductFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
-	ldWarehouse := json.loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
+	ldWarehouse := json.NewWarehouseFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
-	ldEmployee := json.NewJSONFile(a.loaderFilePathEmployee)
+	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
 	if err != nil {

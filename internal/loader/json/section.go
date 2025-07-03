@@ -6,18 +6,18 @@ import (
 	"os"
 )
 
-type JsonFileSection struct {
+type SectionFile struct {
 	// path is the path to the file that contains the vehicles in JSON format
 	path string
 }
 
-func NewSectionJson(path string) *JsonFileSection {
-	return &JsonFileSection{
+func NewSectionFile(path string) *SectionFile {
+	return &SectionFile{
 		path: path,
 	}
 }
 
-func (l *JsonFileSection) Load() (v map[int]models.Section, err error) {
+func (l *SectionFile) Load() (v map[int]models.Section, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {

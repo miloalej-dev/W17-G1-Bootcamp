@@ -11,14 +11,14 @@ import (
 )
 
 // NewProductDefault is a function that returns a new instance of ProductDefault
-func NewProductDefault(sv service.productService) *ProductDefault {
+func NewProductDefault(sv service.ProductService) *ProductDefault {
 	return &ProductDefault{sv: sv}
 }
 
 // ProductDefault is a struct with methods that represent handlers for Products
 type ProductDefault struct {
 	// sv is the service that will be used by the handler
-	sv service.productService
+	sv service.ProductService
 }
 
 // GetAll is a method that returns a handler for the route GET /products
