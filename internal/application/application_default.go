@@ -4,8 +4,8 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/employee"
-	loaderProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
-	loaderWarehouse "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/buyerRepository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
@@ -123,7 +123,6 @@ func (a *ServerChi) Run() (err error) {
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
 
-	//hd := handler.NewFooHandler()
 	// router
 	rt := chi.NewRouter()
 
@@ -140,13 +139,7 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, hdProduct)
-	/*
-		rt.Route("/foo", func(rt chi.Router) {
-			rt.Get("/", hd.GetAllFoo)
-			rt.Post("/", hd.PostFoo)
-		})*/
 
-	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
 }
