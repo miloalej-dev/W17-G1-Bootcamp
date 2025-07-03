@@ -1,5 +1,5 @@
 // Package productRepository defines the interfaces and implementations for product data access.
-package repository
+package productRepository
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 

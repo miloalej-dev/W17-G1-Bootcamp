@@ -11,9 +11,9 @@ POST localhost:8080/api/v1/sellers
 Content-Type: application/json
 
 {
-  "Name": "Mercado libre",
-  "Address":   "123 Main St, Anytown, USA",
-  "Telephone": "123-456-7890"
+  "name": "Mercado libre",
+  "address":   "123 Main St, Anytown, USA",
+  "telephone": "123-456-7890"
 }
 
 ### PUT request to update an specific seller
@@ -21,9 +21,9 @@ PUT localhost:8080/api/v1/sellers/101
 Content-Type: application/json
 
 {
-  "Name": "Mercado libre",
-  "Address":   "123 Main St, Anytown, ARG",
-  "Telephone": "123-456-7890"
+  "name": "Mercado libre",
+  "address":   "123 Main St, Anytown, ARG",
+  "telephone": "123-456-7890"
 }
 
 ### PATCH request to update an specific seller
@@ -31,7 +31,7 @@ PATCH localhost:8080/api/v1/sellers/101
 Content-Type: application/json
 
 {
-  "Name": "Mercado libre - MELI"
+  "name": "Mercado libre - MELI"
 }
 
 ### DELETE request to delete an specific seller
