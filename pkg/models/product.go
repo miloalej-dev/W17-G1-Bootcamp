@@ -12,7 +12,7 @@ type Product struct {
 	// Una dimensión de alto
 	Height float64 `json:"height,validate:required"`
 	//Una dimensión de largo
-	Length float64 `json:"lenght,validate:required"`
+	Length float64 `json:"length,validate:required"`
 	//Un peso neto
 	NetWeight float64 `json:"net_weight,validate:required"`
 	// Un ratio de vencimiento
