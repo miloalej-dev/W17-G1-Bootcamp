@@ -8,7 +8,6 @@ import (
 func main() {
 	// env
 	// ...
-
 	// app
 	// - config
 	cfg := &application.ConfigServerChi{
