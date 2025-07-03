@@ -1,4 +1,4 @@
-package buyerLoader
+package json
 
 import (
 	"encoding/json"

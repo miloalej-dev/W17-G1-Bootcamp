@@ -2,7 +2,7 @@ package memory
 
 import (
 	"errors"
-	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 

@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"net/http"
 	"strconv"
 )
 
-func NewBuyerHandler(sv buyerService.BuyerService) *BuyerHandler {
+func NewBuyerHandler(sv service.BuyerService) *BuyerHandler {
 	return &BuyerHandler{
 		service: sv,
 	}
@@ -21,7 +21,7 @@ func NewBuyerHandler(sv buyerService.BuyerService) *BuyerHandler {
 // BuyerHandler is a struct with methods that represent handlers for buyers
 type BuyerHandler struct {
 	// sv is the service that will be used by the handler
-	service buyerService.BuyerService
+	service service.BuyerService
 }
 
 // GetAll is a method that returns a handler for the route GET /buyers

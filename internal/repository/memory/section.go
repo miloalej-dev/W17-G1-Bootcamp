@@ -2,7 +2,7 @@ package memory
 
 import (
 	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/section"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -96,7 +96,7 @@ func (r *SectionMap) Delete(id int) error {
 func NewSectionMap() *SectionMap {
 	// defaultDb is an empty map
 	defaultDB := make(map[int]models.Section)
-	ld := loader.NewSectionJson("docs/db/sections.json")
+	ld := json.loader.NewSectionJson("docs/db/sections.json")
 	db, err := ld.Load()
 	if err != nil {
 		return nil

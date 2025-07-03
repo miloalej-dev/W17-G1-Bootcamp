@@ -1,4 +1,4 @@
-package loaderWarehouse
+package json
 
 import (
 	"encoding/json"

@@ -2,10 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
 	"strconv"
 
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -17,7 +17,7 @@ import (
 // WarehouseDefault is a struct with methods that represent handlers for warehouses
 type WarehouseDefault struct {
 	// sv is the service that will be used by the handler
-	sv service.WarehouseService
+	sv service.service
 }
 
 // NewWarehouseDefault is a function that returns a new instance of WarehouseDefault

@@ -4,21 +4,21 @@ import (
 	"encoding/json"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"net/http"
 	"strconv"
 )
 
 // NewProductDefault is a function that returns a new instance of ProductDefault
-func NewProductDefault(sv productService.ProductService) *ProductDefault {
+func NewProductDefault(sv service.productService) *ProductDefault {
 	return &ProductDefault{sv: sv}
 }
 
 // ProductDefault is a struct with methods that represent handlers for Products
 type ProductDefault struct {
 	// sv is the service that will be used by the handler
-	sv productService.ProductService
+	sv service.productService
 }
 
 // GetAll is a method that returns a handler for the route GET /products

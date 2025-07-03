@@ -1,18 +1,5 @@
 package repository
 
-import "errors"
-
-var (
-	// ErrEntityNotFound is returned when an entity is not found
-	ErrEntityNotFound = errors.New("entity not found")
-
-	// ErrEntityAlreadyExists is returned when an entity being created already exists
-	ErrEntityAlreadyExists = errors.New("entity already exists")
-
-	// ErrInvalidEntity is returned when an entity is invalid
-	ErrInvalidEntity = errors.New("invalid entity")
-)
-
 // Repository is a generic repository interface for CRUD operations
 // It is parameterized by K for the key type and T for the entity type.
 type Repository[K comparable, T any] interface {

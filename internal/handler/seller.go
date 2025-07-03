@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -13,10 +13,10 @@ import (
 )
 
 type SellerHandler struct {
-	service *service.SellerService
+	service *_default.SellerService
 }
 
-func NewSellerHandler(service *service.SellerService) *SellerHandler {
+func NewSellerHandler(service *_default.SellerService) *SellerHandler {
 	return &SellerHandler{
 		service: service,
 	}

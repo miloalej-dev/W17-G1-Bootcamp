@@ -1,4 +1,4 @@
-package loader
+package json
 
 import (
 	"encoding/json"
