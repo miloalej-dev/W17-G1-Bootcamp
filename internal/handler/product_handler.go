@@ -2,12 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
-
 	"net/http"
 	"strconv"
 )
@@ -32,7 +30,7 @@ func (h *ProductDefault) GetAllProduct() http.HandlerFunc {
 		// - get all Products
 		v, err := h.sv.FindAll()
 		if err != nil {
-			render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			response.JSON(w, http.StatusNotFound, nil)
 			return
 		}
 
@@ -54,7 +52,10 @@ func (h *ProductDefault) GetAllProduct() http.HandlerFunc {
 				SellerID:                       value.SellerID,
 			}
 		}
-		render.Render(w, r, response.NewResponse(data, http.StatusOK))
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
 	}
 }
 
@@ -66,11 +67,16 @@ func (h *ProductDefault) CreateProduct() http.HandlerFunc {
 
 		errService := h.sv.Create(Body)
 		if errService != nil {
-			render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
-
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": errService.Error(),
+			})
 			return
 		}
-		render.Render(w, r, response.NewResponse(Body, http.StatusCreated))
+
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "Producto Creado",
+			"data":    Body,
+		})
 		return
 	}
 }
@@ -81,18 +87,24 @@ func (h *ProductDefault) FindyByIDProduct() http.HandlerFunc {
 		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
 		if errConverter != nil {
-			render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
-
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": errConverter.Error(),
+			})
 			return
 		}
 
 		p, errServiceFindByID := h.sv.FindByID(ID)
 		if errServiceFindByID != nil {
-			render.Render(w, r, response.NewErrorResponse(errServiceFindByID.Error(), http.StatusNotFound))
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": errServiceFindByID.Error(),
+			})
 			return
 		}
-		render.Render(w, r, response.NewResponse(p, http.StatusOK))
 
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Producto Creado",
+			"data":    p,
+		})
 		return
 	}
 }
@@ -104,19 +116,25 @@ func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
 		json.NewDecoder(r.Body).Decode(&Body)
 
 		if errConverter != nil {
-			render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": errConverter.Error(),
+			})
 			return
 		}
 
 		p, errServiceUpdateProduct := h.sv.UpdateProduct(ID, Body)
 
 		if errServiceUpdateProduct != nil {
-			render.Render(w, r, response.NewErrorResponse(errServiceUpdateProduct.Error(), http.StatusNotFound))
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": errServiceUpdateProduct.Error(),
+			})
 			return
 		}
 
-		render.Render(w, r, response.NewResponse(p, http.StatusOK))
-
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Producto Actualizado",
+			"data":    p,
+		})
 		return
 	}
 }
@@ -125,19 +143,24 @@ func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
 		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
 		if errConverter != nil {
-			render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": errConverter.Error(),
+			})
 			return
 		}
 
 		errServiceDelete := h.sv.Delete(ID)
 
 		if errServiceDelete != nil {
-			render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
+			response.JSON(w, http.StatusNotFound, map[string]any{
+				"message": errServiceDelete.Error(),
+			})
 			return
 		}
 
-		render.Render(w, r, response.NewResponse("El producto ha sido borrado", http.StatusOK))
-
+		response.JSON(w, http.StatusNoContent, map[string]any{
+			"message": "Producto Borrado",
+		})
 		return
 	}
 }
