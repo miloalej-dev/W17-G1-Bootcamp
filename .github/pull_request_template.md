@@ -1,6 +1,4 @@
-# Pull Request
-
-## 📋 Descripción
+# 📋 Descripción
 <!-- Describe brevemente los cambios realizados -->
 
 ## 🎯 Tipo de cambio
