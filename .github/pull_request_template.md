@@ -11,6 +11,16 @@
 - [ ] ♻️ Refactor (mejoras de código sin cambiar funcionalidad)
 - [ ] ⚡ Performance (mejoras de rendimiento)
 - [ ] ✅ Test (agregar o corregir tests)
+- [ ] 🔧 Config (cambios en configuración)
+- [ ] 🛠️ Build (cambios en sistema de build o dependencias)
+- [ ] 🚀 Deploy (cambios relacionados con despliegue)
+- [ ] 🔒 Security (correcciones de seguridad)
+- [ ] 🌐 API (cambios en endpoints o contratos de API)
+- [ ] 🧹 Cleanup (limpieza de código, eliminación de código muerto)
+- [ ] 🚑 Hotfix (corrección crítica para producción)
+- [ ] 🔀 Merge (resolución de conflictos de merge)
+- [ ] 🔄 CI/CD (cambios en pipelines de integración/despliegue continuo)
+- [ ] Otro: ___________
 
 ## 🏗️ Módulos afectados
 <!-- Marca los módulos que fueron modificados -->
