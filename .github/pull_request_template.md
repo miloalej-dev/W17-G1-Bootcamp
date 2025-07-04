@@ -41,6 +41,7 @@
 - [ ] Request/Response (DTOs)
 - [ ] Middlewares
 - [ ] Routes
+- [ ] Otros: ___________
 
 ## ✅ Checklist
 <!-- Verifica que se cumplan los siguientes puntos -->
@@ -60,6 +61,3 @@
 ## 📝 Notas adicionales
 <!-- Cualquier información adicional que el revisor deba saber -->
 
-## 👥 Revisores sugeridos
-<!-- Menciona a los compañeros que deberían revisar este PR -->
-@reviewer1 @reviewer2
