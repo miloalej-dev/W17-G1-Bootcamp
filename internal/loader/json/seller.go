@@ -1,4 +1,4 @@
-package seller
+package json
 
 import (
 	"encoding/json"
@@ -6,20 +6,20 @@ import (
 	"os"
 )
 
-// JsonFile is a struct that implements the Loader interface
-type JsonFile struct {
+// SellerFile is a struct that implements the Loader interface
+type SellerFile struct {
 	// path is the path to the file that contains the vehicles in JSON format
 	path string
 }
 
-// NewJSONFile is a function that returns a new instance of JsonFile
-func NewJSONFile(path string) *JsonFile {
-	return &JsonFile{
+// NewSellerFile is a function that returns a new instance of EmployeeFile
+func NewSellerFile(path string) *SellerFile {
+	return &SellerFile{
 		path: path,
 	}
 }
 
-func (j *JsonFile) Load() (data map[int]models.Seller, err error) {
+func (j *SellerFile) Load() (data map[int]models.Seller, err error) {
 
 	// open file
 	file, err := os.Open(j.path)

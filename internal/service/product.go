@@ -1,7 +1,7 @@
 // Package productService defines the business logic layer for product operations.
 // It provides an interface that abstracts the underlying implementation details.
 
-package productService
+package service
 
 import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 

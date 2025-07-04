@@ -2,13 +2,21 @@
 // It acts as an intermediary between the transport layer (e.g., HTTP handlers) and the
 // data access layer (repository), enforcing business rules.
 
-package productService
+package _default
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
-	errorProduct "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product/error"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
+
+// ErrorCreate is returned when an attempt to create a product fails because
+// a product with the same ID already exists in the repository.
+var ErrorCreate = errors.New("There is already a product with that ID")
+
+// ErrorNotFound is returned when a lookup operation fails to find a product
+// with the specified ID.
+var ErrorNotFound = errors.New("Product Not found with that ID")
 
 // NewProductDefault is a constructor function that creates a new instance of ProductDefault.
 // It takes a ProductRepository as a dependency, promoting loose coupling and testability.
@@ -29,7 +37,7 @@ type ProductDefault struct {
 func (s *ProductDefault) FindAll() (v map[int]models.Product, err error) {
 	v, err = s.rp.FindAll()
 	if err != nil {
-		err = errorProduct.ErrorNotFound
+		err = ErrorNotFound
 	}
 	return
 }
@@ -40,7 +48,7 @@ func (s *ProductDefault) FindAll() (v map[int]models.Product, err error) {
 func (s *ProductDefault) Create(P models.Product) (err error) {
 	err = s.rp.Create(P)
 	if err != nil {
-		err = errorProduct.ErrorCreate
+		err = ErrorCreate
 	}
 	return
 }
@@ -51,21 +59,21 @@ func (s *ProductDefault) Create(P models.Product) (err error) {
 func (s *ProductDefault) FindByID(ID int) (P models.Product, err error) {
 	P, err = s.rp.FindByID(ID)
 	if err != nil {
-		err = errorProduct.ErrorNotFound
+		err = ErrorNotFound
 	}
 	return
 }
 func (s *ProductDefault) UpdateProduct(ID int, Body models.Product) (P models.Product, err error) {
 	P, err = s.rp.UpdateProduct(ID, Body)
 	if err != nil {
-		err = errorProduct.ErrorNotFound
+		err = ErrorNotFound
 	}
 	return
 }
 func (s *ProductDefault) Delete(ID int) (err error) {
 	err = s.rp.Delete(ID)
 	if err != nil {
-		err = errorProduct.ErrorNotFound
+		err = ErrorNotFound
 	}
 	return
 }

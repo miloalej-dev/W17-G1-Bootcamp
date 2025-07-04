@@ -2,16 +2,9 @@ package application
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/buyerLoader"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/employee"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/product"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/buyerService"
-	productService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/product"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/section"
-	warehouseService "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/warehouse"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"net/http"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
@@ -83,14 +76,14 @@ func (a *ServerChi) Run() (err error) {
 	// dependencies
 
 	// - loader
-	ldBuyer := buyerLoader.NewBuyerJSONFile(a.loaderFilePathBuyer)
+	ldBuyer := json.NewBuyerFile(a.loaderFilePathBuyer)
 	dbBuyer, err := ldBuyer.Load()
-	ldProduct := loaderProduct.NewProductJSONFile(a.loaderFilePathProducts)
+	ldProduct := json.NewProductFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
-	ldWarehouse := loaderWarehouse.NewJSONFile(a.loaderFilePathWarehouse)
+	ldWarehouse := json.NewWarehouseFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
-	ldEmployee := employee.NewJSONFile(a.loaderFilePathEmployee)
+	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
 	if err != nil {
@@ -105,12 +98,12 @@ func (a *ServerChi) Run() (err error) {
 	sectionRepository := memory.NewSectionMap()
 
 	// - services
-	svBuyer := buyerService.NewBuyerDefault(rpBuyer)
-	svProduct := productService.NewProductDefault(rpProduct)
-	warehouseServ := warehouseService.NewWarehouseDefault(warehouseRepo)
-	sellerService := service.NewSellerService(sellerRepository)
-	sectionService := section.NewSectionDefault(sectionRepository)
-	employeeService := service.NewEmployeeService(employeeRepository)
+	svBuyer := _default.NewBuyerDefault(rpBuyer)
+	svProduct := _default.NewProductDefault(rpProduct)
+	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
+	sellerService := _default.NewSellerService(sellerRepository)
+	sectionService := _default.NewSectionDefault(sectionRepository)
+	employeeService := _default.NewEmployeeService(employeeRepository)
 
 	// - handlers
 	hdBuyer := handler.NewBuyerHandler(svBuyer)

@@ -1,4 +1,4 @@
-package loaderWarehouse
+package json
 
 import (
 	"encoding/json"
@@ -7,21 +7,21 @@ import (
 	"os"
 )
 
-// JsonFile is a struct that implements the LoaderWarehouse interface
-type JsonFile struct {
+// WarehouseFile is a struct that implements the LoaderWarehouse interface
+type WarehouseFile struct {
 	// path is the path to the file that contains the warehouses in JSON format
 	path string
 }
 
-// NewJSONFile is a function that returns a new instance of JsonFile
-func NewJSONFile(path string) *JsonFile {
-	return &JsonFile{
+// NewWarehouseFile is a function that returns a new instance of EmployeeFile
+func NewWarehouseFile(path string) *WarehouseFile {
+	return &WarehouseFile{
 		path: path,
 	}
 }
 
 // Load is a method that loads the foos
-func (l *JsonFile) Load() (warehouses map[int]models.Warehouse, err error) {
+func (l *WarehouseFile) Load() (warehouses map[int]models.Warehouse, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {
