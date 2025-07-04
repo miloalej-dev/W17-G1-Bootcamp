@@ -1,4 +1,4 @@
-package loaderProduct
+package json
 
 import (
 	"encoding/json"
@@ -6,21 +6,21 @@ import (
 	"os"
 )
 
-// JsonFile is a struct that implements the LoaderVehicle interface
-type JsonFile struct {
+// ProductFile is a struct that implements the LoaderVehicle interface
+type ProductFile struct {
 	// path is the path to the file that contains the vehicles in JSON format
 	path string
 }
 
-// NewVehicleJSONFile is a function that returns a new instance of JsonFile
-func NewProductJSONFile(path string) *JsonFile {
-	return &JsonFile{
+// NewProductFile is a function that returns a new instance of EmployeeFile
+func NewProductFile(path string) *ProductFile {
+	return &ProductFile{
 		path: path,
 	}
 }
 
 // Load is a method that loads the products
-func (l *JsonFile) Load() (v map[int]models.Product, err error) {
+func (l *ProductFile) Load() (v map[int]models.Product, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {

@@ -2,7 +2,7 @@ package memory
 
 import (
 	"errors"
-	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/seller"
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -20,7 +20,7 @@ func NewSellerMap() *SellerMap {
 	// defaultDb is an empty map
 	defaultDB := make(map[int]models.Seller)
 
-	ld := loader.NewJSONFile("docs/db/sellers.json")
+	ld := loader.NewSellerFile("docs/db/sellers.json")
 	db, err := ld.Load()
 
 	if err != nil {

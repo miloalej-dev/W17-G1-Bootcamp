@@ -1,0 +1,43 @@
+### GET request to get all sections
+GET http://localhost:8080/api/v1/sections
+Content-Type: application/json
+
+### GET request to get an specific sections
+GET http://localhost:8080/api/v1/sections/10
+Content-Type: application/json
+
+### POST request to create a new sections
+POST localhost:8080/api/v1/sections
+Content-Type: application/json
+
+{
+  "section_number": 104,
+  "current_temperature": 0,
+  "minimum_temperature": 0,
+  "current_capacity": 64,
+  "minimum_capacity": 9,
+  "maximum_capacity": 3,
+  "warehouse_id": 25,
+  "product_type_id": 36,
+  "products_batch": [
+    78,
+    8,
+    35,
+    93
+  ]
+}
+
+
+### PATCH request to update an specific sections
+PATCH localhost:8080/api/v1/sections/3
+Content-Type: application/json
+
+{
+
+  "minimum_capacity": 10
+
+}
+
+### DELETE request to delete an specific sections
+DELETE localhost:8080/api/v1/sections/3
+Content-Type: application/json

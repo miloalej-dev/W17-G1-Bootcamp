@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/section"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"net/http"
 	"strconv"
 )
 
 type SectionDefault struct {
-	sv section.SectionService
+	sv service.SectionService
 }
 
-func NewSectionDefault(sv section.SectionService) *SectionDefault {
+func NewSectionDefault(sv service.SectionService) *SectionDefault {
 	return &SectionDefault{sv: sv}
 }
 

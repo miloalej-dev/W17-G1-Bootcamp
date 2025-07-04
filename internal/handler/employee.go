@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -13,10 +13,10 @@ import (
 )
 
 type EmployeeHandler struct {
-	sr *service.EmployeeService
+	sr *_default.EmployeeService
 }
 
-func NewEmployeeHandler(service *service.EmployeeService) *EmployeeHandler {
+func NewEmployeeHandler(service *_default.EmployeeService) *EmployeeHandler {
 	return &EmployeeHandler{
 		sr: service,
 	}

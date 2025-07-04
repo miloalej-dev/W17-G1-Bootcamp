@@ -1,4 +1,4 @@
-package service
+package _default
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
