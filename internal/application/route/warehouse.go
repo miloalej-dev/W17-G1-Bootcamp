@@ -7,10 +7,10 @@ import (
 
 func WarehouseRoutes(router chi.Router, handler *handler.WarehouseDefault) {
 	router.Route("/api/v1/warehouses", func(rt chi.Router) {
-		rt.Get("/", handler.FindAll())
-		rt.Get("/{id}", handler.FindById())
-		rt.Post("/", handler.Create())
-		rt.Patch("/{id}", handler.Update())
-		rt.Delete("/{id}", handler.Delete())
+		rt.Get("/", handler.FindAll)
+		rt.Get("/{id}", handler.FindById)
+		rt.Post("/", handler.Create)
+		rt.Patch("/{id}", handler.Update)
+		rt.Delete("/{id}", handler.Delete)
 	})
 }
