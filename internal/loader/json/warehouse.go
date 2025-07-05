@@ -2,7 +2,6 @@ package json
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"os"
 )
@@ -25,13 +24,12 @@ func (l *WarehouseFile) Load() (warehouses map[int]models.Warehouse, err error) 
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {
-		fmt.Println("xx")
 		return
 	}
 	defer file.Close()
 
 	// decode file
-	var warehousesDoc []models.WarehouseDoc
+	var warehousesDoc []models.Warehouse
 	err = json.NewDecoder(file).Decode(&warehousesDoc)
 	if err != nil {
 		return
@@ -40,15 +38,13 @@ func (l *WarehouseFile) Load() (warehouses map[int]models.Warehouse, err error) 
 	// serialize warehouses
 	warehouses = make(map[int]models.Warehouse)
 	for _, warehouse := range warehousesDoc {
-		warehouses[warehouse.ID] = models.Warehouse{
-			ID: warehouse.ID,
-			WarehouseAttributes: models.WarehouseAttributes{
-				Code:               warehouse.Code,
-				Address:            warehouse.Address,
-				Telephone:          warehouse.Telephone,
-				MinimumCapacity:    warehouse.MinimumCapacity,
-				MinimumTemperature: warehouse.MinimumTemperature,
-			},
+		warehouses[warehouse.Id] = models.Warehouse{
+			Id: 				warehouse.Id,
+			Code:               warehouse.Code,
+			Address:            warehouse.Address,
+			Telephone:          warehouse.Telephone,
+			MinimumCapacity:    warehouse.MinimumCapacity,
+			MinimumTemperature: warehouse.MinimumTemperature,
 		}
 	}
 
