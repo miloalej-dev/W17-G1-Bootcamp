@@ -2,7 +2,7 @@ package models
 
 type Product struct {
 	//Identificador único de producto
-	ID int `json:"id"`
+	Id int `json:"id"`
 	// Un código de producto
 	ProductCode string `json:"product_code,validate:required"`
 	// Una descripción
@@ -22,11 +22,29 @@ type Product struct {
 	// Un ratio de congelación, el cual indica que tan rápido se congelara
 	FreezingRate float64 `json:"freezing_rate,validate:required"`
 	// Un Tipo de producto(ProductType) asociado
-	ProductTypeID int `json:"product_type_id,validate:required"`
+	ProductTypeId int `json:"product_type_id,validate:required"`
 	// Un Proveedor (Seller) asociado (NO es OBLIGATORIA)
-	SellerID int `json:"seller_id,omitempty"`
+	SellerId int `json:"seller_id,omitempty"`
 }
 type ProductType struct {
-	ID          int
+	Id          int
 	Description string
+}
+
+// NewProduct is a function that creates a new Product
+func NewProduct(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate float64, recommendedFreezingTemperature float64, freezingRate float64, productTypeId int, sellerId int) *Product {
+	return &Product{
+		Id:                             id,
+		ProductCode:                    productCode,
+		Description:                    description,
+		Width:                          width,
+		Height:                         height,
+		Length:                         length,
+		NetWeight:                      netWeight,
+		ExpirationRate:                 expirationRate,
+		RecommendedFreezingTemperature: recommendedFreezingTemperature,
+		FreezingRate:                   freezingRate,
+		ProductTypeId:                  productTypeId,
+		SellerId:                       sellerId,
+	}
 }

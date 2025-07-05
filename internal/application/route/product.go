@@ -8,9 +8,9 @@ import (
 func ProductRoutes(rt chi.Router, handler *handler.ProductDefault) {
 	rt.Route("/api/v1/products", func(rt chi.Router) {
 		// - GET /products
-		rt.Get("/", handler.GetAllProduct())
+		rt.Get("/", handler.GetAllProducts())
 		rt.Post("/", handler.CreateProduct())
-		rt.Get("/{ID}", handler.FindyByIDProduct())
+		rt.Get("/{ID}", handler.FindByIDProduct())
 		rt.Patch("/{ID}", handler.UpdateProduct())
 		rt.Delete("/{ID}", handler.DeleteProduct())
 	})

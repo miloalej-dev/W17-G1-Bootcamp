@@ -31,106 +31,117 @@ func NewProductMap(db map[int]models.Product) *ProductMap {
 
 // FindAll returns a copy of all products currently stored in the repository.
 // It returns an error if the operation fails, which is nil in this implementation.
-func (r *ProductMap) FindAll() (v map[int]models.Product, err error) {
-	v = make(map[int]models.Product)
-	// Create a new map to return a copy, preventing external modification
-	// of the internal database map.
-	for key, value := range r.db {
-		v[key] = value
+func (r *ProductMap) FindAll() (allProducts []models.Product, err error) {
+	var products []models.Product
+
+	if len(r.db) == 0 {
+		err = errors.New("table empty")
+		return
 	}
+
+	for _, product := range r.db {
+		products = append(products, product)
+	}
+
+	allProducts = products
 	return
 }
 
 // Create adds a new product to the repository.
 // It returns an error if a product with the same ID already exists.
-func (r *ProductMap) Create(P models.Product) (err error) {
-	// Check if a product with the given ID already exists.
-	_, exists := r.db[P.ID]
-	if exists {
-		// Return a descriptive error if the product is a duplicate.
-		err = errors.New("1")
-		return
-	}
-	// Create the new product to the map.
-	r.db[P.ID] = P
+func (r *ProductMap) Create(body models.Product) (newProduct models.Product, err error) {
+	// Create the new product to the map in database.
+	r.db[body.Id] = body
+	newProduct = r.db[body.Id]
 	return
 }
 
-// FindByID searches for a product by its unique ID.
+func (r *ProductMap) Update(body models.Product) (product models.Product, err error) {
+	_, exists := r.db[body.Id]
+	if !exists {
+		err = errors.New("product does not exist")
+		return
+	}
+	r.db[body.Id] = body
+	return body, nil
+}
+
+// FindById searches for a product by its unique ID.
 // It returns the found product or an error if the product does not exist.
-func (r *ProductMap) FindByID(ID int) (P models.Product, err error) {
+func (r *ProductMap) FindById(id int) (product models.Product, err error) {
 	// Check if the product exists in the map.
-	value, exists := r.db[ID]
+	value, exists := r.db[id]
 	if !exists {
 		// Return a descriptive error if the product is not found.
-		err = errors.New("1")
+		err = errors.New("product not found")
 		return
 	}
 	// Return the found product.
-	P = value
+	product = value
 	return
 }
-func (r *ProductMap) UpdateProduct(ID int, Body models.Product) (P models.Product, err error) {
-	value, exists := r.db[ID]
+
+func (r *ProductMap) PartialUpdate(id int, fields map[string]interface{}) (product models.Product, err error) {
+	return
+}
+
+func (r *ProductMap) PartialUpdateV2(id int, body models.Product) (product models.Product, err error) {
+	value, exists := r.db[id]
 	if !exists {
 		// Return a descriptive error if the product is not found.
-		err = errors.New("1")
+		err = errors.New("product not found")
 		return
 	}
 
-	// Modify only the filds that cointains data, otherwise will be ignored.
-	if Body.ID != 0 {
-		value.ID = Body.ID
+	if body.ProductCode != "" {
+		value.ProductCode = body.ProductCode
 	}
-	if Body.ProductCode != "" {
-		value.ProductCode = Body.ProductCode
-	}
-	if Body.Description != "" {
-		value.Description = Body.Description
+	if body.Description != "" {
+		value.Description = body.Description
 	}
 
-	if Body.Width != 0 {
-		value.Width = Body.Width
+	if body.Width != 0 {
+		value.Width = body.Width
 	}
 
-	if Body.Height != 0 {
-		value.Height = Body.Height
+	if body.Height != 0 {
+		value.Height = body.Height
 	}
-	if Body.Length != 0 {
-		value.Length = Body.Length
+	if body.Length != 0 {
+		value.Length = body.Length
 	}
 
-	if Body.NetWeight != 0 {
-		value.NetWeight = Body.NetWeight
+	if body.NetWeight != 0 {
+		value.NetWeight = body.NetWeight
 	}
-	if Body.ExpirationRate != 0 {
-		value.ExpirationRate = Body.ExpirationRate
+	if body.ExpirationRate != 0 {
+		value.ExpirationRate = body.ExpirationRate
 	}
-	if Body.RecommendedFreezingTemperature != 0 {
-		value.RecommendedFreezingTemperature = Body.RecommendedFreezingTemperature
+	if body.RecommendedFreezingTemperature != 0 {
+		value.RecommendedFreezingTemperature = body.RecommendedFreezingTemperature
 	}
-	if Body.FreezingRate != 0 {
-		value.FreezingRate = Body.FreezingRate
+	if body.FreezingRate != 0 {
+		value.FreezingRate = body.FreezingRate
 	}
-	if Body.ProductTypeID != 0 {
-		value.ProductTypeID = Body.ProductTypeID
+	if body.ProductTypeId != 0 {
+		value.ProductTypeId = body.ProductTypeId
 	}
-	if Body.SellerID != 0 {
-		value.SellerID = Body.SellerID
+	if body.SellerId != 0 {
+		value.SellerId = body.SellerId
 	}
 	// Overwrite Product in map with new values
-	r.db[ID] = value
-	P = r.db[ID]
+	r.db[id] = value
+	product = r.db[id]
 	return
 }
-func (r *ProductMap) Delete(ID int) (err error) {
-	_, exists := r.db[ID]
+func (r *ProductMap) Delete(id int) (err error) {
+	_, exists := r.db[id]
 	if !exists {
 		// Return a descriptive error if the product is not found.
 		err = errors.New("1")
 		return
 	}
 	// Deletes product from the map
-	delete(r.db, ID)
+	delete(r.db, id)
 	return
 }

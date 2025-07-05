@@ -2,27 +2,28 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
+	"github.com/go-chi/render"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
 )
 
 // NewProductDefault is a function that returns a new instance of ProductDefault
-func NewProductDefault(sv service.ProductService) *ProductDefault {
+func NewProductDefault(sv *_default.ProductDefault) *ProductDefault {
 	return &ProductDefault{sv: sv}
 }
 
 // ProductDefault is a struct with methods that represent handlers for Products
 type ProductDefault struct {
 	// sv is the service that will be used by the handler
-	sv service.ProductService
+	sv *_default.ProductDefault
 }
 
-// GetAll is a method that returns a handler for the route GET /products
-func (h *ProductDefault) GetAllProduct() http.HandlerFunc {
+// GetAllProducts GetAll is a method that returns a handler for the route GET /products
+func (h *ProductDefault) GetAllProducts() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		// ...
@@ -30,137 +31,85 @@ func (h *ProductDefault) GetAllProduct() http.HandlerFunc {
 		// - get all Products
 		v, err := h.sv.FindAll()
 		if err != nil {
-			response.JSON(w, http.StatusNotFound, nil)
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 			return
 		}
-
-		// response
-		data := make(map[int]models.Product)
-		for key, value := range v {
-			data[key] = models.Product{
-				ID:                             value.ID,
-				ProductCode:                    value.ProductCode,
-				Description:                    value.Description,
-				Width:                          value.Width,
-				Height:                         value.Height,
-				Length:                         value.Length,
-				NetWeight:                      value.NetWeight,
-				ExpirationRate:                 value.ExpirationRate,
-				RecommendedFreezingTemperature: value.RecommendedFreezingTemperature,
-				FreezingRate:                   value.FreezingRate,
-				ProductTypeID:                  value.ProductTypeID,
-				SellerID:                       value.SellerID,
-			}
-		}
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    data,
-		})
-	}
-}
-
-// Create is a method that returns a handler for the route CREATE /product/{ID}
-func (h *ProductDefault) CreateProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var Body models.Product
-		json.NewDecoder(r.Body).Decode(&Body)
-
-		errService := h.sv.Create(Body)
-		if errService != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errService.Error(),
-			})
-			return
-		}
-
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "Producto Creado",
-			"data":    Body,
-		})
+		_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
 		return
 	}
 }
 
-// FindByID
-func (h *ProductDefault) FindyByIDProduct() http.HandlerFunc {
+// CreateProduct is a method that returns a handler for the route CREATE /product/{ID}
+func (h *ProductDefault) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
+		var body models.Product
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
+		product, errService := h.sv.Create(body)
+		if errService != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
+			return
+		}
+		_ = render.Render(w, r, response.NewResponse(product, http.StatusCreated))
+		return
+	}
+}
+
+// FindByIDProduct is a method that returns a handler for the route GET /product/{ID}
+func (h *ProductDefault) FindByIDProduct() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
-
-		p, errServiceFindByID := h.sv.FindByID(ID)
-		if errServiceFindByID != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceFindByID.Error(),
-			})
+		p, errServiceFindById := h.sv.FindByID(id)
+		if errServiceFindById != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceFindById.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Creado",
-			"data":    p,
-		})
+		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
 		return
 	}
 }
 
 func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
-		var Body models.Product
-		json.NewDecoder(r.Body).Decode(&Body)
+		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
+		var body models.Product
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
 
-		p, errServiceUpdateProduct := h.sv.UpdateProduct(ID, Body)
+		p, errServiceUpdateProduct := h.sv.UpdatePartiallyV2(id, body)
 
 		if errServiceUpdateProduct != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceUpdateProduct.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceUpdateProduct.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Actualizado",
-			"data":    p,
-		})
+		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
 		return
 	}
 }
 func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ID, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
+		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
 
-		errServiceDelete := h.sv.Delete(ID)
+		errServiceDelete := h.sv.Delete(id)
 
 		if errServiceDelete != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceDelete.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusNoContent, map[string]any{
-			"message": "Producto Borrado",
-		})
+		_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusOK))
 		return
 	}
 }
