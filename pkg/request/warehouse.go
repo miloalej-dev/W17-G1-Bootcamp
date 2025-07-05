@@ -16,19 +16,22 @@ type WarehouseRequest struct {
 
 func (p *WarehouseRequest) Bind(r *http.Request) error {
 	if p.Code == nil {
-		return errors.New("Code must not be null")
+		return errors.New("code must not be null")
 	}
 	if p.Address == nil {
-		return errors.New("Address must not be null")
+		return errors.New("address must not be null")
 	}
 	if p.Telephone == nil {
-		return errors.New("Telephone must not be null")
+		return errors.New("telephone must not be null")
 	}
 	if p.MinimumCapacity == nil {
-		return errors.New("Minimum Capacity must not be null")
+		return errors.New("minimum Capacity must not be null")
+	}
+	if *p.MinimumCapacity < 0 {
+		return errors.New("minimum Capacity must not be negative")
 	}
 	if p.MinimumTemperature == nil {
-		return errors.New("Minimum Temperature must not be null")
+		return errors.New("minimum Temperature must not be null")
 	}
 
 	return nil
