@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
 )
@@ -30,13 +31,11 @@ func (h *ProductDefault) GetAllProducts() http.HandlerFunc {
 		// - get all Products
 		v, err := h.sv.FindAll()
 		if err != nil {
-			response.JSON(w, http.StatusNotFound, nil)
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 			return
 		}
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    v,
-		})
+		_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
+		return
 	}
 }
 
@@ -44,20 +43,14 @@ func (h *ProductDefault) GetAllProducts() http.HandlerFunc {
 func (h *ProductDefault) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body models.Product
-		json.NewDecoder(r.Body).Decode(&body)
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
 		product, errService := h.sv.Create(body)
 		if errService != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errService.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 			return
 		}
-
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "Producto Creado",
-			"data":    product,
-		})
+		_ = render.Render(w, r, response.NewResponse(product, http.StatusCreated))
 		return
 	}
 }
@@ -65,27 +58,17 @@ func (h *ProductDefault) CreateProduct() http.HandlerFunc {
 // FindByIDProduct is a method that returns a handler for the route GET /product/{ID}
 func (h *ProductDefault) FindByIDProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
-
 		p, errServiceFindById := h.sv.FindByID(id)
 		if errServiceFindById != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceFindById.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceFindById.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Creado",
-			"data":    p,
-		})
+		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
 		return
 	}
 }
@@ -94,28 +77,20 @@ func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 		var body models.Product
-		json.NewDecoder(r.Body).Decode(&body)
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
 
 		p, errServiceUpdateProduct := h.sv.UpdatePartiallyV2(id, body)
 
 		if errServiceUpdateProduct != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceUpdateProduct.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceUpdateProduct.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Actualizado",
-			"data":    p,
-		})
+		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
 		return
 	}
 }
@@ -124,24 +99,17 @@ func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
 		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
 		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 			return
 		}
 
 		errServiceDelete := h.sv.Delete(id)
 
 		if errServiceDelete != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceDelete.Error(),
-			})
+			_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
 			return
 		}
-
-		response.JSON(w, http.StatusNoContent, map[string]any{
-			"message": "Producto Borrado",
-		})
+		_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusOK))
 		return
 	}
 }
