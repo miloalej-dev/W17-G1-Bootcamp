@@ -1,7 +1,7 @@
 # 📋 Descripción
 <!-- Describe brevemente los cambios realizados -->
 
-## 🎯 Tipo de cambio
+# 🎯 Tipo de cambio
 <!-- Marca la opción que aplique -->
 - [ ] 🐛 Bug fix (corrección de errores)
 - [ ] ✨ Feature (nueva funcionalidad)
@@ -11,8 +11,18 @@
 - [ ] ♻️ Refactor (mejoras de código sin cambiar funcionalidad)
 - [ ] ⚡ Performance (mejoras de rendimiento)
 - [ ] ✅ Test (agregar o corregir tests)
+- [ ] 🔧 Config (cambios en configuración)
+- [ ] 🛠️ Build (cambios en sistema de build o dependencias)
+- [ ] 🚀 Deploy (cambios relacionados con despliegue)
+- [ ] 🔒 Security (correcciones de seguridad)
+- [ ] 🌐 API (cambios en endpoints o contratos de API)
+- [ ] 🧹 Cleanup (limpieza de código, eliminación de código muerto)
+- [ ] 🚑 Hotfix (corrección crítica para producción)
+- [ ] 🔀 Merge (resolución de conflictos de merge)
+- [ ] 🔄 CI/CD (cambios en pipelines de integración/despliegue continuo)
+- [ ] Otro: ___________
 
-## 🏗️ Módulos afectados
+# 🏗️ Módulos afectados
 <!-- Marca los módulos que fueron modificados -->
 - [ ] Buyers
 - [ ] Employees
@@ -22,7 +32,7 @@
 - [ ] Warehouses
 - [ ] Otros: ___________
 
-## 🔄 Capas de la arquitectura modificadas
+# 🔄 Capas de la arquitectura modificadas
 <!-- Marca las capas que fueron afectadas -->
 - [ ] Handler (capa de presentación)
 - [ ] Service (lógica de negocio)
@@ -31,25 +41,23 @@
 - [ ] Request/Response (DTOs)
 - [ ] Middlewares
 - [ ] Routes
+- [ ] Otros: ___________
 
-## ✅ Checklist
+# ✅ Checklist
 <!-- Verifica que se cumplan los siguientes puntos -->
 - [ ] Se realizaron pruebas manuales de las funcionalidades
 - [ ] Los archivos `.http` en `docs/api/` reflejan los cambios (si aplica)
 - [ ] Se manejaron correctamente los errores
 
-## 🧪 Pruebas realizadas
+# 🧪 Pruebas realizadas
 <!-- Describe cómo probaste los cambios -->
 - [ ] Pruebas unitarias
 - [ ] Pruebas de integración  
 - [ ] Pruebas manuales con Postman/REST client
 
-## 📸 Screenshots (opcional)
+# 📸 Screenshots (opcional)
 <!-- Si aplica, agrega screenshots de la funcionalidad -->
 
-## 📝 Notas adicionales
+# 📝 Notas adicionales
 <!-- Cualquier información adicional que el revisor deba saber -->
 
-## 👥 Revisores sugeridos
-<!-- Menciona a los compañeros que deberían revisar este PR -->
-@reviewer1 @reviewer2
