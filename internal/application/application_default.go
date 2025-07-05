@@ -22,8 +22,6 @@ type ConfigServerChi struct {
 	// LoaderFilePath is the path to the file that contains the products
 	LoaderFilePathProducts string
 	// LoaderFilePath is the path to the file that contains the warehouses
-	LoaderFilePathWarehouse string
-	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathEmployee string
 }
 type ServerChi struct {
@@ -32,7 +30,6 @@ type ServerChi struct {
 	// loaderFilePathProducts is the path to the file that contains the buyers
 	loaderFilePathBuyer     string
 	loaderFilePathProducts  string
-	loaderFilePathWarehouse string
 	loaderFilePathEmployee  string
 }
 
@@ -46,14 +43,9 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePathWarehouse != "" {
-			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
-		}
-
 		if cfg.LoaderFilePathBuyer != "" {
 			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
 		}
-
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
@@ -66,7 +58,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		serverAddress:           defaultConfig.ServerAddress,
 		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
-		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
 }
@@ -80,8 +71,6 @@ func (a *ServerChi) Run() (err error) {
 	dbBuyer, err := ldBuyer.Load()
 	ldProduct := json.NewProductFile(a.loaderFilePathProducts)
 	dbProduct, err := ldProduct.Load()
-	ldWarehouse := json.NewWarehouseFile(a.loaderFilePathWarehouse)
-	dbWarehouse, err := ldWarehouse.Load()
 
 	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
@@ -91,7 +80,7 @@ func (a *ServerChi) Run() (err error) {
 	}
 	// - repositories
 	rpProduct := memory.NewProductMap(dbProduct)
-	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
+	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	rpBuyer := memory.NewBuyerMap(dbBuyer)
