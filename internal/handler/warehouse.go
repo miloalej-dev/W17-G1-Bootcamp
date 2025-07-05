@@ -59,15 +59,16 @@ func (h *WarehouseDefault) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	warehouse := models.Warehouse{
-		Code:               *warehouseJson.Code,
-		Address:            *warehouseJson.Address,
-		Telephone:          *warehouseJson.Telephone,
-		MinimumCapacity:    *warehouseJson.MinimumCapacity,
-		MinimumTemperature: *warehouseJson.MinimumTemperature,
-	}
+	warehouse := models.NewWarehouse(
+		0,									// placeholder, will be overwritten later
+		*warehouseJson.Code,
+		*warehouseJson.Address,
+		*warehouseJson.Telephone,
+		*warehouseJson.MinimumCapacity,
+		*warehouseJson.MinimumTemperature,
+	)
 
-	warehouseResponse, err := h.sv.Create(warehouse)
+	warehouseResponse, err := h.sv.Create(*warehouse)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return

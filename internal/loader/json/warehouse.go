@@ -38,14 +38,14 @@ func (l *WarehouseFile) Load() (warehouses map[int]models.Warehouse, err error) 
 	// serialize warehouses
 	warehouses = make(map[int]models.Warehouse)
 	for _, warehouse := range warehousesDoc {
-		warehouses[warehouse.Id] = models.Warehouse{
-			Id: 				warehouse.Id,
-			Code:               warehouse.Code,
-			Address:            warehouse.Address,
-			Telephone:          warehouse.Telephone,
-			MinimumCapacity:    warehouse.MinimumCapacity,
-			MinimumTemperature: warehouse.MinimumTemperature,
-		}
+		warehouses[warehouse.Id] = *(models.NewWarehouse(
+			warehouse.Id,
+			warehouse.Code,
+			warehouse.Address,
+			warehouse.Telephone,
+			warehouse.MinimumCapacity,
+			warehouse.MinimumTemperature,
+		))
 	}
 
 	return
