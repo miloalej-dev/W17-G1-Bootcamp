@@ -11,8 +11,8 @@ POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
 {"id": 1,
-  "product_code": "BCD678",
-  "description": "Homemade blueberry muffins",
+  "product_code": "new product",
+  "description": "new product",
   "width": 68.64,
   "height": 185.04,
   "length": 185.62,
@@ -27,7 +27,7 @@ Content-Type: application/json
 PATCH http://localhost:8080/api/v1/products/1
 Content-Type: application/json
 
-{"id": 1010,
+{"id": 100,
   "product_code": "jajaj",
   "description": "Cambios realizados"
 }

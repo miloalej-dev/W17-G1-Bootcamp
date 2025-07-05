@@ -34,7 +34,7 @@ type ProductDefault struct {
 
 // FindAll retrieves all products by calling the repository's FindAll method.
 // It directly passes through the results and any error from the repository.
-func (s *ProductDefault) FindAll() (v map[int]models.Product, err error) {
+func (s *ProductDefault) FindAll() (v []models.Product, err error) {
 	v, err = s.rp.FindAll()
 	if err != nil {
 		err = ErrorNotFound
@@ -45,8 +45,8 @@ func (s *ProductDefault) FindAll() (v map[int]models.Product, err error) {
 // Create attempts to add a new product using the repository.
 // If the repository returns any error, it is replaced with the generic
 // errorProduct.ErrorCreate.
-func (s *ProductDefault) Create(P models.Product) (err error) {
-	err = s.rp.Create(P)
+func (s *ProductDefault) Create(body models.Product) (product models.Product, err error) {
+	product, err = s.rp.Create(body)
 	if err != nil {
 		err = ErrorCreate
 	}
@@ -56,22 +56,30 @@ func (s *ProductDefault) Create(P models.Product) (err error) {
 // FindByID retrieves a single product by its ID from the repository.
 // If the repository returns any error (e.g., not found), it is replaced
 // with the generic errorProduct.ErrorNotFound.
-func (s *ProductDefault) FindByID(ID int) (P models.Product, err error) {
-	P, err = s.rp.FindByID(ID)
+func (s *ProductDefault) FindByID(id int) (product models.Product, err error) {
+	product, err = s.rp.FindById(id)
 	if err != nil {
 		err = ErrorNotFound
 	}
 	return
 }
-func (s *ProductDefault) UpdateProduct(ID int, Body models.Product) (P models.Product, err error) {
-	P, err = s.rp.UpdateProduct(ID, Body)
+func (s *ProductDefault) Update(body models.Product) (product models.Product, err error) {
+	product, err = s.rp.Update(body)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (s *ProductDefault) UpdatePartiallyV2(id int, body models.Product) (product models.Product, err error) {
+	product, err = s.rp.PartialUpdateV2(id, body)
 	if err != nil {
 		err = ErrorNotFound
 	}
 	return
 }
-func (s *ProductDefault) Delete(ID int) (err error) {
-	err = s.rp.Delete(ID)
+func (s *ProductDefault) Delete(id int) (err error) {
+	err = s.rp.Delete(id)
 	if err != nil {
 		err = ErrorNotFound
 	}
