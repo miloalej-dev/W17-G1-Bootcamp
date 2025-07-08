@@ -16,6 +16,7 @@ func main() {
 		LoaderFilePathWarehouse: "docs/db/warehouse.json",
 		LoaderFilePathEmployee:  "docs/db/employee.json",
 		LoaderFilePathBuyer:     "docs/db/buyers.json",
+		LoaderFilePathSection:   "docs/db/sections.json",
 	}
 	app := application.NewServerChi(cfg)
 	// - run

@@ -25,6 +25,8 @@ type ConfigServerChi struct {
 	LoaderFilePathWarehouse string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathEmployee string
+	// LoaderFilePath is the path to the file that contains the sections
+	LoaderFilePathSection string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
@@ -34,6 +36,7 @@ type ServerChi struct {
 	loaderFilePathProducts  string
 	loaderFilePathWarehouse string
 	loaderFilePathEmployee  string
+	LoaderFilePathSection   string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -60,6 +63,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.LoaderFilePathEmployee != "" {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
+
 	}
 
 	return &ServerChi{

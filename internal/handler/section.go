@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
@@ -10,29 +11,26 @@ import (
 	"strconv"
 )
 
-type SectionDefault struct {
-	sv service.SectionService
-}
-
 func NewSectionDefault(sv service.SectionService) *SectionDefault {
 	return &SectionDefault{sv: sv}
+}
+
+type SectionDefault struct {
+	sv service.SectionService
 }
 
 func (s *SectionDefault) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sections, err := s.sv.FindAll()
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
+			response.JSON(w, http.StatusInternalServerError, nil)
 			return
 		}
 		if len(sections) == 0 {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, nil)
+			response.JSON(w, http.StatusNotFound, nil)
 			return
 		}
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, sections)
+		response.JSON(w, http.StatusOK, sections)
 	}
 }
 
@@ -41,14 +39,12 @@ func (s *SectionDefault) FindByID() http.HandlerFunc {
 		idRequest := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idRequest)
 		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
+			response.JSON(w, http.StatusNotFound, nil)
 			return
 		}
 		section, err := s.sv.FindByID(id)
 		if err != nil {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
+			response.JSON(w, http.StatusNotFound, nil)
 			return
 		}
 		render.Status(r, http.StatusOK)
@@ -62,24 +58,21 @@ func (s *SectionDefault) Create() http.HandlerFunc {
 
 		err := json.NewDecoder(r.Body).Decode(&section)
 		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, err)
+			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
 
 		createdSecton, err := s.sv.Create(section)
-		if err.Error() == "Section already exists" {
-			render.Status(r, http.StatusConflict)
-			render.JSON(w, r, err)
-			return
-		}
+
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
+			if err.Error() == "Section already exists" {
+				response.JSON(w, http.StatusConflict, nil)
+				return
+			}
+			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
-		render.Status(r, http.StatusCreated)
-		render.JSON(w, r, createdSecton)
+		response.JSON(w, http.StatusCreated, createdSecton)
 
 	}
 }
@@ -89,31 +82,27 @@ func (s *SectionDefault) Update() http.HandlerFunc {
 		idRequest := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idRequest)
 		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
+			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
 		var section models.Section
 		err = json.NewDecoder(r.Body).Decode(&section)
 		section.Id = id
 		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, err)
+			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
 		updatedSecton, err := s.sv.Update(section)
-		if err.Error() == "section not found" {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
-			return
-		}
+
 		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
+			if err.Error() == "section not found" {
+				response.JSON(w, http.StatusNotFound, nil)
+				return
+			}
+			response.JSON(w, http.StatusInternalServerError, err)
 			return
 		}
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, updatedSecton)
+		response.JSON(w, http.StatusOK, updatedSecton)
 	}
 }
 
@@ -122,18 +111,14 @@ func (s *SectionDefault) Delete() http.HandlerFunc {
 		idRequest := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idRequest)
 		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
+			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
 		err = s.sv.Delete(id)
 		if err != nil {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
+			response.JSON(w, http.StatusNotFound, nil)
 			return
 		}
-		render.Status(r, http.StatusNoContent)
-		render.JSON(w, r, nil)
-
+		response.JSON(w, http.StatusNoContent, nil)
 	}
 }

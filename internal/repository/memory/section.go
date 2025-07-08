@@ -10,6 +10,19 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
+func NewSectionMap() *SectionMap {
+	// defaultDb is an empty map
+	defaultDB := make(map[int]models.Section)
+	ld := json.NewFile("docs/db/sections.json")
+	db, err := ld.Load()
+	if err != nil {
+		return nil
+	}
+	if db != nil {
+		defaultDB = db
+	}
+	return &SectionMap{db: defaultDB}
+}
 func (r *SectionMap) FindAll() ([]models.Section, error) {
 	v := make([]models.Section, 0)
 	// copy db
@@ -91,20 +104,6 @@ func (r *SectionMap) Delete(id int) error {
 	}
 	delete(r.db, v.Id)
 	return nil
-}
-
-func NewSectionMap() *SectionMap {
-	// defaultDb is an empty map
-	defaultDB := make(map[int]models.Section)
-	ld := json.NewSectionFile("docs/db/sections.json")
-	db, err := ld.Load()
-	if err != nil {
-		return nil
-	}
-	if db != nil {
-		defaultDB = db
-	}
-	return &SectionMap{db: defaultDB}
 }
 
 func (r *SectionMap) FindBySection(section int) (models.Section, error) {
