@@ -24,42 +24,41 @@ func NewBuyerMap(db map[int]models.Buyer) *BuyerMap {
 }
 
 // FindAll is a method that returns a map of all buyers
-func (r *BuyerMap) FindAll() (buyers map[int]models.Buyer, err error) {
+func (r *BuyerMap) FindAll() ([]models.Buyer, error) {
 
-	buyers = make(map[int]models.Buyer)
-	for key, value := range r.db {
-		buyers[key] = value
+	var buyers []models.Buyer
+	for _, value := range r.db {
+		buyers = append(buyers, value)
 	}
 
-	return
+	return buyers, nil
 }
 
 // FindById is a method that returns a buyer by its unique id
-func (r *BuyerMap) FindById(id int) (v *models.Buyer, err error) {
+func (r *BuyerMap) FindById(id int) (models.Buyer, error) {
+
 	for _, value := range r.db {
 		if value.Id == id {
-			return &value, nil
+			return value, nil
 		}
-
 	}
-	return nil, repository.ErrEntityNotFound
+	return models.Buyer{}, repository.ErrEntityNotFound
 
 }
 
 // Create  is a method that creates a new buyer
-func (r *BuyerMap) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err error) {
+func (r *BuyerMap) Create(buyer models.Buyer) (models.Buyer, error) {
 
 	for _, value := range r.db {
 		if value.CardNumberId == buyer.CardNumberId {
-			return nil, repository.ErrEntityAlreadyExists
+			return models.Buyer{}, repository.ErrEntityAlreadyExists
 		}
-
 	}
 
 	newId := len(r.db)
 
 	for {
-		_, err = r.FindById(newId)
+		_, err := r.FindById(newId)
 		if err == nil {
 			newId++
 		} else {
@@ -67,37 +66,33 @@ func (r *BuyerMap) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err er
 		}
 	}
 
-	b := models.Buyer{
-		Id:              newId,
-		BuyerAtributtes: buyer,
+	buyer.Id = newId
+	r.db[newId] = buyer
+
+	return buyer, nil
+
+}
+
+// Update is a method that modifies an existing Buyer
+func (r *BuyerMap) Update(buyer models.Buyer) (models.Buyer, error) {
+	_, err := r.FindById(buyer.Id)
+
+	if err != nil {
+		return models.Buyer{}, err
 	}
-
-	r.db[newId] = b
-
-	return &b, nil
+	r.db[buyer.Id] = buyer
+	return buyer, nil
 
 }
 
 // Delete is a method that removes a buyer from the repository
-func (r *BuyerMap) Delete(id int) (*models.Buyer, error) {
+func (r *BuyerMap) Delete(id int) (models.Buyer, error) {
 	b, err := r.FindById(id)
 	if err != nil {
-		return nil, err
+		return models.Buyer{}, err
 	}
 
 	delete(r.db, id)
 
 	return b, nil
-}
-
-// Update is a method that modifies an existing Buyer
-func (r *BuyerMap) Update(buyer models.Buyer) (*models.Buyer, error) {
-	_, err := r.FindById(buyer.Id)
-
-	if err != nil {
-		return nil, err
-	}
-	r.db[buyer.Id] = buyer
-	return &buyer, nil
-
 }
