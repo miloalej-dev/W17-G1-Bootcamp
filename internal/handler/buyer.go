@@ -25,7 +25,7 @@ type BuyerHandler struct {
 }
 
 // GetAll is a method that returns a handler for the route GET /buyers
-func (h *BuyerHandler) GetAll() http.HandlerFunc {
+func (h *BuyerHandler) GetBuyers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -46,7 +46,7 @@ func (h *BuyerHandler) GetAll() http.HandlerFunc {
 
 }
 
-func (h *BuyerHandler) GetById() http.HandlerFunc {
+func (h *BuyerHandler) GetBuyer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -64,7 +64,7 @@ func (h *BuyerHandler) GetById() http.HandlerFunc {
 	}
 }
 
-func (h *BuyerHandler) Post() http.HandlerFunc {
+func (h *BuyerHandler) PostBuyer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -92,7 +92,7 @@ func (h *BuyerHandler) Post() http.HandlerFunc {
 
 }
 
-func (h *BuyerHandler) Delete() http.HandlerFunc {
+func (h *BuyerHandler) DeleteBuyer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -109,7 +109,7 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 	}
 }
 
-func (h *BuyerHandler) Patch() http.HandlerFunc {
+func (h *BuyerHandler) PatchBuyer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
