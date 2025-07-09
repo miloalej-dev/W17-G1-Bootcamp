@@ -14,7 +14,7 @@ func NewSectionMap() *SectionMap {
 	// defaultDb is an empty map
 	defaultDB := make(map[int]models.Section)
 	ld := json.NewFile("docs/db/sections.json")
-	db, err := ld.Load()
+	db, err := ld.LoadSections()
 	if err != nil {
 		return nil
 	}

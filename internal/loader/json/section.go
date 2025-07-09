@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func (l *File) Load() (v map[int]models.Section, err error) {
+func (l *File) LoadSections() (v map[int]models.Section, err error) {
 	// open file
 	file, err := os.Open(l.path)
 	if err != nil {
