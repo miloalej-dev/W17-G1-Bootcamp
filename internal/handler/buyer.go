@@ -31,7 +31,7 @@ func (h *BuyerHandler) GetAll() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Println("Consultando buyers")
-		value, err := h.service.FindAll()
+		value, err := h.service.RetrieveAll()
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 			return
@@ -54,7 +54,7 @@ func (h *BuyerHandler) GetById() http.HandlerFunc {
 			response.JSON(w, http.StatusBadRequest, nil)
 			return
 		}
-		value, err := h.service.FindById(id)
+		value, err := h.service.Retrieve(id)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 			return
@@ -82,7 +82,7 @@ func (h *BuyerHandler) Post() http.HandlerFunc {
 			return
 		}
 
-		value, err := h.service.Create(bodyRequest)
+		value, err := h.service.Register(bodyRequest)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
 		}
@@ -100,7 +100,7 @@ func (h *BuyerHandler) Delete() http.HandlerFunc {
 		if err != nil {
 			response.JSON(w, http.StatusBadRequest, nil)
 		}
-		err = h.service.Delete(id)
+		err = h.service.Remove(id)
 		if err != nil {
 			response.JSON(w, http.StatusNotFound, nil)
 		}
@@ -130,7 +130,7 @@ func (h *BuyerHandler) Patch() http.HandlerFunc {
 			response.JSON(w, http.StatusBadRequest, nil)
 		}
 
-		buyer, err := h.service.Update(value)
+		buyer, err := h.service.Modify(value)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
 		}
@@ -140,7 +140,7 @@ func (h *BuyerHandler) Patch() http.HandlerFunc {
 }
 func PutValidator(buyer models.Buyer, id int, h *BuyerHandler) (b models.Buyer, err error) {
 
-	_, err = h.service.FindById(id)
+	_, err = h.service.Retrieve(id)
 	if err != nil {
 		return models.Buyer{}, err
 	}
