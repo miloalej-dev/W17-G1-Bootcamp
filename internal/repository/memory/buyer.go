@@ -1,6 +1,7 @@
 package memory
 
 import (
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
@@ -12,15 +13,22 @@ type BuyerMap struct {
 }
 
 // NewBuyerMap Creates a new Buyer repository
-func NewBuyerMap(db map[int]models.Buyer) *BuyerMap {
+func NewBuyerMap() *BuyerMap {
+
+	// defaultDb is an empty map
+	defaultDB := make(map[int]models.Buyer)
 
 	// default db
-	defaultDb := make(map[int]models.Buyer)
+	ld := loader.NewBuyerFile("docs/db/buyers.json")
+	db, err := ld.Load()
 
-	if db != nil {
-		defaultDb = db
+	if err != nil {
+		return nil
 	}
-	return &BuyerMap{db: defaultDb}
+	if db != nil {
+		defaultDB = db
+	}
+	return &BuyerMap{db: defaultDB}
 }
 
 // FindAll is a method that returns a map of all buyers
