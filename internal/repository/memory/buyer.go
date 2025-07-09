@@ -86,13 +86,22 @@ func (r *BuyerMap) Update(buyer models.Buyer) (models.Buyer, error) {
 }
 
 // Delete is a method that removes a buyer from the repository
-func (r *BuyerMap) Delete(id int) (models.Buyer, error) {
-	b, err := r.FindById(id)
+func (r *BuyerMap) Delete(id int) error {
+	_, err := r.FindById(id)
 	if err != nil {
-		return models.Buyer{}, err
+		return err
 	}
 
 	delete(r.db, id)
 
-	return b, nil
+	return nil
+}
+
+// TODO
+func (r *BuyerMap) PartialUpdate(id int, fields map[string]interface{}) (models.Buyer, error) {
+	Buyer, err := r.FindById(id)
+	if err != nil {
+		return models.Buyer{}, err
+	}
+	return Buyer, nil
 }
