@@ -76,17 +76,18 @@ func (s *SellerMap) PartialUpdate(id int, fields map[string]interface{}) (models
 	}
 
 	// Update only the fields that are provided
+	// this is based on the json tag of the struct
 	for key, value := range fields {
 		switch key {
-		case "Name":
+		case "name":
 			if name, ok := value.(string); ok {
 				seller.Name = name
 			}
-		case "Address":
+		case "address":
 			if address, ok := value.(string); ok {
 				seller.Address = address
 			}
-		case "Telephone":
+		case "telephone":
 			if telephone, ok := value.(string); ok {
 				seller.Telephone = telephone
 			}
