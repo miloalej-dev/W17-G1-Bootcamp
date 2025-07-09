@@ -26,7 +26,7 @@ func NewSellerHandler(service *_default.SellerService) *SellerHandler {
 func (h *SellerHandler) GetSellers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	sellers, err := h.service.GetSellers()
+	sellers, err := h.service.RetrieveAll()
 
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
@@ -47,7 +47,7 @@ func (h *SellerHandler) GetSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	seller, err := h.service.GetSellerById(id)
+	seller, err := h.service.Retrieve(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
@@ -72,7 +72,7 @@ func (h *SellerHandler) PostSeller(w http.ResponseWriter, r *http.Request) {
 		Telephone: *data.Telephone,
 	}
 
-	createdSeller, err := h.service.RegisterSeller(seller)
+	createdSeller, err := h.service.Register(seller)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
@@ -106,7 +106,7 @@ func (h *SellerHandler) PutSeller(w http.ResponseWriter, r *http.Request) {
 		Telephone: *data.Telephone,
 	}
 
-	updatedSeller, err := h.service.ModifySeller(seller)
+	updatedSeller, err := h.service.Modify(seller)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
@@ -133,7 +133,7 @@ func (h *SellerHandler) PatchSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedSeller, err := h.service.UpdateSellerFields(id, fields)
+	updatedSeller, err := h.service.PartialModify(id, fields)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		http.Error(w, "Failed to update seller", http.StatusInternalServerError)
@@ -154,7 +154,7 @@ func (h *SellerHandler) DeleteSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.service.RemoveSeller(id)
+	err = h.service.Remove(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
