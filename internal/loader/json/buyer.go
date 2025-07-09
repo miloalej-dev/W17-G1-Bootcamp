@@ -29,7 +29,7 @@ func (l *BuyerFile) Load() (v map[int]models.Buyer, err error) {
 	defer file.Close()
 
 	// decode file
-	var buyers []models.BuyerDoc
+	var buyers []models.Buyer
 	err = json.NewDecoder(file).Decode(&buyers)
 	if err != nil {
 		return
@@ -39,12 +39,10 @@ func (l *BuyerFile) Load() (v map[int]models.Buyer, err error) {
 	v = make(map[int]models.Buyer)
 	for _, buyer := range buyers {
 		v[buyer.Id] = models.Buyer{
-			Id: buyer.Id,
-			BuyerAtributtes: models.BuyerAtributtes{
-				CardNumberId: buyer.CardNumberId,
-				FirstName:    buyer.FirstName,
-				LastName:     buyer.LastName,
-			},
+			Id:           buyer.Id,
+			CardNumberId: buyer.CardNumberId,
+			FirstName:    buyer.FirstName,
+			LastName:     buyer.LastName,
 		}
 	}
 	return
