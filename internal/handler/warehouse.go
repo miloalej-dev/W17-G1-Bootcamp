@@ -26,7 +26,7 @@ func NewWarehouseDefault(sv service.WarehouseService) *WarehouseDefault {
 }
 
 func (h *WarehouseDefault) FindAll(w http.ResponseWriter, r *http.Request) {
-	warehouses, err := h.sv.FindAll()
+	warehouses, err := h.sv.RetrieveAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,7 +43,7 @@ func (h *WarehouseDefault) FindById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	warehouse, err := h.sv.FindById(id)
+	warehouse, err := h.sv.Retrieve(id)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
@@ -68,7 +68,7 @@ func (h *WarehouseDefault) Create(w http.ResponseWriter, r *http.Request) {
 		*warehouseJson.MinimumTemperature,
 	)
 
-	warehouseResponse, err := h.sv.Create(*warehouse)
+	warehouseResponse, err := h.sv.Register(*warehouse)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
@@ -91,7 +91,7 @@ func (h *WarehouseDefault) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	warehouse, err := h.sv.FindById(id)
+	warehouse, err := h.sv.Retrieve(id)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse("warehouse not found", http.StatusNotFound))
 		return
@@ -122,7 +122,7 @@ func (h *WarehouseDefault) Update(w http.ResponseWriter, r *http.Request) {
 		warehouse.MinimumTemperature = *warehouseJson.MinimumTemperature
 	}
 
-	warehouseResponse, err := h.sv.Update(warehouse)
+	warehouseResponse, err := h.sv.Modify(warehouse)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
@@ -139,7 +139,7 @@ func (h *WarehouseDefault) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.sv.Delete(id)
+	err = h.sv.Remove(id)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
