@@ -57,3 +57,12 @@ func (s *BuyerDefault) Modify(buyer models.Buyer) (models.Buyer, error) {
 
 	return v, nil
 }
+
+func (s *BuyerDefault) PartialModify(id int, fields map[string]any) (models.Buyer, error) {
+	v, err := s.rp.PartialUpdate(id, fields)
+	if err != nil {
+		return models.Buyer{}, err
+	}
+
+	return v, nil
+}

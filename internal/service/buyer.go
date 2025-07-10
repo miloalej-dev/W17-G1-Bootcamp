@@ -8,5 +8,6 @@ type BuyerService interface {
 	RetrieveAll() ([]models.Buyer, error)
 	Retrieve(id int) (models.Buyer, error)
 	Modify(buyer models.Buyer) (models.Buyer, error)
+	PartialModify(id int, fields map[string]any) (models.Buyer, error)
 	Remove(id int) error
 }

@@ -17,8 +17,7 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the Buyers
-	LoaderFilePathBuyer string
+
 	// LoaderFilePath is the path to the file that contains the products
 	LoaderFilePathProducts string
 	// LoaderFilePath is the path to the file that contains the warehouses
@@ -30,7 +29,7 @@ type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
-	loaderFilePathBuyer     string
+
 	loaderFilePathProducts  string
 	loaderFilePathWarehouse string
 	loaderFilePathEmployee  string
@@ -50,10 +49,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
 		}
 
-		if cfg.LoaderFilePathBuyer != "" {
-			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
-		}
-
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
@@ -64,7 +59,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,

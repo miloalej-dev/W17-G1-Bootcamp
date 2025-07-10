@@ -107,9 +107,31 @@ func (r *BuyerMap) Delete(id int) error {
 
 // TODO
 func (r *BuyerMap) PartialUpdate(id int, fields map[string]interface{}) (models.Buyer, error) {
+
 	Buyer, err := r.FindById(id)
 	if err != nil {
 		return models.Buyer{}, err
 	}
+
+	for key, value := range fields {
+		switch key {
+		case "card_number_id":
+			if CardNumberId, ok := value.(string); ok {
+				Buyer.CardNumberId = CardNumberId
+			}
+		case "first_name":
+			if FirstName, ok := value.(string); ok {
+				Buyer.FirstName = FirstName
+			}
+		case "last_name":
+			if Lastname, ok := value.(string); ok {
+				Buyer.LastName = Lastname
+			}
+		}
+	}
+
+	// Update the seller in the database
+	r.db[id] = Buyer
+
 	return Buyer, nil
 }

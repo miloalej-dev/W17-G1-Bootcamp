@@ -9,17 +9,17 @@ func BuyerRoutes(rt chi.Router, handler *handler.BuyerHandler) {
 	rt.Route("/api/v1/buyers", func(rt chi.Router) {
 
 		// - GET /
-		rt.Get("/", handler.GetBuyers())
-		rt.Get("/{id}", handler.GetBuyer())
+		rt.Get("/", handler.GetBuyers)
+		rt.Get("/{id}", handler.GetBuyer)
 
 		// - POST /
-		rt.Post("/", handler.PostBuyer())
+		rt.Post("/", handler.PostBuyer)
 
 		// - PATCH /
-		rt.Patch("/{id}", handler.PatchBuyer())
+		rt.Patch("/{id}", handler.PatchBuyer)
 
 		// - DELETE/
-		rt.Delete("/{id}", handler.DeleteBuyer())
+		rt.Delete("/{id}", handler.DeleteBuyer)
 
 	})
 }
