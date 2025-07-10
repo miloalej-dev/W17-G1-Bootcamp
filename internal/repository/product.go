@@ -7,5 +7,4 @@ import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 type ProductRepository interface {
 	// Repository is a generic repository interface for CRUD operations
 	Repository[int, models.Product]
-	PartialUpdateV2(id int, body models.Product) (product models.Product, err error)
 }

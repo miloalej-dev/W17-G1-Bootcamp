@@ -19,8 +19,6 @@ type ConfigServerChi struct {
 	ServerAddress string
 	// LoaderFilePath is the path to the file that contains the Buyers
 	LoaderFilePathBuyer string
-	// LoaderFilePath is the path to the file that contains the products
-	LoaderFilePathProducts string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathWarehouse string
 	// LoaderFilePath is the path to the file that contains the warehouses
@@ -31,7 +29,6 @@ type ServerChi struct {
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
 	loaderFilePathBuyer     string
-	loaderFilePathProducts  string
 	loaderFilePathWarehouse string
 	loaderFilePathEmployee  string
 }
@@ -54,9 +51,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
 		}
 
-		if cfg.LoaderFilePathProducts != "" {
-			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
-		}
 		if cfg.LoaderFilePathEmployee != "" {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
@@ -65,7 +59,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
 		loaderFilePathBuyer:     defaultConfig.LoaderFilePathBuyer,
-		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
@@ -78,8 +71,6 @@ func (a *ServerChi) Run() (err error) {
 	// - loader
 	ldBuyer := json.NewBuyerFile(a.loaderFilePathBuyer)
 	dbBuyer, err := ldBuyer.Load()
-	ldProduct := json.NewProductFile(a.loaderFilePathProducts)
-	dbProduct, err := ldProduct.Load()
 	ldWarehouse := json.NewWarehouseFile(a.loaderFilePathWarehouse)
 	dbWarehouse, err := ldWarehouse.Load()
 
@@ -90,7 +81,7 @@ func (a *ServerChi) Run() (err error) {
 		return
 	}
 	// - repositories
-	rpProduct := memory.NewProductMap(dbProduct)
+	productRepository := memory.NewProductMap()
 	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
@@ -99,7 +90,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - services
 	svBuyer := _default.NewBuyerDefault(rpBuyer)
-	svProduct := _default.NewProductDefault(rpProduct)
+	productService := _default.NewProductDefault(productRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
@@ -107,7 +98,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - handlers
 	hdBuyer := handler.NewBuyerHandler(svBuyer)
-	hdProduct := handler.NewProductDefault(svProduct)
+	productHandler := handler.NewProductDefault(productService)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
@@ -128,7 +119,7 @@ func (a *ServerChi) Run() (err error) {
 	route.SellerRoutes(rt, sellerHandler)
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
-	route.ProductRoutes(rt, hdProduct)
+	route.ProductRoutes(rt, productHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return

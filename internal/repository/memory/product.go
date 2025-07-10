@@ -6,6 +6,7 @@ package memory
 
 import (
 	"errors"
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -19,14 +20,21 @@ type ProductMap struct {
 // NewProductMap is a constructor that creates and returns a new instance of ProductMap.
 // It can be initialized with a pre-existing map of products.
 
-func NewProductMap(db map[int]models.Product) *ProductMap {
+func NewProductMap() *ProductMap {
 	// Initialize with an empty map to ensure it's not nil.
-	defaultDb := make(map[int]models.Product)
-	if db != nil {
-		// If an initial database is provided, use it.
-		defaultDb = db
+	defaultDB := make(map[int]models.Product)
+
+	ld := loader.NewProductFile("docs/db/products.json")
+	db, err := ld.Load()
+	if err != nil {
+		return nil
 	}
-	return &ProductMap{db: defaultDb}
+
+	if db != nil {
+		defaultDB = db
+	}
+
+	return &ProductMap{db: defaultDB}
 }
 
 // FindAll returns a copy of all products currently stored in the repository.
@@ -81,59 +89,75 @@ func (r *ProductMap) FindById(id int) (product models.Product, err error) {
 	return
 }
 
-func (r *ProductMap) PartialUpdate(id int, fields map[string]interface{}) (product models.Product, err error) {
-	return
-}
-
-func (r *ProductMap) PartialUpdateV2(id int, body models.Product) (product models.Product, err error) {
-	value, exists := r.db[id]
+// PartialUpdate updates specific fields of an existing product.
+func (r *ProductMap) PartialUpdate(id int, fields map[string]interface{}) (models.Product, error) {
+	// 1. Check if the product exists
+	product, exists := r.db[id]
 	if !exists {
-		// Return a descriptive error if the product is not found.
-		err = errors.New("product not found")
-		return
+		return models.Product{}, errors.New("product not found")
 	}
 
-	if body.ProductCode != "" {
-		value.ProductCode = body.ProductCode
-	}
-	if body.Description != "" {
-		value.Description = body.Description
+	// 2. Iterate over the submitted fields and update only those.
+	//    The keys ("product_code", "width", etc.) should match the JSON tags of your struct.
+	for key, value := range fields {
+		switch key {
+		case "product_code":
+			// Perform a type assertion to ensure the value is a string
+			if v, ok := value.(string); ok {
+				product.ProductCode = v
+			}
+		case "description":
+			if v, ok := value.(string); ok {
+				product.Description = v
+			}
+		case "width":
+			// Numbers in JSON are decoded as float64 in Go by default
+			if v, ok := value.(float64); ok {
+				product.Width = v
+			}
+		case "height":
+			if v, ok := value.(float64); ok {
+				product.Height = v
+			}
+		case "length":
+			if v, ok := value.(float64); ok {
+				product.Length = v
+			}
+		case "net_weight":
+			if v, ok := value.(float64); ok {
+				product.NetWeight = v
+			}
+		case "expiration_rate":
+			// If the field in the struct is an int, it must be cast
+			if v, ok := value.(float64); ok {
+				product.ExpirationRate = v
+			}
+		case "recommended_freezing_temperature":
+			if v, ok := value.(float64); ok {
+				product.RecommendedFreezingTemperature = v
+			}
+		case "freezing_rate":
+			if v, ok := value.(float64); ok {
+				product.FreezingRate = v
+			}
+		case "product_type_id":
+			if v, ok := value.(float64); ok {
+				product.ProductTypeId = int(v)
+			}
+		case "seller_id":
+			if v, ok := value.(float64); ok {
+				product.SellerId = int(v)
+			}
+		}
 	}
 
-	if body.Width != 0 {
-		value.Width = body.Width
-	}
+	// 3. Save the updated product in the database
+	r.db[id] = product
 
-	if body.Height != 0 {
-		value.Height = body.Height
-	}
-	if body.Length != 0 {
-		value.Length = body.Length
-	}
-
-	if body.NetWeight != 0 {
-		value.NetWeight = body.NetWeight
-	}
-	if body.ExpirationRate != 0 {
-		value.ExpirationRate = body.ExpirationRate
-	}
-	if body.RecommendedFreezingTemperature != 0 {
-		value.RecommendedFreezingTemperature = body.RecommendedFreezingTemperature
-	}
-	if body.FreezingRate != 0 {
-		value.FreezingRate = body.FreezingRate
-	}
-	if body.ProductTypeId != 0 {
-		value.ProductTypeId = body.ProductTypeId
-	}
-	if body.SellerId != 0 {
-		value.SellerId = body.SellerId
-	}
-	// Overwrite Product in map with new values
-	r.db[id] = value
-	product = r.db[id]
-	return
+	// 4. Return the modified product and a nil error to indicate success
+	return product, nil
 }
+
 func (r *ProductMap) Delete(id int) (err error) {
 	_, exists := r.db[id]
 	if !exists {

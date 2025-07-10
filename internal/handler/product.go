@@ -22,94 +22,99 @@ type ProductDefault struct {
 	sv *_default.ProductDefault
 }
 
-// GetAllProducts GetAll is a method that returns a handler for the route GET /products
-func (h *ProductDefault) GetAllProducts() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
-		// process
-		// - get all Products
-		v, err := h.sv.FindAll()
-		if err != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
-			return
-		}
-		_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
+// GetProducts GetAll is a method that returns a handler for the route GET /products
+func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
+	// request
+	// ...
+	// process
+	// - get all Products
+	v, err := h.sv.RetrieveAll()
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
+	_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
+	return
 }
 
-// CreateProduct is a method that returns a handler for the route CREATE /product/{ID}
-func (h *ProductDefault) CreateProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var body models.Product
-		_ = json.NewDecoder(r.Body).Decode(&body)
+// PostProduct is a method that returns a handler for the route CREATE /product/{ID}
+func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
+	var body models.Product
+	_ = json.NewDecoder(r.Body).Decode(&body)
 
-		product, errService := h.sv.Create(body)
-		if errService != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
-			return
-		}
-		_ = render.Render(w, r, response.NewResponse(product, http.StatusCreated))
+	product, errService := h.sv.Register(body)
+	if errService != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 		return
 	}
+	_ = render.Render(w, r, response.NewResponse(product, http.StatusCreated))
+	return
 }
 
-// FindByIDProduct is a method that returns a handler for the route GET /product/{ID}
-func (h *ProductDefault) FindByIDProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
-		if errConverter != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
-			return
-		}
-		p, errServiceFindById := h.sv.FindByID(id)
-		if errServiceFindById != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errServiceFindById.Error(), http.StatusNotFound))
-			return
-		}
-		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
+// GetProduct is a method that returns a handler for the route GET /product/{ID}
+func (h *ProductDefault) GetProduct(w http.ResponseWriter, r *http.Request) {
+	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
+	if errConverter != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 		return
 	}
+	p, errServiceFindById := h.sv.Retrieve(id)
+	if errServiceFindById != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errServiceFindById.Error(), http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
+	return
 }
 
-func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
-		var body models.Product
-		_ = json.NewDecoder(r.Body).Decode(&body)
+// PatchProduct handles PATCH requests to partially update a product.
+func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		if errConverter != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
-			return
-		}
-
-		p, errServiceUpdateProduct := h.sv.UpdatePartiallyV2(id, body)
-
-		if errServiceUpdateProduct != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errServiceUpdateProduct.Error(), http.StatusNotFound))
-			return
-		}
-		_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
+	// 1. Get the product ID from the URL and handle conversion errors.
+	//    Using "id" for consistency, but "ID" from your original code works too.
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse("Invalid ID format", http.StatusBadRequest))
 		return
 	}
+
+	// 2. Decode the JSON body into a map, not a full struct.
+	//    This is the key to handling partial updates correctly.
+	var fields map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&fields)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse("Invalid request body", http.StatusBadRequest))
+		return
+	}
+
+	// 3. Call the service with the ID and the map of fields.
+	updatedProduct, err := h.sv.PartialModify(id, fields)
+	if err != nil {
+		// Using StatusNotFound as in your original code, which is great for "not found" errors.
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		return
+	}
+
+	// 4. Render the successful response with the updated product.
+	_ = render.Render(w, r, response.NewResponse(updatedProduct, http.StatusOK))
 }
-func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
-		if errConverter != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
-			return
-		}
+func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
 
-		errServiceDelete := h.sv.Delete(id)
-
-		if errServiceDelete != nil {
-			_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
-			return
-		}
-		_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusOK))
+	if errConverter != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 		return
 	}
+
+	errServiceDelete := h.sv.Delete(id)
+
+	if errServiceDelete != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusNoContent))
+	return
 }
