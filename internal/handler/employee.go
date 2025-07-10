@@ -57,7 +57,7 @@ func (h *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	data := &request.EmployeeRequest{}
 	if err := render.Bind(r, data); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 		return
 	}
 	employee := models.Employee{
@@ -98,7 +98,7 @@ func (h *EmployeeHandler) PutEmployee(w http.ResponseWriter, r *http.Request) {
 	}
 	updatedEmployee, err := h.service.Modify(employee)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(updatedEmployee, http.StatusOK))
@@ -119,9 +119,10 @@ func (h *EmployeeHandler) PatchEmployee(w http.ResponseWriter, r *http.Request) 
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
+
 	updatedEmployee, err := h.service.PartialModify(id, fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("Failed to update employee", http.StatusInternalServerError))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(updatedEmployee, http.StatusOK))
@@ -138,7 +139,7 @@ func (h *EmployeeHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request)
 
 	err = h.service.Remove(id)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("Internal error", http.StatusInternalServerError))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 

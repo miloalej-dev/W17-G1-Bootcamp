@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -19,7 +19,7 @@ func (e *EmployeeMap) FindAll() ([]models.Employee, error) {
 		employees = append(employees, emp)
 	}
 	if len(employees) <= 0 {
-		return nil, errors.New("no content")
+		return nil, repository.ErrEntityNotFound
 	}
 	return employees, nil
 }
@@ -27,7 +27,7 @@ func (e *EmployeeMap) FindAll() ([]models.Employee, error) {
 func (e *EmployeeMap) FindById(id int) (models.Employee, error) {
 	employee, exists := e.db[id]
 	if !exists {
-		return models.Employee{}, errors.New("employee does not exists")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 	return employee, nil
 }
@@ -42,7 +42,7 @@ func (e *EmployeeMap) Create(emp models.Employee) (models.Employee, error) {
 func (e *EmployeeMap) Update(emp models.Employee) (models.Employee, error) {
 	_, exists := e.db[emp.Id]
 	if !exists {
-		return models.Employee{}, errors.New("employee does not exists")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 	e.db[emp.Id] = emp
 	return emp, nil
@@ -52,7 +52,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 	employee, exists := e.db[id]
 
 	if !exists {
-		return models.Employee{}, errors.New("employee does not exist")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 
 	if val, ok := fields["card_number_id"]; ok {
@@ -75,7 +75,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 func (e *EmployeeMap) Delete(id int) error {
 	_, exists := e.db[id]
 	if !exists {
-		return errors.New("employee not fount")
+		return repository.ErrEntityNotFound
 	}
 	delete(e.db, id)
 	return nil
