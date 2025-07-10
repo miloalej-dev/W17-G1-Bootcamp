@@ -1,9 +1,9 @@
 package memory
 
 import (
-	"errors"
 	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 )
 
 // Warehouse repository
@@ -39,7 +39,7 @@ func (r *WarehouseMap) FindAll() ([]models.Warehouse, error) {
 func (r *WarehouseMap) FindById(id int) (models.Warehouse, error) {
 	warehouse, found := r.db[id]
 	if !found {
-		return models.Warehouse{}, errors.New("warehouse not found")
+		return models.Warehouse{}, repository.ErrEntityNotFound
 	}
 	return warehouse, nil
 }
@@ -54,7 +54,7 @@ func (r *WarehouseMap) Create(warehouse models.Warehouse) (models.Warehouse, err
 func (r *WarehouseMap) Update(warehouse models.Warehouse) (models.Warehouse, error) {
 	_, found := r.db[warehouse.Id]
 	if !found {
-		return models.Warehouse{}, errors.New("warehouse not found")
+		return models.Warehouse{}, repository.ErrEntityNotFound
 	}
 
 	r.db[warehouse.Id] = warehouse
@@ -65,7 +65,7 @@ func (r *WarehouseMap) PartialUpdate(id int, fields map[string]interface{}) (mod
 	warehouse, found := r.db[id]
 
 	if !found {
-		return models.Warehouse{}, errors.New("warehouse not found")
+		return models.Warehouse{}, repository.ErrEntityNotFound
 	}
 
 	if val, ok := fields["code"]; ok {
@@ -78,10 +78,10 @@ func (r *WarehouseMap) PartialUpdate(id int, fields map[string]interface{}) (mod
 		warehouse.Telephone = val.(string)
 	}
 	if val, ok := fields["minimum_capacity"]; ok {
-		warehouse.MinimumCapacity = val.(int)
+		warehouse.MinimumCapacity = int(val.(float64))
 	}
 	if val, ok := fields["minimum_temperature"]; ok {
-		warehouse.MinimumTemperature = val.(int)
+		warehouse.MinimumTemperature = int(val.(float64))
 	}
 
 	r.db[id] = warehouse
@@ -91,7 +91,7 @@ func (r *WarehouseMap) PartialUpdate(id int, fields map[string]interface{}) (mod
 func (r *WarehouseMap) Delete(id int) error {
 	_, found := r.db[id]
 	if !found {
-		return errors.New("warehouse not found")
+		return repository.ErrEntityNotFound
 	}
 	delete(r.db, id)
 	return nil
