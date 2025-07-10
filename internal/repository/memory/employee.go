@@ -2,8 +2,6 @@ package memory
 
 import (
 	"errors"
-	"strconv"
-
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -67,8 +65,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 		employee.LastName = val.(string)
 	}
 	if val, ok := fields["warehouse_id"]; ok {
-		idWarehouse, _ := strconv.Atoi(val.(string))
-		employee.WarehouseId = idWarehouse
+		employee.WarehouseId = int(val.(float64))
 	}
 
 	e.db[id] = employee
