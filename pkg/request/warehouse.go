@@ -27,9 +27,6 @@ func (p *WarehouseRequest) Bind(r *http.Request) error {
 	if p.MinimumCapacity == nil {
 		return errors.New("minimum Capacity must not be null")
 	}
-	if *p.MinimumCapacity < 0 {
-		return errors.New("minimum Capacity must not be negative")
-	}
 	if p.MinimumTemperature == nil {
 		return errors.New("minimum Temperature must not be null")
 	}
