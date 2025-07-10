@@ -9,10 +9,10 @@ import (
 func EmployeeRoutes(router chi.Router, handler *handler.EmployeeHandler) {
 
 	router.Route("/api/v1/employees", func(r chi.Router) {
-		r.Get("/", handler.GetAllEmployees)
+		r.Get("/", handler.GetEmployees)
 		r.Get("/{id}", handler.GetEmployee)
 		r.Post("/", handler.CreateEmployee)
-		r.Patch("/{id}", handler.UpdateEmployee)
+		r.Patch("/{id}", handler.PutEmployee)
 		r.Delete("/{id}", handler.DeleteEmployee)
 	})
 }
