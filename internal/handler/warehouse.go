@@ -25,7 +25,7 @@ func NewWarehouseDefault(sv service.WarehouseService) *WarehouseDefault {
 	return &WarehouseDefault{sv: sv}
 }
 
-func (h *WarehouseDefault) FindAll(w http.ResponseWriter, r *http.Request) {
+func (h *WarehouseDefault) GetWarehouses(w http.ResponseWriter, r *http.Request) {
 	warehouses, err := h.sv.RetrieveAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -35,7 +35,7 @@ func (h *WarehouseDefault) FindAll(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, response.NewResponse(warehouses, http.StatusOK))
 }
 
-func (h *WarehouseDefault) FindById(w http.ResponseWriter, r *http.Request) {
+func (h *WarehouseDefault) GetWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
@@ -52,7 +52,7 @@ func (h *WarehouseDefault) FindById(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, response.NewResponse(warehouse, http.StatusOK))
 }
 
-func (h *WarehouseDefault) Create(w http.ResponseWriter, r *http.Request) {
+func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request) {
 	warehouseJson := &request.WarehouseRequest{}
 	if err := render.Bind(r, warehouseJson); err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
@@ -77,7 +77,7 @@ func (h *WarehouseDefault) Create(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusCreated))
 }
 
-func (h *WarehouseDefault) Update(w http.ResponseWriter, r *http.Request) {
+func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
@@ -85,44 +85,14 @@ func (h *WarehouseDefault) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	warehouseJson := &request.WarehouseRequest{}
-	if err := json.NewDecoder(r.Body).Decode(&warehouseJson); err != nil {
-		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
-		return
-	}
-
-	warehouse, err := h.sv.Retrieve(id)
+	var fields map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse("warehouse not found", http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
-	if warehouseJson.Code != nil &&
-		*warehouseJson.Code != warehouse.Code {
-		warehouse.Code = *warehouseJson.Code
-	}
-	if warehouseJson.Address != nil &&
-		*warehouseJson.Address != warehouse.Address {
-		warehouse.Address = *warehouseJson.Address
-	}
-	if warehouseJson.Telephone != nil &&
-		*warehouseJson.Telephone != warehouse.Telephone {
-		warehouse.Telephone = *warehouseJson.Telephone
-	}
-	if warehouseJson.MinimumCapacity != nil && 
-		*warehouseJson.MinimumCapacity != warehouse.MinimumCapacity {
-		if (*warehouseJson.MinimumCapacity < 0) {
-			render.Render(w, r, response.NewErrorResponse("minimum capcacity must not be negative", http.StatusBadRequest))
-			return
-		}
-		warehouse.MinimumCapacity = *warehouseJson.MinimumCapacity
-	}
-	if warehouseJson.MinimumTemperature != nil &&
-		*warehouseJson.MinimumTemperature != warehouse.MinimumTemperature {
-		warehouse.MinimumTemperature = *warehouseJson.MinimumTemperature
-	}
-
-	warehouseResponse, err := h.sv.Modify(warehouse)
+	warehouseResponse, err := h.sv.PartialModify(id, fields)
 	if err != nil {
 		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
@@ -131,7 +101,7 @@ func (h *WarehouseDefault) Update(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusOK))
 }
 
-func (h *WarehouseDefault) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *WarehouseDefault) DeleteWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
