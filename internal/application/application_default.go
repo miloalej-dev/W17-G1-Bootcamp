@@ -19,6 +19,8 @@ type ConfigServerChi struct {
 	ServerAddress string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathEmployee string
+	// LoaderFilePath is the path to the file that contains the sections
+	LoaderFilePathSection string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
@@ -26,6 +28,7 @@ type ServerChi struct {
 	// loaderFilePathProducts is the path to the file that contains the buyers
 
 	loaderFilePathEmployee  string
+	LoaderFilePathSection   string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -41,11 +44,17 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.LoaderFilePathEmployee != "" {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
+
+		if cfg.LoaderFilePathSection != "" {
+			defaultConfig.LoaderFilePathSection = cfg.LoaderFilePathSection
+		}
+
 	}
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
 	}
 }
 
@@ -58,6 +67,9 @@ func (a *ServerChi) Run() (err error) {
 	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
+	lfSection := json.NewFile(a.LoaderFilePathSection)
+	dbSection, err := lfSection.LoadSections()
+
 	if err != nil {
 		return
 	}
@@ -67,7 +79,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
-	sectionRepository := memory.NewSectionMap()
+	sectionRepository := memory.NewSectionMap(dbSection)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)

@@ -2,138 +2,133 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
 )
 
-type SectionDefault struct {
+func NewSectionDefault(sv service.SectionService) *SectionHandler {
+	return &SectionHandler{sv: sv}
+}
+
+type SectionHandler struct {
 	sv service.SectionService
 }
 
-func NewSectionDefault(sv service.SectionService) *SectionDefault {
-	return &SectionDefault{sv: sv}
+func (s *SectionHandler) GetSections(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	sections, err := s.sv.RetrieveAll()
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	if len(sections) == 0 {
+		_ = render.Render(w, r, response.NewErrorResponse("not found", http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(sections, http.StatusOK))
+
 }
 
-func (s *SectionDefault) GetAll() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		sections, err := s.sv.FindAll()
-		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
-			return
-		}
-		if len(sections) == 0 {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, nil)
-			return
-		}
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, sections)
+func (s *SectionHandler) GetSection(w http.ResponseWriter, r *http.Request) {
+	idRequest := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idRequest)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
+	section, err := s.sv.Retrieve(id)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(section, http.StatusOK))
+
 }
 
-func (s *SectionDefault) FindByID() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		idRequest := chi.URLParam(r, "id")
-		id, err := strconv.Atoi(idRequest)
-		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
-			return
-		}
-		section, err := s.sv.FindByID(id)
-		if err != nil {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
-			return
-		}
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, section)
+func (s *SectionHandler) PostSection(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	data := &request.SectionRequest{}
+	if err := render.Bind(r, data); err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
+
+	section := models.Section{
+		SectionNumber:      *data.SectionNumber,
+		CurrentTemperature: *data.CurrentTemperature,
+		MinimumTemperature: *data.MinimumTemperature,
+		CurrentCapacity:    *data.CurrentCapacity,
+		MinimumCapacity:    *data.MinimumCapacity,
+		MaximumCapacity:    *data.MaximumCapacity,
+		WarehouseId:        *data.WarehouseId,
+		ProductTypeId:      *data.ProductTypeId,
+		ProductsBatch:      *data.ProductsBatch,
+	}
+
+	createdSection, err := s.sv.Register(section)
+
+	if err != nil {
+		if errors.Is(err, repository.ErrEntityAlreadyExists) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
+			return
+		}
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(createdSection, http.StatusOK))
+
 }
 
-func (s *SectionDefault) Create() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var section models.Section
+func (s *SectionHandler) PatchSection(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		err := json.NewDecoder(r.Body).Decode(&section)
-		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, err)
-			return
-		}
-
-		createdSecton, err := s.sv.Create(section)
-		if err.Error() == "Section already exists" {
-			render.Status(r, http.StatusConflict)
-			render.JSON(w, r, err)
-			return
-		}
-		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
-			return
-		}
-		render.Status(r, http.StatusCreated)
-		render.JSON(w, r, createdSecton)
-
+	idRequest := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idRequest)
+	if err != nil {
+		_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
+	var fields map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&fields)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
+	}
+	updatedSecton, err := s.sv.PartialModify(id, fields)
+
+	if err != nil {
+		if errors.Is(err, repository.ErrEntityNotFound) {
+			_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+		_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(updatedSecton, http.StatusOK))
+
 }
 
-func (s *SectionDefault) Update() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		idRequest := chi.URLParam(r, "id")
-		id, err := strconv.Atoi(idRequest)
-		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
-			return
-		}
-		var section models.Section
-		err = json.NewDecoder(r.Body).Decode(&section)
-		section.Id = id
-		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, err)
-			return
-		}
-		updatedSecton, err := s.sv.Update(section)
-		if err.Error() == "section not found" {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
-			return
-		}
-		if err != nil {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, err)
-			return
-		}
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, updatedSecton)
+func (s *SectionHandler) DeleteSection(w http.ResponseWriter, r *http.Request) {
+	idRequest := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idRequest)
+	if err != nil {
+		_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
-}
-
-func (s *SectionDefault) Delete() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		idRequest := chi.URLParam(r, "id")
-		id, err := strconv.Atoi(idRequest)
-		if err != nil {
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, "Invalid Id")
-			return
-		}
-		err = s.sv.Delete(id)
-		if err != nil {
-			render.Status(r, http.StatusNotFound)
-			render.JSON(w, r, err)
-			return
-		}
-		render.Status(r, http.StatusNoContent)
-		render.JSON(w, r, nil)
-
+	err = s.sv.Remove(id)
+	if err != nil {
+		_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusNotFound))
+		return
 	}
+	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
+
 }
