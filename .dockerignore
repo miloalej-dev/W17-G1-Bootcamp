@@ -4,7 +4,6 @@
 .gitattributes
 
 # Documentation
-README.md
 *.md
 
 # IDE files
@@ -24,7 +23,6 @@ ehthumbs.db
 Thumbs.db
 
 # Build artifacts
-main
 *.exe
 *.dll
 *.so
