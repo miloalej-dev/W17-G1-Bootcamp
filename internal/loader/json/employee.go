@@ -40,7 +40,7 @@ func (l *EmployeeFile) Load() (data map[int]models.Employee, err error) {
 	for _, employee := range employees {
 		data[employee.Id] = models.Employee{
 			Id:           employee.Id,
-			CardNumberId: employee.FirstName,
+			CardNumberId: employee.CardNumberId,
 			FirstName:    employee.FirstName,
 			LastName:     employee.LastName,
 			WarehouseId:  employee.WarehouseId,
