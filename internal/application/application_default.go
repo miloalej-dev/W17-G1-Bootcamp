@@ -18,16 +18,17 @@ type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
 	// LoaderFilePath is the path to the file that contains the warehouses
-	LoaderFilePathWarehouse string
-	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathEmployee string
+	// LoaderFilePath is the path to the file that contains the sections
+	LoaderFilePathSection string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
-	loaderFilePathWarehouse string
+
 	loaderFilePathEmployee  string
+	LoaderFilePathSection   string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -40,18 +41,20 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePathWarehouse != "" {
-			defaultConfig.LoaderFilePathWarehouse = cfg.LoaderFilePathWarehouse
-		}
 		if cfg.LoaderFilePathEmployee != "" {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
+
+		if cfg.LoaderFilePathSection != "" {
+			defaultConfig.LoaderFilePathSection = cfg.LoaderFilePathSection
+		}
+
 	}
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
 	}
 }
 
@@ -61,22 +64,22 @@ func (a *ServerChi) Run() (err error) {
 
 	// - loader
 
-	ldWarehouse := json.NewWarehouseFile(a.loaderFilePathWarehouse)
-	dbWarehouse, err := ldWarehouse.Load()
-
 	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
+
+	lfSection := json.NewFile(a.LoaderFilePathSection)
+	dbSection, err := lfSection.LoadSections()
 
 	if err != nil {
 		return
 	}
 	// - repositories
 	productRepository := memory.NewProductMap()
-	warehouseRepo := memory.NewWarehouseMap(dbWarehouse)
+	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
-	sectionRepository := memory.NewSectionMap()
+	sectionRepository := memory.NewSectionMap(dbSection)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
