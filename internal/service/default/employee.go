@@ -9,7 +9,7 @@ type EmployeeService struct {
 	rp repository.Repository[int, models.Employee]
 }
 
-func NewEmployeeService(repo repository.Repository[int, models.Employee]) *EmployeeService {
+func NewEmployeeService(repo repository.EmployeeRepository) *EmployeeService {
 	return &EmployeeService{rp: repo}
 }
 
