@@ -6,7 +6,7 @@ import (
 )
 
 type EmployeeService struct {
-	rp repository.Repository[int, models.Employee]
+	rp repository.EmployeeRepository
 }
 
 func NewEmployeeService(repo repository.EmployeeRepository) *EmployeeService {
