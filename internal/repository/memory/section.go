@@ -2,7 +2,6 @@ package memory
 
 import (
 	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -10,14 +9,9 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
-func NewSectionMap() *SectionMap {
+func NewSectionMap(db map[int]models.Section) *SectionMap {
 	// defaultDb is an empty map
 	defaultDB := make(map[int]models.Section)
-	ld := json.NewFile("docs/db/sections.json")
-	db, err := ld.LoadSections()
-	if err != nil {
-		return nil
-	}
 	if db != nil {
 		defaultDB = db
 	}
@@ -63,38 +57,61 @@ func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 	if !exist {
 		return models.Section{}, errors.New("section not found")
 	}
-	if s.SectionNumber != 0 {
-		v.SectionNumber = s.SectionNumber
-	}
-	if s.CurrentTemperature != 0 {
-		v.CurrentTemperature = s.CurrentTemperature
-	}
-	if s.MinimumTemperature != 0 {
-		v.MinimumTemperature = s.MinimumTemperature
-	}
-	if s.CurrentCapacity != 0 {
-		v.CurrentCapacity = s.CurrentCapacity
-	}
-	if s.MinimumCapacity != 0 {
-		v.MinimumCapacity = s.MinimumCapacity
-	}
-	if s.MaximumCapacity != 0 {
-		v.MinimumTemperature = s.MinimumTemperature
-	}
-	if s.WarehouseId != 0 {
-		v.WarehouseId = s.WarehouseId
-	}
-	if s.ProductTypeId != 0 {
-		v.ProductTypeId = s.ProductTypeId
-	}
-	if len(s.ProductsBatch) != 0 {
-		v.ProductsBatch = s.ProductsBatch
-	}
+	r.db[s.Id] = s
 	return v, nil
 }
 
 func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (models.Section, error) {
-	return models.Section{}, nil
+	v, exist := r.db[id]
+	if !exist {
+		return models.Section{}, errors.New("section not found")
+	}
+	for key, value := range fields {
+		switch key {
+		case "section_number":
+			if section_number, ok := value.(float64); ok {
+				_, err := r.FindBySection(int(section_number))
+				if err == nil {
+					return models.Section{}, errors.New("Section allready exists")
+
+				} else {
+					v.SectionNumber = int(section_number)
+				}
+			}
+		case "current_temperature":
+			if current_temperature, ok := value.(float64); ok {
+				v.CurrentTemperature = int(current_temperature)
+			}
+		case "minimum_temperature":
+			if minimum_temperature, ok := value.(float64); ok {
+				v.MinimumTemperature = int(minimum_temperature)
+			}
+		case "current_capacity":
+			if current_capacity, ok := value.(float64); ok {
+				v.CurrentCapacity = int(current_capacity)
+			}
+		case "minimum_capacity":
+			if minimum_capacity, ok := value.(float64); ok {
+				v.MinimumCapacity = int(minimum_capacity)
+			}
+		case "maximum_capacity":
+			if maximum_capacity, ok := value.(float64); ok {
+				v.MaximumCapacity = int(maximum_capacity)
+			}
+		case "warehouse_id":
+			if warehouse_id, ok := value.(float64); ok {
+				v.WarehouseId = int(warehouse_id)
+			}
+		case "product_type_id":
+			if product_type_id, ok := value.(float64); ok {
+				v.ProductTypeId = int(product_type_id)
+			}
+		}
+
+	}
+	r.db[id] = v
+	return v, nil
+
 }
 
 func (r *SectionMap) Delete(id int) error {

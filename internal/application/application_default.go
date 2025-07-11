@@ -64,6 +64,10 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
 
+		if cfg.LoaderFilePathSection != "" {
+			defaultConfig.LoaderFilePathSection = cfg.LoaderFilePathSection
+		}
+
 	}
 
 	return &ServerChi{
@@ -72,6 +76,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathWarehouse: defaultConfig.LoaderFilePathWarehouse,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
 	}
 }
 
@@ -90,6 +95,9 @@ func (a *ServerChi) Run() (err error) {
 	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
+	lfSection := json.NewFile(a.LoaderFilePathSection)
+	dbSection, err := lfSection.LoadSections()
+
 	if err != nil {
 		return
 	}
@@ -99,7 +107,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	rpBuyer := memory.NewBuyerMap(dbBuyer)
-	sectionRepository := memory.NewSectionMap()
+	sectionRepository := memory.NewSectionMap(dbSection)
 
 	// - services
 	svBuyer := _default.NewBuyerDefault(rpBuyer)
