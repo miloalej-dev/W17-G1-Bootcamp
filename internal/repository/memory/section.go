@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -30,7 +30,7 @@ func (r *SectionMap) FindById(id int) (models.Section, error) {
 	v, exist := r.db[id]
 
 	if !exist {
-		return models.Section{}, errors.New("Section not found")
+		return models.Section{}, repository.ErrEntityNotFound
 	}
 	return v, nil
 
@@ -42,11 +42,11 @@ func (r *SectionMap) Create(s models.Section) (models.Section, error) {
 	}
 	v, exist := r.db[s.Id]
 	if exist {
-		return v, errors.New("Section already exists")
+		return v, repository.ErrEntityAlreadyExists
 	}
 	sc, err := r.FindBySection(s.SectionNumber)
 	if err == nil {
-		return sc, errors.New("Section already exists")
+		return sc, repository.ErrEntityAlreadyExists
 	}
 	r.db[s.Id] = s
 	return s, nil
@@ -55,7 +55,7 @@ func (r *SectionMap) Create(s models.Section) (models.Section, error) {
 func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 	v, exist := r.db[s.Id]
 	if !exist {
-		return models.Section{}, errors.New("section not found")
+		return models.Section{}, repository.ErrEntityNotFound
 	}
 	r.db[s.Id] = s
 	return v, nil
@@ -64,7 +64,7 @@ func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (models.Section, error) {
 	v, exist := r.db[id]
 	if !exist {
-		return models.Section{}, errors.New("section not found")
+		return models.Section{}, repository.ErrEntityNotFound
 	}
 	for key, value := range fields {
 		switch key {
@@ -72,7 +72,7 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 			if section_number, ok := value.(float64); ok {
 				_, err := r.FindBySection(int(section_number))
 				if err == nil {
-					return models.Section{}, errors.New("Section allready exists")
+					return models.Section{}, repository.ErrInvalidEntity
 
 				} else {
 					v.SectionNumber = int(section_number)
@@ -110,6 +110,7 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 
 	}
 	r.db[id] = v
+
 	return v, nil
 
 }
@@ -117,7 +118,7 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 func (r *SectionMap) Delete(id int) error {
 	v, exist := r.db[id]
 	if !exist {
-		return errors.New("Section not found")
+		return repository.ErrEntityNotFound
 	}
 	delete(r.db, v.Id)
 	return nil
@@ -129,5 +130,5 @@ func (r *SectionMap) FindBySection(section int) (models.Section, error) {
 			return v, nil
 		}
 	}
-	return models.Section{}, errors.New("Section not found")
+	return models.Section{}, repository.ErrEntityNotFound
 }

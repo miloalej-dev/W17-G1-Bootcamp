@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
@@ -75,7 +77,7 @@ func (s *SectionHandler) PostSection(w http.ResponseWriter, r *http.Request) {
 	createdSection, err := s.sv.Register(section)
 
 	if err != nil {
-		if err.Error() == "Section already exists" {
+		if errors.Is(err, repository.ErrEntityAlreadyExists) {
 			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 			return
 		}
@@ -104,7 +106,7 @@ func (s *SectionHandler) PatchSection(w http.ResponseWriter, r *http.Request) {
 	updatedSecton, err := s.sv.PartialModify(id, fields)
 
 	if err != nil {
-		if err.Error() == "section not found" {
+		if errors.Is(err, repository.ErrEntityNotFound) {
 			_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusNotFound))
 			return
 		}

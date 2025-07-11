@@ -101,7 +101,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
-	sectionRepository := memory.NewSectionMap()
+	sectionRepository := memory.NewSectionMap(dbSection)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
