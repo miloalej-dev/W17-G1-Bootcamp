@@ -72,7 +72,6 @@ func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// 1. Get the product ID from the URL and handle conversion errors.
-	//    Using "id" for consistency, but "ID" from your original code works too.
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -81,7 +80,6 @@ func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Decode the JSON body into a map, not a full struct.
-	//    This is the key to handling partial updates correctly.
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
@@ -92,7 +90,6 @@ func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
 	// 3. Call the service with the ID and the map of fields.
 	updatedProduct, err := h.sv.PartialModify(id, fields)
 	if err != nil {
-		// Using StatusNotFound as in your original code, which is great for "not found" errors.
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
@@ -109,7 +106,7 @@ func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	errServiceDelete := h.sv.Delete(id)
+	errServiceDelete := h.sv.Remove(id)
 
 	if errServiceDelete != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))

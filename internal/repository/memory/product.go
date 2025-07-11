@@ -5,8 +5,8 @@
 package memory
 
 import (
-	"errors"
 	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -43,7 +43,7 @@ func (r *ProductMap) FindAll() (allProducts []models.Product, err error) {
 	var products []models.Product
 
 	if len(r.db) == 0 {
-		err = errors.New("table empty")
+		err = repository.ErrEmptyEntity
 		return
 	}
 
@@ -67,7 +67,7 @@ func (r *ProductMap) Create(body models.Product) (newProduct models.Product, err
 func (r *ProductMap) Update(body models.Product) (product models.Product, err error) {
 	_, exists := r.db[body.Id]
 	if !exists {
-		err = errors.New("product does not exist")
+		err = repository.ErrEntityNotFound
 		return
 	}
 	r.db[body.Id] = body
@@ -81,7 +81,8 @@ func (r *ProductMap) FindById(id int) (product models.Product, err error) {
 	value, exists := r.db[id]
 	if !exists {
 		// Return a descriptive error if the product is not found.
-		err = errors.New("product not found")
+		err = repository.ErrEntityNotFound
+
 		return
 	}
 	// Return the found product.
@@ -94,7 +95,7 @@ func (r *ProductMap) PartialUpdate(id int, fields map[string]interface{}) (model
 	// 1. Check if the product exists
 	product, exists := r.db[id]
 	if !exists {
-		return models.Product{}, errors.New("product not found")
+		return models.Product{}, repository.ErrEntityNotFound
 	}
 
 	// 2. Iterate over the submitted fields and update only those.
@@ -162,7 +163,7 @@ func (r *ProductMap) Delete(id int) (err error) {
 	_, exists := r.db[id]
 	if !exists {
 		// Return a descriptive error if the product is not found.
-		err = errors.New("1")
+		err = repository.ErrEntityNotFound
 		return
 	}
 	// Deletes product from the map

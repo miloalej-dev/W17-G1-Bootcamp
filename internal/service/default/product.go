@@ -51,6 +51,6 @@ func (s *ProductDefault) PartialModify(id int, fields map[string]any) (models.Pr
 	return s.rp.PartialUpdate(id, fields)
 
 }
-func (s *ProductDefault) Delete(id int) (err error) {
+func (s *ProductDefault) Remove(id int) (err error) {
 	return s.rp.Delete(id)
 }
