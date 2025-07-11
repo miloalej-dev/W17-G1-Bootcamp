@@ -32,30 +32,30 @@ func (h *WarehouseDefault) GetWarehouses(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(warehouses, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(warehouses, http.StatusOK))
 }
 
 func (h *WarehouseDefault) GetWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
 		return
 	}
 
 	warehouse, err := h.sv.Retrieve(id)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(warehouse, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(warehouse, http.StatusOK))
 }
 
 func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request) {
 	warehouseJson := &request.WarehouseRequest{}
 	if err := render.Bind(r, warehouseJson); err != nil {
-		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -70,18 +70,18 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 
 	warehouseResponse, err := h.sv.Register(*warehouse)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
+		_ = render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusCreated))
+	_ = render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusCreated))
 }
 
 func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
 		return
 	}
 
@@ -94,26 +94,26 @@ func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request
 
 	warehouseResponse, err := h.sv.PartialModify(id, fields)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusOK))
 }
 
 func (h *WarehouseDefault) DeleteWarehouse(w http.ResponseWriter, r *http.Request) {
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
 		return
 	}
 
 	err = h.sv.Remove(id)
 	if err != nil {
-		render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
+	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 }
