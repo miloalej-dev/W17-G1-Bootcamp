@@ -180,6 +180,59 @@ W17-G1-Bootcamp
 └── models
 ```
 
+## 🐳 Docker
+
+Este proyecto incluye configuración completa de Docker para facilitar el desarrollo y despliegue. La aplicación utiliza un build multi-etapa para optimizar el tamaño de la imagen final.
+
+### Prerrequisitos
+
+- Docker Engine 20.10+
+- Docker Compose 2.0+
+
+### Ejecutar con Docker Compose (Recomendado)
+
+La forma más sencilla de ejecutar el proyecto completo (aplicación + base de datos MySQL):
+
+```bash
+# Construir y ejecutar todos los servicios
+docker compose up --build
+
+# Ejecutar en segundo plano (detached mode)
+docker compose up --build -d
+
+# Ver logs
+docker compose logs app
+docker compose logs database
+
+# Detener todos los servicios
+docker compose down
+
+# Detener y eliminar volúmenes (reinicio completo)
+docker compose down --volumes
+```
+
+### Construcción manual con Docker
+
+Si prefieres usar Docker directamente sin Compose:
+
+```bash
+# Construir la imagen
+docker build -t frescos-app .
+
+# Ejecutar el contenedor
+docker run -p 8080:8080 frescos-app
+
+# Ejecutar en segundo plano
+docker run -d -p 8080:8080 --name frescos-container frescos-app
+
+# Ver logs
+docker logs frescos-container
+
+# Detener y eliminar el contenedor
+docker stop frescos-container
+docker rm frescos-container
+```
+
 ## Recursos
 
 1. GitFlow
@@ -192,4 +245,6 @@ W17-G1-Bootcamp
     2. https://dev.to/achamorro_dev/conventional-commits-que-es-y-por-que-deberias-empezar-a-utilizarlo-23an
 3. Mockaroo (generar datos de prueba)
     1. https://www.mockaroo.com/
-
+4. Docker
+   1. https://www.docker.com/101-tutorial/
+   2. https://docs.docker.com/compose/gettingstarted/

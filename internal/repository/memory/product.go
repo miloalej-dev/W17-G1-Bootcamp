@@ -24,7 +24,7 @@ func NewProductMap() *ProductMap {
 	// Initialize with an empty map to ensure it's not nil.
 	defaultDB := make(map[int]models.Product)
 
-	ld := loader.NewProductFile("docs/db/products.json")
+	ld := loader.NewProductFile("docs/db/json/products.json")
 	db, err := ld.Load()
 	if err != nil {
 		return nil

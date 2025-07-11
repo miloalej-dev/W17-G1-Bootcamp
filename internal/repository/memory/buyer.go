@@ -19,7 +19,7 @@ func NewBuyerMap() *BuyerMap {
 	defaultDB := make(map[int]models.Buyer)
 
 	// default db
-	ld := loader.NewBuyerFile("docs/db/buyers.json")
+	ld := loader.NewBuyerFile("docs/db/json/buyers.json")
 	db, err := ld.Load()
 
 	if err != nil {
