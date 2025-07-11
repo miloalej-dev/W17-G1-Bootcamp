@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
@@ -39,15 +40,35 @@ func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 // PostProduct is a method that returns a handler for the route CREATE /product/{ID}
 func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
-	var body models.Product
-	_ = json.NewDecoder(r.Body).Decode(&body)
+	data := &request.ProductRequest{}
 
-	product, errService := h.sv.Register(body)
+	if err := render.Bind(r, data); err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	}
+	product := models.Product{
+		ProductCode:                    *data.ProductCode,
+		Description:                    *data.Description,
+		Width:                          *data.Width,
+		Height:                         *data.Height,
+		Length:                         *data.Length,
+		NetWeight:                      *data.NetWeight,
+		ExpirationRate:                 *data.ExpirationRate,
+		RecommendedFreezingTemperature: *data.RecommendedFreezingTemperature,
+		FreezingRate:                   *data.FreezingRate,
+		ProductTypeId:                  *data.ProductTypeId,
+	}
+
+	if data.SellerId != nil {
+		product.SellerId = *data.SellerId
+	}
+
+	createdProduct, errService := h.sv.Register(product)
+
 	if errService != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 		return
 	}
-	_ = render.Render(w, r, response.NewResponse(product, http.StatusCreated))
+	_ = render.Render(w, r, response.NewResponse(createdProduct, http.StatusCreated))
 	return
 }
 

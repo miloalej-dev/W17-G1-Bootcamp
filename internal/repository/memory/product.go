@@ -59,6 +59,8 @@ func (r *ProductMap) FindAll() (allProducts []models.Product, err error) {
 // It returns an error if a product with the same ID already exists.
 func (r *ProductMap) Create(body models.Product) (newProduct models.Product, err error) {
 	// Create the new product to the map in database.
+	id := len(r.db) + 1
+	body.Id = id
 	r.db[body.Id] = body
 	newProduct = r.db[body.Id]
 	return

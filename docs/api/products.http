@@ -10,8 +10,7 @@ Content-Type: application/json
 POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
-{"id": 1,
-  "product_code": "new product",
+{"product_code": "new product",
   "description": "new product",
   "width": 68.64,
   "height": 185.04,
@@ -21,10 +20,10 @@ Content-Type: application/json
   "recommended_freezing_temperature": -33.84,
   "freezing_rate": 0.62,
   "product_type_id": 12,
-  "seller_id": 252}
+  "seller_id": 2}
 
 ### PATCH request to update an specific product
-PATCH http://localhost:8080/api/v1/products/1
+PATCH http://localhost:8080/api/v1/products/7
 Content-Type: application/json
 
 {
@@ -33,5 +32,5 @@ Content-Type: application/json
 }
 
 ### DELETE request to delete an specific product
-DELETE http://localhost:8080/api/v1/products/1
+DELETE http://localhost:8080/api/v1/products/7
 Content-Type: application/json
