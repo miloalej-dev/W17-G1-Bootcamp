@@ -17,41 +17,51 @@ type BuyerDefault struct {
 }
 
 // FindAll is a method that returns a map of all buyers
-func (s *BuyerDefault) FindAll() (v map[int]models.Buyer, err error) {
-	v, err = s.rp.FindAll()
-	return
+func (s *BuyerDefault) RetrieveAll() ([]models.Buyer, error) {
+	v, err := s.rp.FindAll()
+
+	return v, err
 }
 
-func (s *BuyerDefault) FindById(id int) (v *models.Buyer, err error) {
-	v, err = s.rp.FindById(id)
+func (s *BuyerDefault) Retrieve(id int) (models.Buyer, error) {
+	v, err := s.rp.FindById(id)
 	if err != nil {
-		return nil, err
+		return models.Buyer{}, err
 	}
 	return v, nil
 
 }
 
-func (s *BuyerDefault) Create(buyer models.BuyerAtributtes) (v *models.Buyer, err error) {
-	v, err = s.rp.Create(buyer)
+func (s *BuyerDefault) Register(buyer models.Buyer) (models.Buyer, error) {
+	v, err := s.rp.Create(buyer)
 	if err != nil {
-		return nil, err
+		return models.Buyer{}, err
 	}
 	return v, nil
 }
 
-func (s *BuyerDefault) Delete(id int) (v *models.Buyer, err error) {
-	v, err = s.rp.Delete(id)
+func (s *BuyerDefault) Remove(id int) error {
+	err := s.rp.Delete(id)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return v, nil
+	return nil
 
 }
 
-func (s *BuyerDefault) Update(buyer models.Buyer) (v *models.Buyer, err error) {
-	v, err = s.rp.Update(buyer)
+func (s *BuyerDefault) Modify(buyer models.Buyer) (models.Buyer, error) {
+	v, err := s.rp.Update(buyer)
 	if err != nil {
-		return nil, err
+		return models.Buyer{}, err
+	}
+
+	return v, nil
+}
+
+func (s *BuyerDefault) PartialModify(id int, fields map[string]any) (models.Buyer, error) {
+	v, err := s.rp.PartialUpdate(id, fields)
+	if err != nil {
+		return models.Buyer{}, err
 	}
 
 	return v, nil
