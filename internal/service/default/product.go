@@ -5,18 +5,9 @@
 package _default
 
 import (
-	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
-
-// ErrorCreate is returned when an attempt to create a product fails because
-// a product with the same ID already exists in the repository.
-var ErrorCreate = errors.New("There is already a product with that ID")
-
-// ErrorNotFound is returned when a lookup operation fails to find a product
-// with the specified ID.
-var ErrorNotFound = errors.New("Product Not found with that ID")
 
 // NewProductDefault is a constructor function that creates a new instance of ProductDefault.
 // It takes a ProductRepository as a dependency, promoting loose coupling and testability.
@@ -32,48 +23,34 @@ type ProductDefault struct {
 	rp repository.ProductRepository
 }
 
-// FindAll retrieves all products by calling the repository's FindAll method.
+// RetrieveAll retrieves all products by calling the repository's FindAll method.
 // It directly passes through the results and any error from the repository.
-func (s *ProductDefault) FindAll() (v map[int]models.Product, err error) {
-	v, err = s.rp.FindAll()
-	if err != nil {
-		err = ErrorNotFound
-	}
-	return
+func (s *ProductDefault) RetrieveAll() (v []models.Product, err error) {
+	return s.rp.FindAll()
 }
 
-// Create attempts to add a new product using the repository.
+// Register attempts to add a new product using the repository.
 // If the repository returns any error, it is replaced with the generic
 // errorProduct.ErrorCreate.
-func (s *ProductDefault) Create(P models.Product) (err error) {
-	err = s.rp.Create(P)
-	if err != nil {
-		err = ErrorCreate
-	}
-	return
+func (s *ProductDefault) Register(body models.Product) (models.Product, error) {
+	return s.rp.Create(body)
 }
 
-// FindByID retrieves a single product by its ID from the repository.
+// Retrieve retrieves a single product by its ID from the repository.
 // If the repository returns any error (e.g., not found), it is replaced
 // with the generic errorProduct.ErrorNotFound.
-func (s *ProductDefault) FindByID(ID int) (P models.Product, err error) {
-	P, err = s.rp.FindByID(ID)
-	if err != nil {
-		err = ErrorNotFound
-	}
-	return
+func (s *ProductDefault) Retrieve(id int) (models.Product, error) {
+	return s.rp.FindById(id)
+
 }
-func (s *ProductDefault) UpdateProduct(ID int, Body models.Product) (P models.Product, err error) {
-	P, err = s.rp.UpdateProduct(ID, Body)
-	if err != nil {
-		err = ErrorNotFound
-	}
-	return
+func (s *ProductDefault) Modify(body models.Product) (models.Product, error) {
+	return s.rp.Update(body)
 }
-func (s *ProductDefault) Delete(ID int) (err error) {
-	err = s.rp.Delete(ID)
-	if err != nil {
-		err = ErrorNotFound
-	}
-	return
+
+func (s *ProductDefault) PartialModify(id int, fields map[string]any) (models.Product, error) {
+	return s.rp.PartialUpdate(id, fields)
+
+}
+func (s *ProductDefault) Remove(id int) (err error) {
+	return s.rp.Delete(id)
 }

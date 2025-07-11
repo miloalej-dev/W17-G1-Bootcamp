@@ -38,8 +38,8 @@ func (l *ProductFile) Load() (v map[int]models.Product, err error) {
 	// serialize vehicles
 	v = make(map[int]models.Product)
 	for _, producto := range productos {
-		v[producto.ID] = models.Product{
-			ID:                             producto.ID,
+		v[producto.Id] = models.Product{
+			Id:                             producto.Id,
 			ProductCode:                    producto.ProductCode,
 			Description:                    producto.Description,
 			Width:                          producto.Width,
@@ -49,8 +49,8 @@ func (l *ProductFile) Load() (v map[int]models.Product, err error) {
 			ExpirationRate:                 producto.ExpirationRate,
 			RecommendedFreezingTemperature: producto.RecommendedFreezingTemperature,
 			FreezingRate:                   producto.FreezingRate,
-			ProductTypeID:                  producto.ProductTypeID,
-			SellerID:                       producto.SellerID,
+			ProductTypeId:                  producto.ProductTypeId,
+			SellerId:                       producto.SellerId,
 		}
 	}
 

@@ -17,9 +17,6 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-
-	// LoaderFilePath is the path to the file that contains the products
-	LoaderFilePathProducts string
 	// LoaderFilePath is the path to the file that contains the warehouses
 	LoaderFilePathEmployee string
 }
@@ -28,7 +25,6 @@ type ServerChi struct {
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
 
-	loaderFilePathProducts  string
 	loaderFilePathEmployee  string
 }
 
@@ -42,9 +38,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePathProducts != "" {
-			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
-		}
 		if cfg.LoaderFilePathEmployee != "" {
 			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
 		}
@@ -52,7 +45,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 
 	return &ServerChi{
 		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathProducts:  defaultConfig.LoaderFilePathProducts,
 		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
 	}
 }
@@ -63,9 +55,6 @@ func (a *ServerChi) Run() (err error) {
 
 	// - loader
 
-	ldProduct := json.NewProductFile(a.loaderFilePathProducts)
-	dbProduct, err := ldProduct.Load()
-
 	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
 	dbEmployee, err := ldEmployee.Load()
 
@@ -73,7 +62,7 @@ func (a *ServerChi) Run() (err error) {
 		return
 	}
 	// - repositories
-	rpProduct := memory.NewProductMap(dbProduct)
+	productRepository := memory.NewProductMap()
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
@@ -82,15 +71,15 @@ func (a *ServerChi) Run() (err error) {
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
-	svProduct := _default.NewProductDefault(rpProduct)
+	productService := _default.NewProductDefault(productRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
 
 	// - handlers
+	productHandler := handler.NewProductDefault(productService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
-	hdProduct := handler.NewProductDefault(svProduct)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
@@ -111,7 +100,7 @@ func (a *ServerChi) Run() (err error) {
 	route.SellerRoutes(rt, sellerHandler)
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
-	route.ProductRoutes(rt, hdProduct)
+	route.ProductRoutes(rt, productHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
