@@ -42,9 +42,6 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePathBuyer != "" {
-			defaultConfig.LoaderFilePathBuyer = cfg.LoaderFilePathBuyer
-		}
 		if cfg.LoaderFilePathProducts != "" {
 			defaultConfig.LoaderFilePathProducts = cfg.LoaderFilePathProducts
 		}
