@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
 )
@@ -21,127 +23,116 @@ type ProductDefault struct {
 	sv *_default.ProductDefault
 }
 
-// GetAllProducts GetAll is a method that returns a handler for the route GET /products
-func (h *ProductDefault) GetAllProducts() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
-		// process
-		// - get all Products
-		v, err := h.sv.FindAll()
-		if err != nil {
-			response.JSON(w, http.StatusNotFound, nil)
-			return
-		}
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    v,
-		})
-	}
-}
-
-// CreateProduct is a method that returns a handler for the route CREATE /product/{ID}
-func (h *ProductDefault) CreateProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var body models.Product
-		json.NewDecoder(r.Body).Decode(&body)
-
-		product, errService := h.sv.Create(body)
-		if errService != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errService.Error(),
-			})
-			return
-		}
-
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "Producto Creado",
-			"data":    product,
-		})
+// GetProducts GetAll is a method that returns a handler for the route GET /products
+func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
+	// request
+	// ...
+	// process
+	// - get all Products
+	v, err := h.sv.RetrieveAll()
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
+	_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
+	return
 }
 
-// FindByIDProduct is a method that returns a handler for the route GET /product/{ID}
-func (h *ProductDefault) FindByIDProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+// PostProduct is a method that returns a handler for the route CREATE /product/{ID}
+func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
+	data := &request.ProductRequest{}
 
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
-		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
-			return
-		}
+	if err := render.Bind(r, data); err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	}
+	product := models.Product{
+		ProductCode:                    *data.ProductCode,
+		Description:                    *data.Description,
+		Width:                          *data.Width,
+		Height:                         *data.Height,
+		Length:                         *data.Length,
+		NetWeight:                      *data.NetWeight,
+		ExpirationRate:                 *data.ExpirationRate,
+		RecommendedFreezingTemperature: *data.RecommendedFreezingTemperature,
+		FreezingRate:                   *data.FreezingRate,
+		ProductTypeId:                  *data.ProductTypeId,
+	}
 
-		p, errServiceFindById := h.sv.FindByID(id)
-		if errServiceFindById != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceFindById.Error(),
-			})
-			return
-		}
+	if data.SellerId != nil {
+		product.SellerId = *data.SellerId
+	}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Creado",
-			"data":    p,
-		})
+	createdProduct, errService := h.sv.Register(product)
+
+	if errService != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 		return
 	}
+	_ = render.Render(w, r, response.NewResponse(createdProduct, http.StatusCreated))
+	return
 }
 
-func (h *ProductDefault) UpdateProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
-		var body models.Product
-		json.NewDecoder(r.Body).Decode(&body)
-
-		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
-			return
-		}
-
-		p, errServiceUpdateProduct := h.sv.UpdatePartiallyV2(id, body)
-
-		if errServiceUpdateProduct != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceUpdateProduct.Error(),
-			})
-			return
-		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Producto Actualizado",
-			"data":    p,
-		})
+// GetProduct is a method that returns a handler for the route GET /product/{ID}
+func (h *ProductDefault) GetProduct(w http.ResponseWriter, r *http.Request) {
+	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
+	if errConverter != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
 		return
 	}
+	p, errServiceFindById := h.sv.Retrieve(id)
+	if errServiceFindById != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errServiceFindById.Error(), http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
+	return
 }
-func (h *ProductDefault) DeleteProduct() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, errConverter := strconv.Atoi(chi.URLParam(r, "ID"))
 
-		if errConverter != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": errConverter.Error(),
-			})
-			return
-		}
+// PatchProduct handles PATCH requests to partially update a product.
+func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		errServiceDelete := h.sv.Delete(id)
-
-		if errServiceDelete != nil {
-			response.JSON(w, http.StatusNotFound, map[string]any{
-				"message": errServiceDelete.Error(),
-			})
-			return
-		}
-
-		response.JSON(w, http.StatusNoContent, map[string]any{
-			"message": "Producto Borrado",
-		})
+	// 1. Get the product ID from the URL and handle conversion errors.
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse("Invalid ID format", http.StatusBadRequest))
 		return
 	}
+
+	// 2. Decode the JSON body into a map, not a full struct.
+	var fields map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&fields)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse("Invalid request body", http.StatusBadRequest))
+		return
+	}
+
+	// 3. Call the service with the ID and the map of fields.
+	updatedProduct, err := h.sv.PartialModify(id, fields)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		return
+	}
+
+	// 4. Render the successful response with the updated product.
+	_ = render.Render(w, r, response.NewResponse(updatedProduct, http.StatusOK))
+}
+
+func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
+
+	if errConverter != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+		return
+	}
+
+	errServiceDelete := h.sv.Remove(id)
+
+	if errServiceDelete != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errServiceDelete.Error(), http.StatusNotFound))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusNoContent))
+	return
 }
