@@ -26,6 +26,7 @@ func NewWarehouseDefault(sv service.WarehouseService) *WarehouseDefault {
 }
 
 func (h *WarehouseDefault) GetWarehouses(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	warehouses, err := h.sv.RetrieveAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -36,6 +37,7 @@ func (h *WarehouseDefault) GetWarehouses(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *WarehouseDefault) GetWarehouse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
@@ -53,6 +55,7 @@ func (h *WarehouseDefault) GetWarehouse(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	warehouseJson := &request.WarehouseRequest{}
 	if err := render.Bind(r, warehouseJson); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
@@ -78,6 +81,7 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
@@ -102,6 +106,7 @@ func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request
 }
 
 func (h *WarehouseDefault) DeleteWarehouse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
