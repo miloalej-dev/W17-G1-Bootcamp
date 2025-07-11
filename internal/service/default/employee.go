@@ -6,34 +6,34 @@ import (
 )
 
 type EmployeeService struct {
-	rp repository.Repository[int, models.Employee]
+	rp repository.EmployeeRepository
 }
 
 func NewEmployeeService(repo repository.EmployeeRepository) *EmployeeService {
 	return &EmployeeService{rp: repo}
 }
 
-func (sv *EmployeeService) GetEmployees() (e []models.Employee, err error) {
+func (sv *EmployeeService) RetrieveAll() (e []models.Employee, err error) {
 	e, err = sv.rp.FindAll()
 	return
 }
 
-func (sv *EmployeeService) GetEmployeeById(id int) (models.Employee, error) {
+func (sv *EmployeeService) Retrieve(id int) (models.Employee, error) {
 	return sv.rp.FindById(id)
 }
 
-func (sv *EmployeeService) CreateEmployee(emp models.Employee) (models.Employee, error) {
+func (sv *EmployeeService) Register(emp models.Employee) (models.Employee, error) {
 	return sv.rp.Create(emp)
 }
 
-func (sv *EmployeeService) ModifyEmployee(emp models.Employee) (models.Employee, error) {
+func (sv *EmployeeService) Modify(emp models.Employee) (models.Employee, error) {
 	return sv.rp.Update(emp)
 }
 
-func (sv *EmployeeService) UpdateEmployeeFields(id int, fields map[string]interface{}) (models.Employee, error) {
+func (sv *EmployeeService) PartialModify(id int, fields map[string]interface{}) (models.Employee, error) {
 	return sv.rp.PartialUpdate(id, fields)
 }
 
-func (sv *EmployeeService) DeleteEmployee(id int) error {
+func (sv *EmployeeService) Remove(id int) error {
 	return sv.rp.Delete(id)
 }

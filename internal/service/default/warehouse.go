@@ -1,6 +1,7 @@
 package _default
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
@@ -16,26 +17,37 @@ func NewWarehouseDefault(rp repository.WarehouseRepository) *WarehouseDefault {
 	return &WarehouseDefault{rp: rp}
 }
 
-func (s *WarehouseDefault) FindAll() ([]models.Warehouse, error) {
+func (s *WarehouseDefault) RetrieveAll() ([]models.Warehouse, error) {
 	return s.rp.FindAll()
 }
 
-func (s *WarehouseDefault) FindById(id int) (models.Warehouse, error) {
+func (s *WarehouseDefault) Retrieve(id int) (models.Warehouse, error) {
 	return s.rp.FindById(id)
 }
 
-func (s *WarehouseDefault) Create(entity models.Warehouse) (models.Warehouse, error) {
+func (s *WarehouseDefault) Register(entity models.Warehouse) (models.Warehouse, error) {
+	if entity.MinimumCapacity < 0 {
+		return models.Warehouse{}, errors.New("minimum Capacity must not be negative")
+	}
 	return s.rp.Create(entity)
 }
 
-func (s *WarehouseDefault) Update(entity models.Warehouse) (models.Warehouse, error) {
+func (s *WarehouseDefault) Modify(entity models.Warehouse) (models.Warehouse, error) {
+	if entity.MinimumCapacity < 0 {
+		return models.Warehouse{}, errors.New("minimum Capacity must not be negative")
+	}
 	return s.rp.Update(entity)
 }
 
-func (s *WarehouseDefault) PartialUpdate(id int, fields map[string]interface{}) (models.Warehouse, error) {
+func (s *WarehouseDefault) PartialModify(id int, fields map[string]interface{}) (models.Warehouse, error) {
+	if val, ok := fields["minimum_capacity"]; ok {
+		if val.(float64) < 0 {
+			return models.Warehouse{}, errors.New("minimum Capacity must not be negative")
+		}
+	}
 	return s.rp.PartialUpdate(id, fields)
 }
 
-func (s *WarehouseDefault) Delete(id int) error {
+func (s *WarehouseDefault) Remove(id int) error {
 	return s.rp.Delete(id)
 }

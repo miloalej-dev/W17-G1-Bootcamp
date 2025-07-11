@@ -14,21 +14,24 @@ func NewSectionDefault(rp repository.SectionRepository) *SectionDefault {
 	return &SectionDefault{rp: rp}
 }
 
-func (s *SectionDefault) FindAll() (v []models.Section, err error) {
+func (s *SectionDefault) RetrieveAll() (v []models.Section, err error) {
 	return s.rp.FindAll()
 }
 
-func (s *SectionDefault) FindByID(id int) (models.Section, error) {
+func (s *SectionDefault) Retrieve(id int) (models.Section, error) {
 	return s.rp.FindById(id)
 }
 
-func (s *SectionDefault) Create(ss models.Section) (models.Section, error) {
+func (s *SectionDefault) Register(ss models.Section) (models.Section, error) {
 
 	return s.rp.Create(ss)
 }
-func (s *SectionDefault) Update(ss models.Section) (models.Section, error) {
+func (s *SectionDefault) Modify(ss models.Section) (models.Section, error) {
 	return s.rp.Update(ss)
 }
-func (s *SectionDefault) Delete(id int) error {
+func (s *SectionDefault) PartialModify(id int, fields map[string]any) (models.Section, error) {
+	return s.rp.PartialUpdate(id, fields)
+}
+func (s *SectionDefault) Remove(id int) error {
 	return s.rp.Delete(id)
 }

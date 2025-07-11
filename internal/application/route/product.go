@@ -8,10 +8,10 @@ import (
 func ProductRoutes(rt chi.Router, handler *handler.ProductDefault) {
 	rt.Route("/api/v1/products", func(rt chi.Router) {
 		// - GET /products
-		rt.Get("/", handler.GetAllProduct())
-		rt.Post("/", handler.CreateProduct())
-		rt.Get("/{ID}", handler.FindyByIDProduct())
-		rt.Patch("/{ID}", handler.UpdateProduct())
-		rt.Delete("/{ID}", handler.DeleteProduct())
+		rt.Get("/", handler.GetProducts)
+		rt.Post("/", handler.PostProduct)
+		rt.Get("/{id}", handler.GetProduct)
+		rt.Patch("/{id}", handler.PatchProduct)
+		rt.Delete("/{id}", handler.DeleteProduct)
 	})
 }

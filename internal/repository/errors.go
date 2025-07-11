@@ -11,4 +11,7 @@ var (
 
 	// ErrInvalidEntity is returned when an entity is invalid
 	ErrInvalidEntity = errors.New("invalid entity")
+
+	// ErrEmptyEntity is returned when an entity is empty
+	ErrEmptyEntity = errors.New("empty entity")
 )
