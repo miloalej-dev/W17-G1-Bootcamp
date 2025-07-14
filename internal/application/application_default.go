@@ -1,16 +1,16 @@
 package application
 
 import (
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
-	"net/http"
-
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"log"
+	"net/http"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -27,8 +27,8 @@ type ServerChi struct {
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
 
-	loaderFilePathEmployee  string
-	LoaderFilePathSection   string
+	loaderFilePathEmployee string
+	LoaderFilePathSection  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -52,15 +52,21 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	}
 
 	return &ServerChi{
-		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
-		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
+		serverAddress:          defaultConfig.ServerAddress,
+		loaderFilePathEmployee: defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:  defaultConfig.LoaderFilePathSection,
 	}
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	// dependencies
+	// Database connection
+	db, err := database.NewConnection()
+
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
 
 	// - loader
 
@@ -70,11 +76,8 @@ func (a *ServerChi) Run() (err error) {
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
 
-	if err != nil {
-		return
-	}
 	// - repositories
-	productRepository := memory.NewProductMap()
+	productRepository := database.NewProductDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
