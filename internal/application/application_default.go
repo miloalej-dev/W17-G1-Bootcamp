@@ -1,22 +1,16 @@
 package application
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"log"
 	"net/http"
-	"time"
-
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -81,32 +75,9 @@ func (a *ServerChi) Run() (err error) {
 
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
-	var gormDB *gorm.DB
-	maxRetries := 10
-	retryDelay := 2 * time.Second
-	dsn := "frescos_user:password@tcp(database:3306)/frescos?charset=utf8mb4&parseTime=True&loc=Local"
 
-	for i := 0; i < maxRetries; i++ {
-		gormDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err == nil {
-			// Conexión exitosa, salimos del bucle
-			log.Println("Successfully connected to the database")
-			break
-		}
-		log.Printf("Failed to connect to database (attempt %d/%d): %v. Retrying in %v...", i+1, maxRetries, err, retryDelay)
-		time.Sleep(retryDelay)
-	}
-
-	// Si después de todos los reintentos el error persiste, la aplicación se detiene.
-	if err != nil {
-		log.Fatalf("failed to connect to database after %d attempts: %v", maxRetries, err)
-	}
-
-	if err != nil {
-		return
-	}
 	// - repositories
-	productRepository := database.NewProductDB(gormDB)
+	productRepository := database.NewProductDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)

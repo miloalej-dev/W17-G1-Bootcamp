@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"log"
 	"os"
 	"time"
 )
@@ -19,6 +20,12 @@ type configuration struct {
 
 func configure() (*configuration, error) {
 	// Set environment variables or load from .env file
+	_ = os.Setenv("DB_USER", "frescos_user")
+	_ = os.Setenv("DB_PASSWORD", "password")
+	_ = os.Setenv("DB_HOST", "database")
+	_ = os.Setenv("DB_NAME", "frescos")
+	_ = os.Setenv("DB_PORT", "3306")
+
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
@@ -27,7 +34,7 @@ func configure() (*configuration, error) {
 
 	// Default values
 	if host == "" {
-		host = "localhost"
+		host = "database"
 	}
 	if port == "" {
 		port = "3306"
@@ -71,15 +78,29 @@ func NewConnection() (*gorm.DB, error) {
 		config.database,
 	)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info), // Enable logging
-		NowFunc: func() time.Time {
-			return time.Now().Local()
-		},
-	})
+	var db *gorm.DB
+	maxRetries := 10
+	retryDelay := 2 * time.Second
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	for i := 0; i < maxRetries; i++ {
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info), // Enable logging
+			NowFunc: func() time.Time {
+				return time.Now().Local()
+			},
+		})
+		if err == nil {
+			// Connection successful
+			log.Println("Successfully connected to the database")
+			break
+		}
+		log.Printf("Failed to connect to database (attempt %d/%d): %v. Retrying in %v...", i+1, maxRetries, err, retryDelay)
+		time.Sleep(retryDelay)
+	}
+
+	// If the connection is still nil after all retries, return the final error.
+	if db == nil {
+		return nil, fmt.Errorf("failed to connect to database after %d attempts: %w", maxRetries, err)
 	}
 
 	// Configure connection pool
@@ -87,7 +108,6 @@ func NewConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
-
 	// Connection pool settings
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
