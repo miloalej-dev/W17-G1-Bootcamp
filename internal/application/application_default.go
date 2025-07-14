@@ -6,6 +6,7 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -65,7 +66,13 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	// dependencies
+	// Database connection
+	db, err := database.NewConnection()
+
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
 
 	// - loader
 
