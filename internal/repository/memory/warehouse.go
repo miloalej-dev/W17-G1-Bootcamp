@@ -2,8 +2,8 @@ package memory
 
 import (
 	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 // Warehouse repository
@@ -16,7 +16,7 @@ func NewWarehouseMap() *WarehouseMap {
 	// defaultDB is an empty map
 	defaultDB := make(map[int]models.Warehouse)
 
-	ld := loader.NewWarehouseFile("docs/db/warehouse.json")
+	ld := loader.NewWarehouseFile("docs/db/json/warehouse.json")
 	db, err := ld.Load()
 
 	if err != nil {

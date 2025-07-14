@@ -1,0 +1,38 @@
+name: frescos
+services:
+  app:
+    build: .
+    container_name: frescos-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - frescos-network
+
+  database:
+    image: mysql:9.3.0
+    container_name: frescos-database
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: frescos
+      MYSQL_USER: frescos_user
+      MYSQL_PASSWORD: password
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data-volume:/var/lib/mysql
+      - ./docs/db/scripts/frescos_ddl.sql:/docker-entrypoint-initdb.d/frescos_ddl.sql:ro
+      - ./docs/db/scripts/frescos_dml.sql:/docker-entrypoint-initdb.d/frescos_dml.sql:ro
+    networks:
+      - frescos-network
+
+volumes:
+    mysql-data-volume:
+      driver: local
+
+networks:
+  frescos-network:
+    driver: bridge
