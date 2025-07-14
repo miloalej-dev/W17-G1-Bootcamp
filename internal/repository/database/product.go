@@ -2,32 +2,26 @@ package database
 
 import (
 	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
 
-type ProductMap struct {
-	// db holds the product data. It is a private field to encapsulate storage.
-	db map[int]models.Product
-}
-
 // ProductMap implements a product repository using an in-memory map.
 // The key of the map is the product ID.
-type ProductDB struct {
+type ProductRepository struct {
 	// db conection to db
 	db *gorm.DB
 }
 
 // NewProductMap is a constructor that creates and returns a new instance of ProductMap.
 // It can be initialized with a pre-existing map of products.
-func NewProductDB(db *gorm.DB) repository.ProductRepository {
-	return &ProductDB{db: db}
+func NewProductDB(db *gorm.DB) *ProductRepository {
+	return &ProductRepository{db: db}
 }
 
 // FindAll returns a copy of all products currently stored in the repository.
 // It returns an error if the operation fails, which is nil in this implementation.
-func (r *ProductDB) FindAll() ([]models.Product, error) {
+func (r *ProductRepository) FindAll() ([]models.Product, error) {
 	var products []models.Product
 	// GORM genera: SELECT * FROM products;
 	result := r.db.Find(&products)
@@ -39,14 +33,14 @@ func (r *ProductDB) FindAll() ([]models.Product, error) {
 
 // Create adds a new product to the repository.
 // It returns an error if a product with the same ID already exists.
-func (r *ProductDB) Create(body models.Product) (models.Product, error) {
+func (r *ProductRepository) Create(body models.Product) (models.Product, error) {
 	result := r.db.Create(&body)
 	if result.Error != nil {
 		return models.Product{}, errors.New(result.Error.Error())
 	}
 	return body, nil
 }
-func (r *ProductDB) Update(body models.Product) (models.Product, error) {
+func (r *ProductRepository) Update(body models.Product) (models.Product, error) {
 	result := r.db.Save(body)
 	if result.Error != nil {
 		return models.Product{}, result.Error
@@ -56,7 +50,7 @@ func (r *ProductDB) Update(body models.Product) (models.Product, error) {
 
 // FindById searches for a product by its unique ID.
 // It returns the found product or an error if the product does not exist.
-func (r *ProductDB) FindById(id int) (models.Product, error) {
+func (r *ProductRepository) FindById(id int) (models.Product, error) {
 	var product models.Product
 	result := r.db.First(&product, id)
 	if result.Error != nil {
@@ -69,7 +63,7 @@ func (r *ProductDB) FindById(id int) (models.Product, error) {
 }
 
 // PartialUpdate updates specific fields of an existing product.
-func (r *ProductDB) PartialUpdate(id int, fields map[string]interface{}) (models.Product, error) {
+func (r *ProductRepository) PartialUpdate(id int, fields map[string]interface{}) (models.Product, error) {
 	var product models.Product
 	// Primero, busca el producto para asegurarte de que existe.
 	if err := r.db.First(&product, id).Error; err != nil {
@@ -88,7 +82,7 @@ func (r *ProductDB) PartialUpdate(id int, fields map[string]interface{}) (models
 }
 
 // Delete elimina un producto por su ID.
-func (r *ProductDB) Delete(id int) error {
+func (r *ProductRepository) Delete(id int) error {
 	result := r.db.Delete(&models.Product{}, id)
 
 	if result.Error != nil {
