@@ -6,7 +6,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - frescos-network
 
@@ -22,6 +26,11 @@ services:
       MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
     volumes:
       - mysql-data-volume:/var/lib/mysql
       - ./docs/db/scripts/frescos_ddl.sql:/docker-entrypoint-initdb.d/frescos_ddl.sql:ro
