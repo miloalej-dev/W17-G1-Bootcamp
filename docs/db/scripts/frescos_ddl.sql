@@ -177,16 +177,16 @@ CREATE TABLE IF NOT EXISTS `frescos`.`products`
 
     PRIMARY KEY (`id`),
     INDEX `fk_products_sellers1_idx` (`seller_id` ASC) VISIBLE,
-    ##INDEX `fk_products_product_type1_idx` (`product_type_id` ASC) VISIBLE,
+    INDEX `fk_products_product_type1_idx` (`product_type_id` ASC) VISIBLE,
     CONSTRAINT `fk_products_sellers1`
-    FOREIGN KEY (`seller_id`)
-    REFERENCES `frescos`.`sellers` (`id`)
-    ##CONSTRAINT `fk_products_product_type1`
-    ##FOREIGN KEY (`product_type_id`)
-    ##REFERENCES `frescos`.`product_type` (`id`)
-    ##ON DELETE NO ACTION
-    ##ON UPDATE NO ACTION
-    )
+        FOREIGN KEY (`seller_id`)
+            REFERENCES `frescos`.`sellers` (`id`),
+    CONSTRAINT `fk_products_product_type1`
+        FOREIGN KEY (`product_type_id`)
+            REFERENCES `frescos`.`product_type` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
 
