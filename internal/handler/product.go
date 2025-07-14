@@ -47,10 +47,6 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 	}
-	var sellerId int
-	if data.SellerId != nil {
-		sellerId = *data.SellerId // Si no es nulo, asigna el valor.
-	}
 
 	product := models.NewProduct(
 		0,
@@ -63,10 +59,9 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 		*data.RecommendedFreezingTemperature,
 		*data.FreezingRate,
 		*data.ProductTypeId,
-		sellerId,
+		data.SellerId,
 	)
 	createdProduct, errService := h.sv.Register(*product)
-
 	if errService != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 		return

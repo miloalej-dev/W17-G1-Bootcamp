@@ -162,7 +162,7 @@ DROP TABLE IF EXISTS `frescos`.`products`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`products`
 (
-    `id`                               INT            NOT NULL,
+    `id`                               INT  UNSIGNED AUTO_INCREMENT NOT NULL,
     `product_code`                     VARCHAR(32)    NULL DEFAULT NULL,
     `description`                      VARCHAR(255)   NULL DEFAULT NULL,
     `width`                            DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`products`
     `recommended_freezing_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
     `freezing_rate`                    DECIMAL(19,2)  NULL DEFAULT NULL,
     `product_type_id`                  INT            NOT NULL,
-    `seller_id`                       INT             NULL DEFAULT NULL,
+    `seller_id`                        INT            NULL DEFAULT NULL,
 
     PRIMARY KEY (`id`),
     INDEX `fk_products_sellers1_idx` (`seller_id` ASC) VISIBLE,
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `manufacturing_hour`  TIME           NULL DEFAULT NULL,
     `minumum_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
     `sections_id`         INT            NOT NULL,
-    `products_id`         INT            NOT NULL,
+    `products_id`         INT UNSIGNED           NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_product_batches_sections1_idx` (`sections_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products1_idx` (`products_id` ASC) VISIBLE,
@@ -298,7 +298,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_records`
     `last_update`    DATETIME(6)    NULL DEFAULT NULL,
     `purchase_price` DECIMAL(19, 2) NULL DEFAULT NULL,
     `sale_price`     DECIMAL(19, 2) NULL DEFAULT NULL,
-    `products_id`    INT            NOT NULL,
+    `products_id`    INT   UNSIGNED         NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_product_records_products1_idx` (`products_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_records_products1`

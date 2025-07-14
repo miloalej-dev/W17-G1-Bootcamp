@@ -25,7 +25,7 @@ type Product struct {
 	// The ID of the associated ProductType.
 	ProductTypeId int `json:"product_type_id"`
 	// The ID of the associated Seller (OPTIONAL).
-	SellerId int `json:"seller_id,omitempty"`
+	SellerId *int `json:"seller_id,omitempty"`
 }
 
 // ProductType represents the type of product.
@@ -35,7 +35,7 @@ type ProductType struct {
 }
 
 // NewProduct is a function that creates a new Product
-func NewProduct(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate float64, recommendedFreezingTemperature float64, freezingRate float64, productTypeId int, sellerId int) *Product {
+func NewProduct(id int, productCode string, description string, width float64, height float64, length float64, netWeight float64, expirationRate float64, recommendedFreezingTemperature float64, freezingRate float64, productTypeId int, sellerId *int) *Product {
 	return &Product{
 		Id:                             id,
 		ProductCode:                    productCode,

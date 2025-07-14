@@ -42,7 +42,7 @@ func (r *ProductDB) FindAll() ([]models.Product, error) {
 func (r *ProductDB) Create(body models.Product) (models.Product, error) {
 	result := r.db.Create(&body)
 	if result.Error != nil {
-		return models.Product{}, result.Error
+		return models.Product{}, errors.New(result.Error.Error())
 	}
 	return body, nil
 }
