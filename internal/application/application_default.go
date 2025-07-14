@@ -3,9 +3,14 @@ package application
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 
@@ -27,8 +32,8 @@ type ServerChi struct {
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
 
-	loaderFilePathEmployee  string
-	LoaderFilePathSection   string
+	loaderFilePathEmployee string
+	LoaderFilePathSection  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -52,9 +57,9 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	}
 
 	return &ServerChi{
-		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
-		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
+		serverAddress:          defaultConfig.ServerAddress,
+		loaderFilePathEmployee: defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:  defaultConfig.LoaderFilePathSection,
 	}
 }
 
@@ -69,12 +74,32 @@ func (a *ServerChi) Run() (err error) {
 
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
+	var gormDB *gorm.DB
+	maxRetries := 10
+	retryDelay := 2 * time.Second
+	dsn := "frescos_user:password@tcp(database:3306)/frescos?charset=utf8mb4&parseTime=True&loc=Local"
+
+	for i := 0; i < maxRetries; i++ {
+		gormDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			// Conexión exitosa, salimos del bucle
+			log.Println("Successfully connected to the database")
+			break
+		}
+		log.Printf("Failed to connect to database (attempt %d/%d): %v. Retrying in %v...", i+1, maxRetries, err, retryDelay)
+		time.Sleep(retryDelay)
+	}
+
+	// Si después de todos los reintentos el error persiste, la aplicación se detiene.
+	if err != nil {
+		log.Fatalf("failed to connect to database after %d attempts: %v", maxRetries, err)
+	}
 
 	if err != nil {
 		return
 	}
 	// - repositories
-	productRepository := memory.NewProductMap()
+	productRepository := database.NewProductDB(gormDB)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
