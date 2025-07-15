@@ -4,6 +4,7 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
 	"strconv"
+	"errors"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
@@ -61,6 +62,10 @@ func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
 
 	carrierResponse, err := h.sv.Register(*carrier)
 	if err != nil {
+		if errors.Is(err, service.ErrEntityAlreadyExists) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
+			return
+		}
 		_ = render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
 	}

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
@@ -31,6 +32,18 @@ func (r *CarrierDB) FindById(id int) (models.Carrier, error) {
 		return models.Carrier{}, result.Error
 	}
 	return carrier, nil
+}
+
+func (r *CarrierDB) FindByCid(cid string) (models.Carrier, bool, error) {
+	var carrier models.Carrier
+	result := r.db.Where("cid = ?", cid).First(&carrier)
+	if result.Error != nil {
+		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return models.Carrier{}, false, result.Error
+		}
+	}
+	found := result.RowsAffected >= 1
+	return carrier, found, nil
 }
 
 func (r *CarrierDB) Create(carrier models.Carrier) (models.Carrier, error) {
