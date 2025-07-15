@@ -21,6 +21,6 @@ func BuyerRoutes(rt chi.Router, handler *handler.BuyerHandler) {
 		// - DELETE/
 		rt.Delete("/{id}", handler.DeleteBuyer)
 
-		rt.Get("/reportPurchaseOrders", handler.GetBuyer)
+		rt.Get("/reportPurchaseOrders", handler.GetBuyerPurchaseOrderReport)
 	})
 }

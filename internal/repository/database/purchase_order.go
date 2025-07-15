@@ -70,14 +70,14 @@ func (r *PurchaseOrderRepository) PartialUpdate(id int, fields map[string]interf
 	if val, ok := fields["tracing_code"]; ok {
 		po.TracingCode = val.(string)
 	}
-	if val, ok := fields["buyers_id"]; ok {
-		po.BuyersID = int(val.(float64))
+	if val, ok := fields["buyer_id"]; ok {
+		po.BuyerID = int(val.(float64))
 	}
-	if val, ok := fields["warehouses_id"]; ok {
-		po.WarehousesID = int(val.(float64))
+	if val, ok := fields["warehouse_id"]; ok {
+		po.WarehouseID = int(val.(float64))
 	}
-	if val, ok := fields["carriers_id"]; ok {
-		po.CarriersID = int(val.(float64))
+	if val, ok := fields["carrier_id"]; ok {
+		po.CarrierID = int(val.(float64))
 	}
 	if val, ok := fields["order_status_id"]; ok {
 		po.OrderStatusID = int(val.(float64))
@@ -98,7 +98,7 @@ func (r *PurchaseOrderRepository) Delete(id int) error {
 
 func (r *PurchaseOrderRepository) FindByBuyerId(id int) ([]models.PurchaseOrder, error) {
 	var orders []models.PurchaseOrder
-	result := r.db.Where("buyers_id = ?", id).Find(&orders)
+	result := r.db.Where("buyer_id = ?", id).Find(&orders)
 	if result.Error != nil {
 		return []models.PurchaseOrder{}, result.Error
 	}

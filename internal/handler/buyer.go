@@ -123,3 +123,26 @@ func (h *BuyerHandler) PatchBuyer(w http.ResponseWriter, r *http.Request) {
 	_ = render.Render(w, r, response.NewResponse(buyer, http.StatusOK))
 
 }
+
+func (h *BuyerHandler) GetBuyerPurchaseOrderReport(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	idParam := r.URL.Query().Get("id")
+	var id int
+	var err error
+	if idParam != "" {
+		id, err = strconv.Atoi(idParam)
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(idParam, http.StatusBadRequest))
+			return
+		}
+	} else {
+		id = 0 // valor por defecto si no hay query param
+	}
+	report, err := h.service.RetrieveByPurchaseOrderReport(id)
+
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+	}
+	_ = render.Render(w, r, response.NewResponse(report, http.StatusOK))
+
+}

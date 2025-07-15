@@ -11,16 +11,13 @@ type PurchaseOrderRequest struct {
 	OrderNumber   *string    `json:"order_number"`
 	OrderDate     *time.Time `json:"order_date"`
 	TracingCode   *string    `json:"tracing_code"`
-	BuyersID      *int       `json:"buyers_id"`
-	WarehousesID  *int       `json:"warehouses_id"`
-	CarriersID    *int       `json:"carriers_id"`
+	BuyersID      *int       `json:"buyer_id"`
+	WarehousesID  *int       `json:"warehouse_id"`
+	CarriersID    *int       `json:"carrier_id"`
 	OrderStatusID *int       `json:"order_status_id"`
 }
 
 func (p *PurchaseOrderRequest) Bind(r *http.Request) error {
-	if p.Id == nil {
-		return errors.New("ID must not be null")
-	}
 	if p.OrderNumber == nil {
 		return errors.New("OrderNumber must not be null")
 	}

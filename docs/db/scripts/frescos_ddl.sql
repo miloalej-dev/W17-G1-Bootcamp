@@ -327,7 +327,7 @@ DROP TABLE IF EXISTS `frescos`.`purchase_orders`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`purchase_orders`
 (
-    `id`              INT         NOT NULL,
+    `id`              INT     AUTO_INCREMENT    NOT NULL,
     `order_number`    VARCHAR(64) NULL DEFAULT NULL,
     `order_date`      DATETIME(6) NULL DEFAULT NULL,
     `tracing_code`    VARCHAR(64) NULL DEFAULT NULL,

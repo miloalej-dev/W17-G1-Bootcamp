@@ -33,14 +33,11 @@ INSERT INTO `frescos`.`order_status` (`id`, `name`, `description`) VALUES
                                                                        (2, 'En tránsito', 'La orden ha sido despachada y está en tránsito'),
                                                                        (3, 'Entregada', 'La orden fue entregada satisfactoriamente');
 
--- BUYERS
-INSERT INTO `frescos`.`buyers` (`id`, `card_number_id`, `first_name`, `last_name`) VALUES
-    (1, 1, 'alejo', 'CM');
 
 
 INSERT INTO `frescos`.`purchase_orders` (
     `id`, `order_number`, `order_date`, `tracing_code`,
-    `buyers_id`, `warehouses_id`, `carriers_id`, `order_status_id`
+    `buyer_id`, `warehouse_id`, `carrier_id`, `order_status_id`
 ) VALUES
       (1, 'PO-20250715-001', '2025-07-15 10:00:00', 'TRC001', 1, 1, 1, 1),
       (2, 'PO-20250715-002', '2025-07-14 14:30:00', 'TRC002', 1, 1, 1, 2),

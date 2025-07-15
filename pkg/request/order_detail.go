@@ -15,9 +15,7 @@ type OrderDetailRequest struct {
 }
 
 func (o *OrderDetailRequest) Bind(r *http.Request) error {
-	if o.ID == nil {
-		return errors.New("ID must not be null")
-	}
+
 	if o.Quantity == nil {
 		return errors.New("Quantity must not be null")
 	}

@@ -20,10 +20,16 @@ type PurchaseOrderHandler struct {
 
 func (h *PurchaseOrderHandler) GetPurchaseOrdersReport(w http.ResponseWriter, r *http.Request) {
 	idParam := r.URL.Query().Get("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("Invalid buyer ID", http.StatusBadRequest))
-		return
+	var id int
+	var err error
+	if idParam != "" {
+		id, err = strconv.Atoi(idParam)
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(idParam, http.StatusBadRequest))
+			return
+		}
+	} else {
+		id = 0 // valor por defecto si no hay query param
 	}
 
 	// Suponiendo que tienes un servicio llamado h.sv con método ReportByBuyerID
@@ -46,13 +52,12 @@ func (h *PurchaseOrderHandler) PostPurchaseOrders(w http.ResponseWriter, r *http
 	}
 
 	purchaseOrders := models.PurchaseOrder{
-		Id:            *data.Id,
 		OrderNumber:   *data.OrderNumber,
 		OrderDate:     *data.OrderDate,
 		TracingCode:   *data.TracingCode,
-		BuyersID:      *data.BuyersID,
-		WarehousesID:  *data.WarehousesID,
-		CarriersID:    *data.CarriersID,
+		BuyerID:       *data.BuyersID,
+		WarehouseID:   *data.WarehousesID,
+		CarrierID:     *data.CarriersID,
 		OrderStatusID: *data.OrderStatusID,
 	}
 
