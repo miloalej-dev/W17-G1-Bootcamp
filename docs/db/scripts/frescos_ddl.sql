@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `frescos`.`buyers`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`buyers`
 (
-    `id`             INT         NOT NULL,
+    `id`             INT    AUTO_INCREMENT      NOT NULL,
     `card_number_id` VARCHAR(64) NULL DEFAULT NULL,
     `first_name`     VARCHAR(64) NULL DEFAULT NULL,
     `last_name`      VARCHAR(64) NULL DEFAULT NULL,
