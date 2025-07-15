@@ -56,7 +56,7 @@ func (r *CarrierDB) PartialUpdate(id int, fields map[string]interface{}) (models
 	}
 
 	if val, ok := fields["cid"]; ok {
-		carrier.CarrierCode = val.(string)
+		carrier.CId = val.(string)
 	}
 	if val, ok := fields["company_name"]; ok {
 		carrier.Address = val.(string)
