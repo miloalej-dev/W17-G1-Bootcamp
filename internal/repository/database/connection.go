@@ -18,13 +18,6 @@ type configuration struct {
 }
 
 func configure() (*configuration, error) {
-	// Set environment variables or load from .env file
-	_ = os.Setenv("DB_USER", "frescos_user")
-	_ = os.Setenv("DB_PASSWORD", "password")
-	_ = os.Setenv("DB_HOST", "localhost")
-	_ = os.Setenv("DB_NAME", "frescos")
-	_ = os.Setenv("DB_PORT", "3306")
-
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
