@@ -10,13 +10,13 @@ type ProductBatch struct {
 	InitialQuantity    int     `json:"initial_quantity"`
 	ManufacturingDate  string  `json:"manufacturing_date"`
 	ManufacturingHour  int     `json:"manufacturing_hour"`
-	MinumumTemperature float64 `json:"minumum_temperature"`
-	SectionsId         int     `json:"sections_id"`
-	ProductsId         int     `json:"products_id"`
+	MinimumTemperature float64 `json:"minimum_temperature"`
+	SectionId          int     `json:"section_id"`
+	ProductId          int     `json:"product_id"`
 }
 
 // NewProductBatch is a function that creates a new Product
-func NewProductBatch(id int, batchNumber int, currentQuantity int, currentTemperature float64, dueDate string, initialQuantity int, manufacturingDate string, manufacturingHour int, minumumTemperature float64, sectionsId int, productsId int) ProductBatch {
+func NewProductBatch(id int, batchNumber int, currentQuantity int, currentTemperature float64, dueDate string, initialQuantity int, manufacturingDate string, manufacturingHour int, minimumTemperature float64, sectionId int, productId int) ProductBatch {
 	return ProductBatch{
 		Id:                 id,
 		BatchNumber:        batchNumber,
@@ -26,8 +26,8 @@ func NewProductBatch(id int, batchNumber int, currentQuantity int, currentTemper
 		InitialQuantity:    initialQuantity,
 		ManufacturingDate:  manufacturingDate,
 		ManufacturingHour:  manufacturingHour,
-		MinumumTemperature: minumumTemperature,
-		SectionsId:         sectionsId,
-		ProductsId:         productsId,
+		MinimumTemperature: minimumTemperature,
+		SectionId:          sectionId,
+		ProductId:          productId,
 	}
 }

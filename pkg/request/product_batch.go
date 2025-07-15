@@ -14,9 +14,9 @@ type ProductBatchRequest struct {
 	InitialQuantity    *int     `json:"initial_quantity"`
 	ManufacturingDate  *string  `json:"manufacturing_date"`
 	ManufacturingHour  *int     `json:"manufacturing_hour"`
-	MinumumTemperature *float64 `json:"minumum_temperature"`
-	SectionsId         *int     `json:"sections_id"`
-	ProductsId         *int     `json:"products_id"`
+	MinimumTemperature *float64 `json:"minimum_temperature"`
+	SectionId          *int     `json:"section_id"`
+	ProductId          *int     `json:"product_id"`
 }
 
 func (p *ProductBatchRequest) Bind(r *http.Request) error {
@@ -41,14 +41,14 @@ func (p *ProductBatchRequest) Bind(r *http.Request) error {
 	if p.ManufacturingHour == nil {
 		return errors.New("ManufacturingHour must not be null")
 	}
-	if p.MinumumTemperature == nil {
-		return errors.New("MinumumTemperature must not be null")
+	if p.MinimumTemperature == nil {
+		return errors.New("MinimumTemperature must not be null")
 	}
-	if p.SectionsId == nil {
-		return errors.New("SectionsId must not be null")
+	if p.SectionId == nil {
+		return errors.New("SectionId must not be null")
 	}
-	if p.ProductsId == nil {
-		return errors.New("ProductsId must not be null")
+	if p.ProductId == nil {
+		return errors.New("ProductId must not be null")
 	}
 
 	return nil

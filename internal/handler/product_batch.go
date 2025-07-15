@@ -38,9 +38,9 @@ func (h *ProductBatchDefault) PostProductBatch(w http.ResponseWriter, r *http.Re
 		*data.InitialQuantity,
 		*data.ManufacturingDate,
 		*data.ManufacturingHour,
-		*data.MinumumTemperature,
-		*data.SectionsId,
-		*data.ProductsId,
+		*data.MinimumTemperature,
+		*data.SectionId,
+		*data.ProductId,
 	)
 	createdProductBatch, errService := h.sv.Register(product)
 	if errService != nil {
