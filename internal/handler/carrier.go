@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
-	"strconv"
 	"errors"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
@@ -22,24 +22,6 @@ type CarrierDefault struct {
 // NewCarrierDefault is a function that returns a new instance of CarrierDefault
 func NewCarrierDefault(sv service.CarrierService) *CarrierDefault {
 	return &CarrierDefault{sv: sv}
-}
-
-func (h *CarrierDefault) GetCarrier(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	idRequest := r.URL.Query().Get("id")
-	id, err := strconv.Atoi(idRequest)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
-		return
-	}
-
-	carriers, err := h.sv.RetrieveByLocality(id)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
-		return
-	}
-
-	_ = render.Render(w, r, response.NewResponse(carriers, http.StatusOK))
 }
 
 func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +47,11 @@ func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
 			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 			return
 		}
+		if errors.Is(err, repository.ErrForeignKeyViolation) {
+			_ = render.Render(w, r, response.NewErrorResponse("Specified locality does not exist", http.StatusConflict))
+			return
+		}
+
 		_ = render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
 	}
