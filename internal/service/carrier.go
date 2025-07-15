@@ -5,6 +5,6 @@ import (
 )
 
 type CarrierService interface {
-	Retrieve(id int) (models.Carrier, error)
+	RetrieveByLocality(id int) ([]models.Carrier, error)
 	Register(seller models.Carrier) (models.Carrier, error)
 }
