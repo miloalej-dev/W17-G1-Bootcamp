@@ -72,9 +72,6 @@ func (a *ServerChi) Run() (err error) {
 
 	// - loader
 
-	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
-	dbEmployee, err := ldEmployee.Load()
-
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
 
@@ -85,7 +82,7 @@ func (a *ServerChi) Run() (err error) {
 	productRepository := memory.NewProductMap()
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
-	employeeRepository := memory.NewEmployeeMap(dbEmployee)
+	employeeRepository := database.NewEmployeeRepository(db)
 	buyerRepository := memory.NewBuyerMap()
 	sectionRepository := memory.NewSectionMap(dbSection)
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
