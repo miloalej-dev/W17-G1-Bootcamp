@@ -17,10 +17,6 @@ func NewCarrierDefault(rp repository.CarrierRepository) *CarrierDefault {
 	return &CarrierDefault{rp: rp}
 }
 
-func (s *CarrierDefault) RetrieveByLocality(id int) ([]models.Carrier, error) {
-	return s.rp.FindByLocality(id)
-}
-
 func (s *CarrierDefault) Register(entity models.Carrier) (models.Carrier, error) {
 	// Validate that cid does not exists
 	_,found,err := s.rp.FindByCid(entity.CId)

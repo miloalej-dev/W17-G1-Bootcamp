@@ -7,5 +7,4 @@ import (
 type CarrierRepository interface {
 	Repository[int, models.Carrier]
 	FindByCid(cid string) (models.Carrier, bool, error)
-	FindByLocality(id int) ([]models.Carrier, error)
 }

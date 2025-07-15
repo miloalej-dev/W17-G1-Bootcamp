@@ -4,6 +4,8 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/go-sql-driver/mysql"
 )
 
 // Carrier repository
@@ -19,15 +21,6 @@ func NewCarrierDB(db *gorm.DB) *CarrierDB {
 func (r *CarrierDB) FindAll() ([]models.Carrier, error) {
 	carriers := make([]models.Carrier, 0)
 	result := r.db.Find(&carriers)
-	if result.Error != nil {
-		return make([]models.Carrier, 0), result.Error
-	}
-	return carriers, nil
-}
-
-func (r *CarrierDB) FindByLocality(id int) ([]models.Carrier, error) {
-	carriers := make([]models.Carrier, 0)
-	result := r.db.Where("locality_id = ?", id).Find(&carriers)
 	if result.Error != nil {
 		return make([]models.Carrier, 0), result.Error
 	}
@@ -58,6 +51,12 @@ func (r *CarrierDB) FindByCid(cid string) (models.Carrier, bool, error) {
 func (r *CarrierDB) Create(carrier models.Carrier) (models.Carrier, error) {
 	result := r.db.Create(&carrier)
 	if result.Error != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(result.Error, &mysqlErr) {
+			if mysqlErr.Number == 1452 {
+				return models.Carrier{}, repository.ErrForeignKeyViolation
+			}
+		}
 		return models.Carrier{}, result.Error
 	}
 	return carrier, nil
