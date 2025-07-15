@@ -45,3 +45,25 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 
 	_ = render.Render(w, r, response.NewResponse(res, http.StatusOK))
 }
+
+func (h *LocalityHandler) GetCarrier(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	idRequest := r.URL.Query().Get("id")
+	var id int
+	if idRequest != "" {
+		var err error
+		id, err = strconv.Atoi(idRequest)
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+			return
+		}
+	}
+
+	carriers, err := h.service.RetrieveCarriers(id)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		return
+	}
+
+	_ = render.Render(w, r, response.NewResponse(carriers, http.StatusOK))
+}
