@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/go-chi/render"
 	_default "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
@@ -40,5 +41,7 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = render.Render(w, r, response.NewResponse(locality, http.StatusOK))
+	res := []models.Locality{locality}
+
+	_ = render.Render(w, r, response.NewResponse(res, http.StatusOK))
 }
