@@ -103,7 +103,7 @@ DROP TABLE IF EXISTS `frescos`.`employees`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`employees`
 (
-    `id`             INT         NOT NULL,
+    `id`             INT         NOT NULL AUTO_INCREMENT,
     `card_number_id` VARCHAR(64) NULL DEFAULT NULL,
     `first_name`     VARCHAR(64) NULL DEFAULT NULL,
     `last_name`      VARCHAR(64) NULL DEFAULT NULL,
