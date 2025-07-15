@@ -15,7 +15,10 @@ func NewLocalityRepository(db *gorm.DB) *LocalityRepository {
 
 func (l LocalityRepository) FindAll() ([]models.Locality, error) {
 	var localities []models.Locality
-	_ = l.db.Find(&localities)
+	result := l.db.Find(&localities)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return localities, nil
 }
 
