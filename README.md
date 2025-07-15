@@ -157,6 +157,49 @@ Es una convención para escribir commits en proyectos que utilizan control de ve
 * `perf`: usado para mejoras de rendimiento.
 * `revert`: si el commit revierte un commit anterior. Debería indicarse el hash del commit que se revierte.
 
+## 🔧 Configuración de Variables de Entorno
+
+Este proyecto utiliza variables de entorno para configurar diferentes aspectos de la aplicación y la base de datos. La configuración se gestiona a través de un archivo `.env` que Docker Compose lee automáticamente.
+
+### Archivo .env
+
+El archivo `.env` debe crearse en la raíz del proyecto y contiene todas las variables de configuración necesarias:
+
+```dotenv
+# Database Configuration
+MYSQL_ROOT_PASSWORD=your_root_password_here
+MYSQL_DATABASE=your_database_here
+MYSQL_USER=your_user_here
+MYSQL_PASSWORD=your_password_here
+MYSQL_CHARACTER_SET_SERVER=your_character_set_here
+MYSQL_COLLATION_SERVER=your_collation_here
+MYSQL_PORT=your_mysql_port_here
+
+# Application Configuration
+APP_PORT=your_app_port_here
+```
+
+### Descripción de Variables
+
+#### 🗄️ Configuración de Base de Datos
+
+| Variable                     | Descripción                                   | 
+|------------------------------|-----------------------------------------------|
+| `MYSQL_ROOT_PASSWORD`        | Contraseña del usuario root de MySQL          |
+| `MYSQL_DATABASE`             | Nombre de la base de datos que se creará      |
+| `MYSQL_USER`                 | Usuario de aplicación para conectarse a MySQL |
+| `MYSQL_PASSWORD`             | Contraseña del usuario de aplicación          |
+| `MYSQL_CHARACTER_SET_SERVER` | Conjunto de caracteres del servidor MySQL     |
+| `MYSQL_COLLATION_SERVER`     | Collation del servidor MySQL                  |
+| `MYSQL_PORT`                 | Puerto donde MySQL aceptará las conexiones    |
+
+
+#### 🌐 Configuración de la Aplicación (FRESCOS)
+
+| Variable | Descripción |
+|----------|-------------|
+| `APP_PORT` | Puerto donde se expone la aplicación Go |
+
 ## Estructura del proyecto
 
 ```markdown

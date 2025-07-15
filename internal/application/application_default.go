@@ -3,8 +3,10 @@ package application
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"log"
 	"net/http"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
@@ -60,7 +62,13 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	// dependencies
+	// Database connection
+	db, err := database.NewConnection()
+
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
 
 	// - loader
 
