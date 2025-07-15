@@ -1,7 +1,6 @@
 -- Select the database to use
 USE `frescos`;
 
-
 -- Step 1: Populate the parent table 'product_type' first.
 -- Note: A placeholder description is used.
 INSERT INTO `product_type` (id, name, description)

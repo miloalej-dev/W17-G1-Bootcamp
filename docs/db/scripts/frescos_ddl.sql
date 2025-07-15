@@ -187,7 +187,6 @@ CREATE TABLE IF NOT EXISTS `frescos`.`products`
             REFERENCES `frescos`.`sellers` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
-)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
 
@@ -239,7 +238,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `manufacturing_hour`  TIME           NULL DEFAULT NULL,
     `minimum_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
     `section_id`          INT            NOT NULL,
-    `product_id`          INT            NOT NULL,
+    `product_id`          INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products_idx` (`product_id` ASC) VISIBLE,
