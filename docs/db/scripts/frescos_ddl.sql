@@ -197,7 +197,7 @@ DROP TABLE IF EXISTS `frescos`.`sections`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`sections`
 (
-    `id`                  INT            NOT NULL,
+    `id`                  INT AUTO_INCREMENT NOT NULL,
     `section_number`      VARCHAR(64)    NULL DEFAULT NULL,
     `current_capacity`    INT            NULL DEFAULT NULL,
     `current_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -205,16 +205,15 @@ CREATE TABLE IF NOT EXISTS `frescos`.`sections`
     `minimum_capacity`    INT            NULL DEFAULT NULL,
     `minimum_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
     `product_type_id`     INT            NULL DEFAULT NULL,
-    `warehouses_id`       INT            NOT NULL,
-    `product_type_id1`    INT            NOT NULL,
+    `warehouses_id`       INT            NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_sections_warehouses1_idx` (`warehouses_id` ASC) VISIBLE,
-    INDEX `fk_sections_product_type1_idx` (`product_type_id1` ASC) VISIBLE,
+    INDEX `fk_sections_product_type1_idx` (`product_type_id` ASC) VISIBLE,
     CONSTRAINT `fk_sections_warehouses1`
     FOREIGN KEY (`warehouses_id`)
     REFERENCES `frescos`.`warehouses` (`id`),
     CONSTRAINT `fk_sections_product_type1`
-    FOREIGN KEY (`product_type_id1`)
+    FOREIGN KEY (`product_type_id`)
     REFERENCES `frescos`.`product_type` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
@@ -391,3 +390,4 @@ CREATE TABLE IF NOT EXISTS `frescos`.`order_details`
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS = @OLD_UNIQUE_CHECKS;
+
