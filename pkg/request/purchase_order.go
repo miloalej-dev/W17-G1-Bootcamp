@@ -7,7 +7,7 @@ import (
 )
 
 type PurchaseOrderRequest struct {
-	ID            *int       `json:"id"`
+	Id            *int       `json:"id"`
 	OrderNumber   *string    `json:"order_number"`
 	OrderDate     *time.Time `json:"order_date"`
 	TracingCode   *string    `json:"tracing_code"`
@@ -18,7 +18,7 @@ type PurchaseOrderRequest struct {
 }
 
 func (p *PurchaseOrderRequest) Bind(r *http.Request) error {
-	if p.ID == nil {
+	if p.Id == nil {
 		return errors.New("ID must not be null")
 	}
 	if p.OrderNumber == nil {

@@ -88,6 +88,7 @@ func (a *ServerChi) Run() (err error) {
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
 	sectionRepository := memory.NewSectionMap(dbSection)
+	purchaseOrderRepository := database.NewPurchaseOrderRepository(db)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
@@ -96,6 +97,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	purchaseOrderService := _default.NewPurchaseOrderDefault(purchaseOrderRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
@@ -104,6 +106,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	purchaseOrderHandler := handler.NewPurchaseOrderDefault(purchaseOrderService)
 
 	// router
 	rt := chi.NewRouter()
@@ -121,6 +124,7 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
+	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return

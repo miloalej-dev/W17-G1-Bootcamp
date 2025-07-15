@@ -9,4 +9,5 @@ type PurchaseOrderService interface {
 	Modify(s models.PurchaseOrder) (models.PurchaseOrder, error)
 	PartialModify(id int, fields map[string]any) (models.PurchaseOrder, error)
 	Remove(id int) error
+	RetrieveByBuyer(id int) ([]models.PurchaseOrder, error)
 }
