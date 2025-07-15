@@ -6,10 +6,10 @@ import (
 )
 
 type SellerService struct {
-	repository repository.Repository[int, models.Seller]
+	repository repository.SellerRepository
 }
 
-func NewSellerService(repository repository.Repository[int, models.Seller]) *SellerService {
+func NewSellerService(repository repository.SellerRepository) *SellerService {
 	return &SellerService{
 		repository: repository,
 	}
