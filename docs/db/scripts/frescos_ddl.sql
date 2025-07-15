@@ -231,7 +231,7 @@ DROP TABLE IF EXISTS `frescos`.`product_batches`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
 (
-    `id`                  INT            NOT NULL,
+    `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
     `batch_number`        VARCHAR(32)    NULL DEFAULT NULL,
     `current_quantity`    INT            NULL DEFAULT NULL,
     `current_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -243,14 +243,15 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `sections_id`         INT            NOT NULL,
     `products_id`         INT UNSIGNED           NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_product_batches_sections1_idx` (`sections_id` ASC) VISIBLE,
+    UNIQUE INDEX `uq_batch_number` (`batch_number` ASC) VISIBLE,
+    ##INDEX `fk_product_batches_sections1_idx` (`sections_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products1_idx` (`products_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_batches_products1`
     FOREIGN KEY (`products_id`)
-    REFERENCES `frescos`.`products` (`id`),
-    CONSTRAINT `fk_product_batches_sections1`
-    FOREIGN KEY (`sections_id`)
-    REFERENCES `frescos`.`sections` (`id`)
+    REFERENCES `frescos`.`products` (`id`)##,
+   ## CONSTRAINT `fk_product_batches_sections1`
+    ##FOREIGN KEY (`sections_id`)
+    ##REFERENCES `frescos`.`sections` (`id`)
     )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
@@ -268,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`inbound_orders`
     `order_number`       VARCHAR(64) NULL DEFAULT NULL,
     `employees_id`       INT         NOT NULL,
     `warehouses_id`      INT         NOT NULL,
-    `product_batches_id` INT         NOT NULL,
+    `product_batches_id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_inbound_orders_employees1_idx` (`employees_id` ASC) VISIBLE,
     INDEX `fk_inbound_orders_warehouses1_idx` (`warehouses_id` ASC) VISIBLE,

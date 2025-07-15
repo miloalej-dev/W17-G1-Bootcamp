@@ -78,15 +78,16 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repositories
 	productRepository := database.NewProductDB(db)
+	productBatchRepository := database.NewProductBatchDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
 	sectionRepository := memory.NewSectionMap(dbSection)
-
 	// - services
-	buyerService := _default.NewBuyerDefault(buyerRepository)
 	productService := _default.NewProductDefault(productRepository)
+	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
+	buyerService := _default.NewBuyerDefault(buyerRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
@@ -94,6 +95,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
+	productBatchHandler := handler.NewProductBatchDefault(productBatchService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
@@ -116,6 +118,7 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
+	route.ProductBatchRoutes(rt, productBatchHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return

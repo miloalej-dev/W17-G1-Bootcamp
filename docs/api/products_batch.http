@@ -1,0 +1,16 @@
+### POST request to create a new product
+POST http://localhost:8080/api/v1/productBatches
+Content-Type: application/json
+
+{
+    "batch_number": 112,
+    "current_quantity": 200,
+    "current_temperature": 20,
+    "due_date": "2022-04-04",
+    "initial_quantity": 10,
+    "manufacturing_date": "2020-04-04",
+    "manufacturing_hour": 10,
+    "minumum_temperature":5,
+    "products_id": 1,
+    "sections_id": 1
+}
