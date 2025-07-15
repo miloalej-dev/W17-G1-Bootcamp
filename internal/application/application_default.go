@@ -72,21 +72,19 @@ func (a *ServerChi) Run() (err error) {
 
 	// - loader
 
-	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
-	dbEmployee, err := ldEmployee.Load()
-
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
 
 	if err != nil {
 		return
 	}
+
 	// - repositories
 	productRepository := memory.NewProductMap()
 	warehouseRepo := memory.NewWarehouseMap()
-	sellerRepository := memory.NewSellerMap()
-	employeeRepository := memory.NewEmployeeMap(dbEmployee)
-	buyerRepository := database.NewBuyerRepository(db)
+	sellerRepository := database.NewSellerRepository(db)
+	employeeRepository := database.NewEmployeeRepository(db)
+  buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := memory.NewSectionMap(dbSection)
 
 	// - services
