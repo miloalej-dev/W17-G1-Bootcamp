@@ -1,6 +1,7 @@
 package memory
 
 import (
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
@@ -9,12 +10,22 @@ type EmployeeMap struct {
 	db map[int]models.Employee
 }
 
-func NewEmployeeMap(db map[int]models.Employee) *EmployeeMap {
-	return &EmployeeMap{db: db}
+func NewEmployeeMap() *EmployeeMap {
+
+	defaultDB := make(map[int]models.Employee)
+	ld := loader.NewEmployeeFile("docs/db/json/employee.json")
+	db, err := ld.Load()
+	if err != nil {
+		return &EmployeeMap{db: defaultDB}
+	}
+	if db != nil {
+		defaultDB = db
+	}
+	return &EmployeeMap{db: defaultDB}
 }
 
 func (e *EmployeeMap) FindAll() ([]models.Employee, error) {
-	employees := make([]models.Employee, 0)
+	var employees []models.Employee
 	for _, emp := range e.db {
 		employees = append(employees, emp)
 	}
