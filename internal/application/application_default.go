@@ -76,7 +76,7 @@ func (a *ServerChi) Run() (err error) {
 	dbEmployee, err := ldEmployee.Load()
 
 	lfSection := json.NewFile(a.LoaderFilePathSection)
-	dbSection, err := lfSection.LoadSections()
+	_, err = lfSection.LoadSections()
 
 	if err != nil {
 		return
@@ -87,14 +87,14 @@ func (a *ServerChi) Run() (err error) {
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
 	buyerRepository := memory.NewBuyerMap()
-	sectionRepository := memory.NewSectionMap(dbSection)
+	sectionRepository := database.NewSectionRepository(db)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
 	productService := _default.NewProductDefault(productRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
-	sectionService := _default.NewSectionDefault(sectionRepository)
+	sectionService := _default.NewSectionService(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
 
 	// - handlers
