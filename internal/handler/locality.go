@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/render"
 	_default "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"net/http"
 	"strconv"
@@ -35,13 +36,35 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	locality, err := h.service.Retrieve(id)
+	locality, err := h.service.RetriveBySellerId(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	res := []models.Locality{locality}
+	res := []models.LocalitySellerCount{locality}
 
 	_ = render.Render(w, r, response.NewResponse(res, http.StatusOK))
+}
+
+func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	data := &request.LocalityRequest{}
+	if err := render.Bind(r, data); err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+		return
+	}
+	locality := models.Locality{
+		Id:       data.Id,
+		Locality: data.Locality,
+		Province: data.Province,
+		Country:  data.Country,
+	}
+
+	localityCreated, err := h.service.Register(locality)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(localityCreated, http.StatusCreated))
 }

@@ -19,12 +19,14 @@ func (l LocalityService) RetrieveAll() ([]models.Locality, error) {
 }
 
 func (l LocalityService) Retrieve(id int) (models.Locality, error) {
-	return l.rp.FindById(id)
-}
-
-func (l LocalityService) Register(seller models.Locality) (models.Locality, error) {
 	//TODO implement me
 	panic("implement me")
+}
+func (l LocalityService) RetriveBySellerId(id int) (models.LocalitySellerCount, error) {
+	return l.rp.FindBySellerId(id)
+}
+func (l LocalityService) Register(seller models.Locality) (models.Locality, error) {
+	return l.rp.Create(seller)
 }
 
 func (l LocalityService) Modify(seller models.Locality) (models.Locality, error) {
