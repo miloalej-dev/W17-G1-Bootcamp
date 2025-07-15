@@ -38,11 +38,11 @@ func (l *ProductRecordFile) Load() (v map[int]models.ProductRecord, err error) {
 	v = make(map[int]models.ProductRecord)
 	for _, product := range productRecords {
 		v[product.Id] = models.ProductRecord{
-			Id:             product.Id,
-			LastUpdateDate: product.LastUpdateDate,
-			PurchasePrice:  product.PurchasePrice,
-			SalePrice:      product.SalePrice,
-			ProductId:      product.ProductId,
+			Id:            product.Id,
+			LastUpdate:    product.LastUpdate,
+			PurchasePrice: product.PurchasePrice,
+			SalePrice:     product.SalePrice,
+			ProductsId:    product.ProductsId,
 		}
 	}
 

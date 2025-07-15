@@ -7,15 +7,16 @@ import (
 )
 
 type ProductRecordRequest struct {
-	Id             *int       `json:"id"`
-	LastUpdateDate *time.Time `json:"last_update_date"`
-	PurchasePrice  *float64   `json:"purchase_price"`
-	SalePrice      *float64   `json:"sale_price"`
-	ProductId      *int       `json:"product_id"`
+	Id            *int       `json:"id"`
+	LastUpdate    *time.Time `json:"last_update"`
+	PurchasePrice *float64   `json:"purchase_price"`
+	SalePrice     *float64   `json:"sale_price"`
+	ProductsId    *int       `json:"products_id"`
 }
 
 func (b *ProductRecordRequest) Bind(r *http.Request) error {
-	if b.LastUpdateDate == nil {
+
+	if b.LastUpdate == nil {
 		return errors.New("Last update date must be not null")
 	}
 	if b.PurchasePrice == nil {
@@ -23,6 +24,9 @@ func (b *ProductRecordRequest) Bind(r *http.Request) error {
 	}
 	if b.SalePrice == nil {
 		return errors.New("Sale price must be not null")
+	}
+	if b.ProductsId == nil {
+		return errors.New("Products Id must be not null")
 	}
 
 	return nil

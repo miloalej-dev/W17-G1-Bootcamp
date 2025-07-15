@@ -83,7 +83,7 @@ func (a *ServerChi) Run() (err error) {
 	}
 	// - repositories
 	productRepository := memory.NewProductMap()
-	productRecordRepository := memory.NewProductRecordMap()
+	productRecordRepository := database.NewProductRecordRepository(db)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)

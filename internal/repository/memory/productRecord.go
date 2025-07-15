@@ -110,7 +110,7 @@ func (r *ProductRecordMap) PartialUpdate(id int, fields map[string]interface{}) 
 		case "last_update_date":
 			// Perform a type assertion to ensure the value is a string
 			if lastUpdateDate, ok := value.(time.Time); ok {
-				productRecord.LastUpdateDate = lastUpdateDate
+				productRecord.LastUpdate = lastUpdateDate
 			}
 		case "purchase_price":
 			if purchasePrice, ok := value.(float64); ok {
@@ -123,7 +123,7 @@ func (r *ProductRecordMap) PartialUpdate(id int, fields map[string]interface{}) 
 
 		case "product_id":
 			if productId, ok := value.(int); ok {
-				productRecord.ProductId = productId
+				productRecord.ProductsId = productId
 			}
 
 		}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
@@ -66,12 +67,13 @@ func (h *ProductRecordHandler) PostProductRecord(w http.ResponseWriter, r *http.
 	}
 
 	productRecord := models.ProductRecord{
-		LastUpdateDate: *bodyRequest.LastUpdateDate,
-		PurchasePrice:  *bodyRequest.PurchasePrice,
-		SalePrice:      *bodyRequest.SalePrice,
-		ProductId:      *bodyRequest.ProductId,
+		LastUpdate:    *bodyRequest.LastUpdate,
+		PurchasePrice: *bodyRequest.PurchasePrice,
+		SalePrice:     *bodyRequest.SalePrice,
+		ProductsId:    *bodyRequest.ProductsId,
 	}
 
+	fmt.Println(productRecord)
 	value, err := h.service.Register(productRecord)
 
 	if err != nil {
