@@ -1,10 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Locality struct {
-	gorm.Model
-	ID       int
+	Id       int `gorm:"primaryKey"`
 	Locality *string
 	Province *string
 	Country  *string
@@ -12,9 +9,13 @@ type Locality struct {
 
 func NewLocality(id int, locality, province, country *string) *Locality {
 	return &Locality{
-		ID:       id,
+		Id:       id,
 		Locality: locality,
 		Province: province,
 		Country:  country,
 	}
+}
+
+func (Locality) TableName() string {
+	return "localities"
 }

@@ -14,8 +14,8 @@ func NewLocalityService(rp *database.LocalityRepository) *LocalityService {
 }
 
 func (l LocalityService) RetrieveAll() ([]models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+	localities, err := l.rp.FindAll()
+	return localities, err
 }
 
 func (l LocalityService) Retrieve(id int) (models.Locality, error) {
