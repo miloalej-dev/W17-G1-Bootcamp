@@ -3,7 +3,6 @@ package application
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
@@ -63,7 +62,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// Database connection
-	db, err := database.NewConnection()
+	//db, err := database.NewConnection()
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -71,9 +70,6 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - loader
-
-	ldEmployee := json.NewEmployeeFile(a.loaderFilePathEmployee)
-	dbEmployee, err := ldEmployee.Load()
 
 	lfSection := json.NewFile(a.LoaderFilePathSection)
 	dbSection, err := lfSection.LoadSections()
@@ -85,7 +81,7 @@ func (a *ServerChi) Run() (err error) {
 	productRepository := memory.NewProductMap()
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
-	employeeRepository := memory.NewEmployeeMap(dbEmployee)
+	employeeRepository := memory.NewEmployeeMap()
 	buyerRepository := memory.NewBuyerMap()
 	sectionRepository := memory.NewSectionMap(dbSection)
 
