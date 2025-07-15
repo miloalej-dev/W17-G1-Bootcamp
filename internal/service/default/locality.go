@@ -19,8 +19,7 @@ func (l LocalityService) RetrieveAll() ([]models.Locality, error) {
 }
 
 func (l LocalityService) Retrieve(id int) (models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+	return l.rp.FindById(id)
 }
 
 func (l LocalityService) Register(seller models.Locality) (models.Locality, error) {

@@ -1,10 +1,11 @@
 package models
 
 type Locality struct {
-	Id       int `gorm:"primaryKey"`
-	Locality *string
-	Province *string
-	Country  *string
+	Id          int `gorm:"primaryKey"`
+	Locality    *string
+	Province    *string
+	Country     *string
+	SellerCount int `gorm:"default:0"`
 }
 
 func NewLocality(id int, locality, province, country *string) *Locality {
