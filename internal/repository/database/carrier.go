@@ -25,6 +25,15 @@ func (r *CarrierDB) FindAll() ([]models.Carrier, error) {
 	return carriers, nil
 }
 
+func (r *CarrierDB) FindByLocality(id int) ([]models.Carrier, error) {
+	carriers := make([]models.Carrier, 0)
+	result := r.db.Where("locality_id = ?", id).Find(&carriers)
+	if result.Error != nil {
+		return make([]models.Carrier, 0), result.Error
+	}
+	return carriers, nil
+}
+
 func (r *CarrierDB) FindById(id int) (models.Carrier, error) {
 	var carrier models.Carrier
 	result := r.db.First(&carrier, id)
