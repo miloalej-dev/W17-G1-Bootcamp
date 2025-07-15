@@ -27,8 +27,8 @@ type ServerChi struct {
 	serverAddress string
 	// loaderFilePathProducts is the path to the file that contains the buyers
 
-	loaderFilePathEmployee  string
-	LoaderFilePathSection   string
+	loaderFilePathEmployee string
+	LoaderFilePathSection  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -52,9 +52,9 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	}
 
 	return &ServerChi{
-		serverAddress:           defaultConfig.ServerAddress,
-		loaderFilePathEmployee:  defaultConfig.LoaderFilePathEmployee,
-		LoaderFilePathSection:   defaultConfig.LoaderFilePathSection,
+		serverAddress:          defaultConfig.ServerAddress,
+		loaderFilePathEmployee: defaultConfig.LoaderFilePathEmployee,
+		LoaderFilePathSection:  defaultConfig.LoaderFilePathSection,
 	}
 }
 
@@ -75,6 +75,7 @@ func (a *ServerChi) Run() (err error) {
 	}
 	// - repositories
 	productRepository := memory.NewProductMap()
+	productRecordRepository := memory.NewProductRecordMap()
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := memory.NewSellerMap()
 	employeeRepository := memory.NewEmployeeMap(dbEmployee)
@@ -83,6 +84,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
+	productRecordService := _default.NewProductRecordDefault(productRecordRepository)
 	productService := _default.NewProductDefault(productRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
@@ -91,6 +93,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
+	productRecordHandler := handler.NewProductRecordHandler(productRecordService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
@@ -113,6 +116,7 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
+	route.ProductRecordRoutes(rt, productRecordHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
