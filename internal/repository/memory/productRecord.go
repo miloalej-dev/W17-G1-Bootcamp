@@ -4,7 +4,6 @@ import (
 	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
-	"time"
 )
 
 type ProductRecordMap struct {
@@ -107,10 +106,10 @@ func (r *ProductRecordMap) PartialUpdate(id int, fields map[string]interface{}) 
 	//    The keys ("product_code", "width", etc.) should match the JSON tags of your struct.
 	for key, value := range fields {
 		switch key {
-		case "last_update_date":
+		case "last_update":
 			// Perform a type assertion to ensure the value is a string
-			if lastUpdateDate, ok := value.(time.Time); ok {
-				productRecord.LastUpdate = lastUpdateDate
+			if lastUpdate, ok := value.(string); ok {
+				productRecord.LastUpdate = lastUpdate
 			}
 		case "purchase_price":
 			if purchasePrice, ok := value.(float64); ok {

@@ -3,15 +3,14 @@ package request
 import (
 	"errors"
 	"net/http"
-	"time"
 )
 
 type ProductRecordRequest struct {
-	Id            *int       `json:"id"`
-	LastUpdate    *time.Time `json:"last_update"`
-	PurchasePrice *float64   `json:"purchase_price"`
-	SalePrice     *float64   `json:"sale_price"`
-	ProductsId    *int       `json:"products_id"`
+	Id            *int     `json:"id"`
+	LastUpdate    *string  `json:"last_update"`
+	PurchasePrice *float64 `json:"purchase_price"`
+	SalePrice     *float64 `json:"sale_price"`
+	ProductsId    *int     `json:"products_id"`
 }
 
 func (b *ProductRecordRequest) Bind(r *http.Request) error {
