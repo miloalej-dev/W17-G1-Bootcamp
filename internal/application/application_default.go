@@ -84,8 +84,10 @@ func (a *ServerChi) Run() (err error) {
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
-	buyerRepository := memory.NewBuyerMap()
-	sectionRepository := database.NewSectionRepository(db)
+
+  buyerRepository := database.NewBuyerRepository(db)
+  sectionRepository := database.NewSectionRepository(db)
+
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
