@@ -10,7 +10,6 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
@@ -27,20 +26,20 @@ func NewCarrierDefault(sv service.CarrierService) *CarrierDefault {
 
 func (h *CarrierDefault) GetCarrier(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	idRequest := chi.URLParam(r, "id")
+	idRequest := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
 		return
 	}
 
-	carrier, err := h.sv.Retrieve(id)
+	carriers, err := h.sv.RetrieveByLocality(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
 
-	_ = render.Render(w, r, response.NewResponse(carrier, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(carriers, http.StatusOK))
 }
 
 func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
