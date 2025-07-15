@@ -22,7 +22,7 @@ func (l LocalityService) Retrieve(id int) (models.Locality, error) {
 	//TODO implement me
 	panic("implement me")
 }
-func (l LocalityService) RetriveBySellerId(id int) (models.LocalitySellerCount, error) {
+func (l LocalityService) RetrieveBySellerId(id int) (models.LocalitySellerCount, error) {
 	return l.rp.FindBySellerId(id)
 }
 func (l LocalityService) Register(seller models.Locality) (models.Locality, error) {

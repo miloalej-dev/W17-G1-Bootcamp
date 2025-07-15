@@ -36,7 +36,7 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	locality, err := h.service.RetriveBySellerId(id)
+	locality, err := h.service.RetrieveBySellerId(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
