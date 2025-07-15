@@ -8,8 +8,8 @@ import (
 // WharehouseRequest is a struct that represents a wharehouse in JSON format
 type CarrierRequest struct {
 	ID				*int	`json:"id"`
-	CId				*string	`json:"cid"`
-	CompanyName		*string	`json:"company_name"`
+	CId				*string	`json:"cid" gorm:"column:cid"`
+	CompanyName		*string	`json:"company_name" gorm:"column:name"`
 	Address			*string	`json:"address"`
 	Telephone		*string	`json:"telephone"`
 	LocalityId		*int	`json:"locality_id"`
