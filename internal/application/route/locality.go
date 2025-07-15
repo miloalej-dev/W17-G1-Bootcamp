@@ -12,6 +12,9 @@ func LocalityRoutes(router chi.Router, handler *handler.LocalityHandler) {
 		r.Get("/", handler.GetLocalities)
 		r.Get("/reportSellers", handler.GetLocality)
 		r.Post("/", handler.CreateLocality)
+		r.Get("/reportCarriers", handler.GetCarrier)
+
+		//r.Post("/", handler.CreateEmployee)
 		//r.Patch("/{id}", handler.PatchEmployee)
 		//r.Delete("/{id}", handler.DeleteEmployee)
 	})

@@ -43,3 +43,7 @@ func (l LocalityService) Remove(id int) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (l LocalityService) RetrieveCarriers(id int) (map[int]int, error) {
+	return l.rp.FindByLocality(id)
+}

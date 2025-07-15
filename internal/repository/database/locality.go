@@ -72,3 +72,37 @@ func (l LocalityRepository) Delete(id int) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (l LocalityRepository) FindByLocality(id int) (map[int]int, error) {
+
+	type Result struct {
+		LocalityID     int `gorm:"column:locality_id"`
+		TotalCarriers  int `gorm:"column:total_carriers"`
+	}
+	var results []Result
+	var err error
+	if id == 0 {
+		err = l.db.Model(&models.Locality{}).
+			Select("localities.id as 'locality_id', COUNT(carriers.id) 'total_carriers'").
+			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
+			Group("localities.id").
+			Find(&results).Error
+	} else {
+		err = l.db.Model(&models.Locality{}).
+			Select("localities.id as 'locality_id', COUNT(carriers.id) 'total_carriers'").
+			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
+			Where("localities.id = ?", id).
+			Group("localities.id").
+			Find(&results).Error
+	}
+
+	if err != nil {
+		return make(map[int]int), err
+	}
+
+	carriers := make(map[int]int)
+	for _, r := range results {
+		carriers[r.LocalityID] = r.TotalCarriers
+	}
+	return carriers, nil
+}
