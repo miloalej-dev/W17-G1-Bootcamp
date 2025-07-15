@@ -30,9 +30,8 @@ func (l *File) LoadSections() (v map[int]models.Section, err error) {
 			CurrentCapacity:    section.CurrentCapacity,
 			MinimumCapacity:    section.MinimumCapacity,
 			MaximumCapacity:    section.MaximumCapacity,
-			WarehouseId:        section.WarehouseId,
+			WarehousesId:       section.WarehousesId,
 			ProductTypeId:      section.ProductTypeId,
-			ProductsBatch:      section.ProductsBatch,
 		}
 
 	}

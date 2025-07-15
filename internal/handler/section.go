@@ -69,9 +69,8 @@ func (s *SectionHandler) PostSection(w http.ResponseWriter, r *http.Request) {
 		CurrentCapacity:    *data.CurrentCapacity,
 		MinimumCapacity:    *data.MinimumCapacity,
 		MaximumCapacity:    *data.MaximumCapacity,
-		WarehouseId:        *data.WarehouseId,
+		WarehousesId:       *data.WarehousesId,
 		ProductTypeId:      *data.ProductTypeId,
-		ProductsBatch:      *data.ProductsBatch,
 	}
 
 	createdSection, err := s.sv.Register(section)

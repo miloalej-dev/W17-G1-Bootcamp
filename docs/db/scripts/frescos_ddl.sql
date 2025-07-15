@@ -199,7 +199,7 @@ DROP TABLE IF EXISTS `frescos`.`sections`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`sections`
 (
-    `id`                  INT            NOT NULL,
+    `id`                  INT AUTO_INCREMENT NOT NULL,
     `section_number`      VARCHAR(64)    NULL DEFAULT NULL,
     `current_capacity`    INT            NULL DEFAULT NULL,
     `current_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -217,6 +217,8 @@ CREATE TABLE IF NOT EXISTS `frescos`.`sections`
     CONSTRAINT `fk_sections_warehouses1`
         FOREIGN KEY (`warehouse_id`)
             REFERENCES `frescos`.`warehouses` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
