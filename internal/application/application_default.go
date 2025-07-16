@@ -83,6 +83,7 @@ func (a *ServerChi) Run() (err error) {
 	buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := database.NewSectionRepository(db)
 
+
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
 	localityRepository := database.NewLocalityRepository(db)
 	purchaseOrderRepository := database.NewPurchaseOrderRepository(db)

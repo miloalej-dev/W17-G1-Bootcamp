@@ -177,6 +177,7 @@ VALUES
 
 
 
+
 INSERT INTO buyers (id, card_number_id, first_name, last_name)
 VALUES
     (1, '428-62-7504', 'Gracie', 'Hatter'),
