@@ -122,7 +122,7 @@ func (r *ProductRecordMap) PartialUpdate(id int, fields map[string]interface{}) 
 
 		case "product_id":
 			if productId, ok := value.(int); ok {
-				productRecord.ProductsId = productId
+				productRecord.ProductId = productId
 			}
 
 		}
