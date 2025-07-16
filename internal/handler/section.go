@@ -158,8 +158,10 @@ func (h *SectionHandler) GetSectionReportProducts(w http.ResponseWriter, r *http
 	if err != nil {
 		if errors.Is(err, repository.ErrSectionNotFound) {
 			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
 		}
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	_ = render.Render(w, r, response.NewResponse(data, http.StatusOK))
