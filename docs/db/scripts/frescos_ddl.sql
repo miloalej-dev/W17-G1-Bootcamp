@@ -107,11 +107,11 @@ CREATE TABLE IF NOT EXISTS `frescos`.`employees`
     `card_number_id` VARCHAR(64) NULL DEFAULT NULL,
     `first_name`     VARCHAR(64) NULL DEFAULT NULL,
     `last_name`      VARCHAR(64) NULL DEFAULT NULL,
-    `warehouses_id`   INT         NOT NULL,
+    `warehouse_id`   INT         NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_employees_warehouses_idx` (`warehouses_id` ASC) VISIBLE,
+    INDEX `fk_employees_warehouses_idx` (`warehouse_id` ASC) VISIBLE,
     CONSTRAINT `fk_employees_warehouses`
-    FOREIGN KEY (`warehouses_id`)
+    FOREIGN KEY (`warehouse_id`)
     REFERENCES `frescos`.`warehouses` (`id`)
 )
     ENGINE = InnoDB
