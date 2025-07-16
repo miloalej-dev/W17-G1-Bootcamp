@@ -12,7 +12,7 @@ type SectionRequest struct {
 	CurrentCapacity    *int     `json:"current_capacity"`
 	MinimumCapacity    *int     `json:"minimum_capacity"`
 	MaximumCapacity    *int     `json:"maximum_capacity"`
-	WarehouseId        *int     `json:"warehouse_id"`
+	WarehousesId       *int     `json:"warehouses_id"`
 	ProductTypeId      *int     `json:"product_type_id"`
 }
 

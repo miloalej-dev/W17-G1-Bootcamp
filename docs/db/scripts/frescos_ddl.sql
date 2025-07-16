@@ -299,11 +299,11 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_records`
     `last_update`    DATETIME(6)    NULL DEFAULT NULL,
     `purchase_price` DECIMAL(19, 2) NULL DEFAULT NULL,
     `sale_price`     DECIMAL(19, 2) NULL DEFAULT NULL,
-    `product_id`     INT            UNSIGNED NOT NULL,
+    `products_id`     INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_product_records_products_idx` (`product_id` ASC) VISIBLE,
+    INDEX `fk_product_records_products_idx` (`products_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_records_products`
-        FOREIGN KEY (`product_id`)
+        FOREIGN KEY (`products_id`)
             REFERENCES `frescos`.`products` (`id`)
 )
     ENGINE = InnoDB

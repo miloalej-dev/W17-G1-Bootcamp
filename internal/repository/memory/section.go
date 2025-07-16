@@ -98,9 +98,9 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 			if maximum_capacity, ok := value.(float64); ok {
 				v.MaximumCapacity = int(maximum_capacity)
 			}
-		case "warehouse_id":
-			if warehouse_id, ok := value.(float64); ok {
-				v.WarehouseId = int(warehouse_id)
+		case "warehouses_id":
+			if warehouses_id, ok := value.(float64); ok {
+				v.WarehousesId = int(warehouses_id)
 			}
 		case "product_type_id":
 			if product_type_id, ok := value.(float64); ok {
