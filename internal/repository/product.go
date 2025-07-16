@@ -8,4 +8,5 @@ type ProductRepository interface {
 	// Repository is a generic repository interface for CRUD operations
 	Repository[int, models.Product]
 	FindRecordsCountByProductId(id int) (models.ProductReport, error)
+	FindRecordsCount() ([]models.ProductReport, error)
 }

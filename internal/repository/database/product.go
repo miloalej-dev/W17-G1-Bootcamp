@@ -102,3 +102,12 @@ func (r *ProductRepository) FindRecordsCountByProductId(id int) (models.ProductR
 	}
 	return reports, nil
 }
+
+func (r *ProductRepository) FindRecordsCount() ([]models.ProductReport, error) {
+	var reports []models.ProductReport
+	err := r.db.Table("products").Select("products.id, products.description, COUNT(product_records.id) as records_count").Joins("inner join  product_records on product_records.product_id = products.id").Group("products.id").Scan(&reports).Error
+	if err != nil {
+		return nil, err
+	}
+	return reports, nil
+}

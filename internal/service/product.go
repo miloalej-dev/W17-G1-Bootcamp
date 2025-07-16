@@ -17,4 +17,5 @@ type ProductService interface {
 	PartialModify(id int, fields map[string]any) (models.Product, error)
 	Remove(id int) error
 	RetrieveRecordsCountByProductId(id int) (models.ProductReport, error)
+	RetrieveRecordsCount() ([]models.ProductReport, error)
 }
