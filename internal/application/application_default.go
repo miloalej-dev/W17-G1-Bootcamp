@@ -86,6 +86,8 @@ func (a *ServerChi) Run() (err error) {
 	employeeRepository := database.NewEmployeeRepository(db)
     buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := memory.NewSectionMap(dbSection)
+	inboundOrderRepository := database.NewInboundOrderRepository(db)
+	localityRepository := database.NewLocalityRepository(db)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
@@ -95,6 +97,8 @@ func (a *ServerChi) Run() (err error) {
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
+	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
@@ -104,6 +108,8 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
+	localityHandler := handler.NewLocalityHandler(localityService)
 
 	// router
 	rt := chi.NewRouter()
@@ -122,6 +128,8 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.ProductRecordRoutes(rt, productRecordHandler)
+	route.InboundOrderRoutes(rt, inboundOrderHandler)
+	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return

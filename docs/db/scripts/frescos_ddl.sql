@@ -79,7 +79,7 @@ DROP TABLE IF EXISTS `frescos`.`warehouses`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`warehouses`
 (
-    `id`                  INT          NOT NULL,
+    `id`                  INT AUTO_INCREMENT NOT NULL,
     `address`             VARCHAR(128) NULL DEFAULT NULL,
     `telephone`           VARCHAR(16)  NULL DEFAULT NULL,
     `warehouse_code`      VARCHAR(32)  NULL DEFAULT NULL,
@@ -261,7 +261,7 @@ DROP TABLE IF EXISTS `frescos`.`inbound_orders`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`inbound_orders`
 (
-    `id`               INT         NOT NULL,
+    `id`               INT         AUTO_INCREMENT NOT NULL,
     `order_date`       DATETIME(6) NULL DEFAULT NULL,
     `order_number`     VARCHAR(64) NULL DEFAULT NULL,
     `employee_id`      INT         NOT NULL,

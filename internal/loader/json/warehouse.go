@@ -40,11 +40,12 @@ func (l *WarehouseFile) Load() (warehouses map[int]models.Warehouse, err error) 
 	for _, warehouse := range warehousesDoc {
 		warehouses[warehouse.Id] = *(models.NewWarehouse(
 			warehouse.Id,
-			warehouse.Code,
+			warehouse.WarehouseCode,
 			warehouse.Address,
 			warehouse.Telephone,
 			warehouse.MinimumCapacity,
 			warehouse.MinimumTemperature,
+			warehouse.LocalityId,
 		))
 	}
 
