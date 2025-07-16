@@ -1,0 +1,72 @@
+### GET request to get one purchase order report by buyer ID
+GET  http://localhost:8080/api/v1/buyers/reportPurchaseOrders?id=1
+Content-Type: application/json
+
+### GET request to get all purchase order report
+GET  http://localhost:8080/api/v1/buyers/reportPurchaseOrders
+Content-Type: application/json
+
+### GET request to get one purchase order report by buyer ID that dont exist
+GET  http://localhost:8080/api/v1/buyers/reportPurchaseOrders?id=1000
+Content-Type: application/json
+
+
+### POST request to create a new purchaseOrders
+POST http://localhost:8080/api/v1/purchaseOrders
+Content-Type: application/json
+
+{
+
+  "order_number": "PO-20250715-020",
+  "order_date": "2025-07-15T11:30:00Z",
+  "tracing_code": "TRC004",
+  "buyer_id": 1,
+  "warehouse_id": 1,
+  "carrier_id": 1,
+  "order_status_id": 1,
+  "order_details": [
+    {
+      "quantity": 10,
+      "clean_lines_status": "clean",
+      "temperature": 4.5,
+      "product_record_id": 1
+    },
+    {
+      "quantity": 25,
+      "clean_lines_status": "dirty",
+      "temperature": 8.0,
+      "product_record_id": 2
+    }
+
+  ]
+}
+
+### POST request to create a new purchaseOrders Error
+POST http://localhost:8080/api/v1/purchaseOrders
+Content-Type: application/json
+
+{
+
+  "order_number": "PO-20250715-020",
+  "order_date": "2025-07-15T11:30:00Z",
+  "tracing_code": "TRC004",
+  "buyer_id": 1000,
+  "warehouse_id": 1,
+  "carrier_id": 1,
+  "order_status_id": 1,
+  "order_details": [
+    {
+      "quantity": 10,
+      "clean_lines_status": "clean",
+      "temperature": 4.5,
+      "product_record_id": 1
+    },
+    {
+      "quantity": 25,
+      "clean_lines_status": "dirty",
+      "temperature": 8.0,
+      "product_record_id": 2
+    }
+
+  ]
+}
