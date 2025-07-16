@@ -63,7 +63,7 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 	}
 
 	warehouse := models.NewWarehouse(
-		0,									// placeholder, will be overwritten later
+		0, // placeholder, will be overwritten later
 		*warehouseJson.WarehouseCode,
 		*warehouseJson.Address,
 		*warehouseJson.Telephone,

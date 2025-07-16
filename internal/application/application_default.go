@@ -81,31 +81,42 @@ func (a *ServerChi) Run() (err error) {
 	productRepository := database.NewProductDB(db)
 	warehouseRepository := database.NewWarehouseDB(db)
 	carrierRepository := database.NewCarrierDB(db)
+	productBatchRepository := database.NewProductBatchDB(db)
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 	buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := memory.NewSectionMap(dbSection)
+
+	inboundOrderRepository := database.NewInboundOrderRepository(db)
 	localityRepository := database.NewLocalityRepository(db)
+	purchaseOrderRepository := database.NewPurchaseOrderRepository(db)
 
 	// - services
-	buyerService := _default.NewBuyerDefault(buyerRepository)
 	productService := _default.NewProductDefault(productRepository)
-	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
+  warehouseService := _default.NewWarehouseDefault(warehouseRepository)
 	carrierService := _default.NewCarrierDefault(carrierRepository)
+	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
+	buyerService := _default.NewBuyerDefault(buyerRepository)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	purchaseOrderService := _default.NewPurchaseOrderDefault(purchaseOrderRepository)
+	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
 	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
+	productBatchHandler := handler.NewProductBatchDefault(productBatchService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 	warehouseHand := handler.NewWarehouseDefault(warehouseService)
 	carrierHand := handler.NewCarrierDefault(carrierService)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	purchaseOrderHandler := handler.NewPurchaseOrderDefault(purchaseOrderService)
+	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
 	localityHandler := handler.NewLocalityHandler(localityService)
+
 	// router
 	rt := chi.NewRouter()
 
@@ -123,6 +134,10 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
+	route.ProductBatchRoutes(rt, productBatchHandler)
+
+	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
+	route.InboundOrderRoutes(rt, inboundOrderHandler)
 	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)

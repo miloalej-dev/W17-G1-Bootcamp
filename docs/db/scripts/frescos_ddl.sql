@@ -164,18 +164,18 @@ DROP TABLE IF EXISTS `frescos`.`products`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`products`
 (
-    `id`                               INT  UNSIGNED AUTO_INCREMENT NOT NULL,
-    `product_code`                     VARCHAR(32)    NULL DEFAULT NULL,
-    `description`                      VARCHAR(255)   NULL DEFAULT NULL,
-    `width`                            DECIMAL(19, 2) NULL DEFAULT NULL,
-    `height`                           DECIMAL(19, 2) NULL DEFAULT NULL,
-    `length`                           DECIMAL(19, 2) NULL DEFAULT NULL,
-    `net_weight`                       DECIMAL(19, 2) NULL DEFAULT NULL,
-    `expiration_rate`                  DECIMAL(19, 2) NULL DEFAULT NULL,
-    `recommended_freezing_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
-    `freezing_rate`                    DECIMAL(19,2)  NULL DEFAULT NULL,
-    `product_type_id`                  INT            NOT NULL,
-    `seller_id`                        INT            NULL DEFAULT NULL,
+    `id`                               INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    `product_code`                     VARCHAR(32)                 NULL DEFAULT NULL,
+    `description`                      VARCHAR(255)                NULL DEFAULT NULL,
+    `width`                            DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `height`                           DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `length`                           DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `net_weight`                       DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `expiration_rate`                  DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `recommended_freezing_temperature` DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `freezing_rate`                    DECIMAL(19, 2)              NULL DEFAULT NULL,
+    `product_type_id`                  INT                         NOT NULL,
+    `seller_id`                        INT                         NULL DEFAULT NULL,
 
     PRIMARY KEY (`id`),
     INDEX `fk_products_sellers_idx` (`seller_id` ASC) VISIBLE,
@@ -186,8 +186,8 @@ CREATE TABLE IF NOT EXISTS `frescos`.`products`
     CONSTRAINT `fk_products_sellers1`
         FOREIGN KEY (`seller_id`)
             REFERENCES `frescos`.`sellers` (`id`)
-   ON DELETE NO ACTION
-   ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
@@ -230,7 +230,7 @@ DROP TABLE IF EXISTS `frescos`.`product_batches`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
 (
-    `id`                  INT            NOT NULL,
+    `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
     `batch_number`        VARCHAR(32)    NULL DEFAULT NULL,
     `current_quantity`    INT            NULL DEFAULT NULL,
     `current_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -242,14 +242,15 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `section_id`          INT            NOT NULL,
     `product_id`          INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
+    UNIQUE INDEX `uq_batch_number` (`batch_number` ASC) VISIBLE,
+    #INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_batches_products`
         FOREIGN KEY (`product_id`)
-            REFERENCES `frescos`.`products` (`id`),
-    CONSTRAINT `fk_product_batches_sections`
-        FOREIGN KEY (`section_id`)
-            REFERENCES `frescos`.`sections` (`id`)
+            REFERENCES `frescos`.`products` (`id`)
+    #CONSTRAINT `fk_product_batches_sections`
+     #   FOREIGN KEY (`section_id`)
+      #      REFERENCES `frescos`.`sections` (`id`)
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
@@ -262,12 +263,12 @@ DROP TABLE IF EXISTS `frescos`.`inbound_orders`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`inbound_orders`
 (
-    `id`               INT         NOT NULL,
+    `id`               INT         AUTO_INCREMENT NOT NULL,
     `order_date`       DATETIME(6) NULL DEFAULT NULL,
     `order_number`     VARCHAR(64) NULL DEFAULT NULL,
     `employee_id`      INT         NOT NULL,
     `warehouse_id`     INT         NOT NULL,
-    `product_batch_id` INT         NOT NULL,
+    `product_batch_id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_inbound_orders_employees_idx` (`employee_id` ASC) VISIBLE,
     INDEX `fk_inbound_orders_warehouses_idx` (`warehouse_id` ASC) VISIBLE,
@@ -331,8 +332,8 @@ DROP TABLE IF EXISTS `frescos`.`purchase_orders`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`purchase_orders`
 (
-    `id`              INT         NOT NULL,
-    `order_number`    VARCHAR(64) NULL DEFAULT NULL,
+    `id`              INT     AUTO_INCREMENT    NOT NULL,
+    `order_number`    VARCHAR(64) Unique NULL DEFAULT NULL,
     `order_date`      DATETIME(6) NULL DEFAULT NULL,
     `tracing_code`    VARCHAR(64) NULL DEFAULT NULL,
     `buyer_id`        INT         NOT NULL,
@@ -368,7 +369,7 @@ DROP TABLE IF EXISTS `frescos`.`order_details`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`order_details`
 (
-    `id`                 INT            NOT NULL,
+    `id`                 INT       AUTO_INCREMENT NOT NULL,
     `quantity`           INT            NULL DEFAULT NULL,
     `clean_lines_status` VARCHAR(64)    NULL DEFAULT NULL,
     `temperature`        DECIMAL(19, 2) NULL DEFAULT NULL,
