@@ -100,8 +100,8 @@ func (a *ServerChi) Run() (err error) {
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
-	warehouseHand := handler.NewWarehouseDefault(warehouseService)
-	carrierHand := handler.NewCarrierDefault(carrierService)
+	warehouseHandler := handler.NewWarehouseDefault(warehouseService)
+	carrierHandler := handler.NewCarrierDefault(carrierService)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
@@ -117,8 +117,8 @@ func (a *ServerChi) Run() (err error) {
 
 	route.DefaultRoutes(rt)
 	route.BuyerRoutes(rt, buyerHandler)
-	route.WarehouseRoutes(rt, warehouseHand)
-	route.CarrierRoutes(rt, carrierHand)
+	route.WarehouseRoutes(rt, warehouseHandler)
+	route.CarrierRoutes(rt, carrierHandler)
 	route.SellerRoutes(rt, sellerHandler)
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
