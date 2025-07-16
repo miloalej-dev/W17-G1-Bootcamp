@@ -1,5 +1,28 @@
 -- Insert statements for populating the frescos database
-USE frescos;
+
+-- Select the database to use
+USE `frescos`;
+
+-- Step 1: Populate the parent table 'product_type' first.
+-- Note: A placeholder description is used.
+INSERT INTO `product_type` (id, name, description)
+VALUES
+(1, 'Fruits', 'Placeholder Type Description'),
+(2, 'Red Meat', 'Placeholder Type Description'),
+(3, 'Grain', 'Placeholder Type Description'),
+(4, 'Candy', 'Placeholder Type Description'),
+(5, 'Canned food', 'Placeholder Type Description'),
+(6, 'Vegetables', 'Placeholder Type Description');
+
+-- Step 2: Populate the child table 'products'.
+INSERT INTO `products` (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id)
+VALUES
+( 'JKL012', 'Gourmet truffle mashed potatoes', 7.25, 55.19, 133.35, 3.83, 7.51, -13.47, -3.78, 1),
+( 'QRS345', 'Farm-fresh kale', 50.35, 106.70, 15.00, 1.95, 6.60, -14.85, -1.24, 2),
+( 'QRS123', 'Organic arugula and beet salad', 1.59, 27.04, 72.92, 1.76, 2.97, -15.89, -2.38, 3),
+( 'STU789', 'Organic strawberries', 28.42, 49.17, 69.23, 3.82, 9.08, -31.93, 0.35, 4),
+( 'ABC123', 'Hand-rolled sushi combo', 113.96, 75.86, 151.19, 6.74, 2.50, -42.64, -7.91, 5),
+( 'YZA567', 'Handcrafted gluten-free bread', 151.32, 39.27, 105.51, 1.28, 9.44, -40.94, -1.53, 6);
 
 insert into buyers (id, card_number_id, first_name, last_name) values (1, '428-62-7504', 'Gracie', 'Hatter');
 insert into buyers (id, card_number_id, first_name, last_name) values (2, '721-99-3742', 'Tabbitha', 'Cucuzza');

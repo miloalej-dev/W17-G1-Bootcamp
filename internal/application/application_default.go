@@ -1,18 +1,16 @@
 package application
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
 	"net/http"
-
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -80,8 +78,10 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - repositories
-	productRepository := memory.NewProductMap()
-	warehouseRepo := database.NewWarehouseDB(db)
+
+	productRepository := database.NewProductDB(db)
+	warehouseRepo := memory.NewWarehouseMap()
+
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
   buyerRepository := database.NewBuyerRepository(db)

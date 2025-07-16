@@ -25,6 +25,7 @@ type ProductDefault struct {
 
 // GetProducts GetAll is a method that returns a handler for the route GET /products
 func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	// request
 	// ...
 	// process
@@ -40,30 +41,27 @@ func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 // PostProduct is a method that returns a handler for the route CREATE /product/{ID}
 func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	data := &request.ProductRequest{}
 
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 	}
-	product := models.Product{
-		ProductCode:                    *data.ProductCode,
-		Description:                    *data.Description,
-		Width:                          *data.Width,
-		Height:                         *data.Height,
-		Length:                         *data.Length,
-		NetWeight:                      *data.NetWeight,
-		ExpirationRate:                 *data.ExpirationRate,
-		RecommendedFreezingTemperature: *data.RecommendedFreezingTemperature,
-		FreezingRate:                   *data.FreezingRate,
-		ProductTypeId:                  *data.ProductTypeId,
-	}
 
-	if data.SellerId != nil {
-		product.SellerId = *data.SellerId
-	}
-
-	createdProduct, errService := h.sv.Register(product)
-
+	product := models.NewProduct(
+		0,
+		*data.ProductCode, *data.Description,
+		*data.Width,
+		*data.Height,
+		*data.Length,
+		*data.NetWeight,
+		*data.ExpirationRate,
+		*data.RecommendedFreezingTemperature,
+		*data.FreezingRate,
+		*data.ProductTypeId,
+		data.SellerId,
+	)
+	createdProduct, errService := h.sv.Register(*product)
 	if errService != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errService.Error(), http.StatusBadRequest))
 		return
@@ -74,6 +72,7 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 // GetProduct is a method that returns a handler for the route GET /product/{ID}
 func (h *ProductDefault) GetProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
 	if errConverter != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
@@ -120,6 +119,7 @@ func (h *ProductDefault) PatchProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	id, errConverter := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if errConverter != nil {
