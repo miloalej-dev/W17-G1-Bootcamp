@@ -1,18 +1,16 @@
 package application
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
 	"net/http"
-
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -78,14 +76,18 @@ func (a *ServerChi) Run() (err error) {
 	if err != nil {
 		return
 	}
+
 	// - repositories
-	productRepository := memory.NewProductMap()
+
+	productRepository := database.NewProductDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
-	sellerRepository := memory.NewSellerMap()
+
+	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
-	buyerRepository := memory.NewBuyerMap()
+  buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := memory.NewSectionMap(dbSection)
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
+	localityRepository := database.NewLocalityRepository(db)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
@@ -95,6 +97,7 @@ func (a *ServerChi) Run() (err error) {
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
 	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
+	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
@@ -104,6 +107,7 @@ func (a *ServerChi) Run() (err error) {
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
 	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
+	localityHandler := handler.NewLocalityHandler(localityService)
 
 	// router
 	rt := chi.NewRouter()
@@ -122,6 +126,7 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.InboundOrderRoutes(rt, inboundOrderHandler)
+	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
