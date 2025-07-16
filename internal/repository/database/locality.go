@@ -73,23 +73,24 @@ func (l LocalityRepository) Delete(id int) error {
 	panic("implement me")
 }
 
-func (l LocalityRepository) FindByLocality(id int) (map[int]int, error) {
+func (l LocalityRepository) FindByLocality(id int) ([]map[string]any, error) {
 
 	type Result struct {
 		LocalityID     int `gorm:"column:locality_id"`
+		LocalityName   string `gorm:"column:locality_name"`
 		TotalCarriers  int `gorm:"column:total_carriers"`
 	}
 	var results []Result
 	var err error
 	if id == 0 {
 		err = l.db.Model(&models.Locality{}).
-			Select("localities.id as 'locality_id', COUNT(carriers.id) 'total_carriers'").
+			Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
 			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
 			Group("localities.id").
 			Find(&results).Error
 	} else {
 		err = l.db.Model(&models.Locality{}).
-			Select("localities.id as 'locality_id', COUNT(carriers.id) 'total_carriers'").
+			Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
 			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
 			Where("localities.id = ?", id).
 			Group("localities.id").
@@ -97,12 +98,20 @@ func (l LocalityRepository) FindByLocality(id int) (map[int]int, error) {
 	}
 
 	if err != nil {
-		return make(map[int]int), err
+		return make([]map[string]any, 0), err
 	}
 
-	carriers := make(map[int]int)
+	if len(results) == 0 {
+		return make([]map[string]any, 0), repository.ErrEntityNotFound
+	}
+
+	carriers := make([]map[string]any, 0)
 	for _, r := range results {
-		carriers[r.LocalityID] = r.TotalCarriers
+		carriers = append(carriers, map[string]any{
+			"locality_id": r.LocalityID,
+			"locality_name": r.LocalityName,
+			"carries_count": r.TotalCarriers,
+		})
 	}
 	return carriers, nil
 }
