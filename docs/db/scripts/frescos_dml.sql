@@ -46,7 +46,7 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (17, 'Compañía Q', 'Carrera 5 #10-20, Santo Domingo', '1812901234', 17),
 (18, 'Compañía R', 'Calle 9 #15-30, San Salvador', '1913012345', 18),
 (19, 'Compañía S', 'Avenida Cero 78, Santa Fe', '2023123456', 19),
-(20, 'Compañía T', 'Calle América 42, Cúcuta', '2123234567', 20),
+(20, 'Compañía T', 'Calle América 42, Cúcuta', '2123234567', 19),
 (21, 'Compañía U', 'Calle de los Vendedores 101, Buenos Aires', '2223345678', 1),
 (22, 'Compañía V', 'Avenida del Río 102, Córdoba', '2324456789', 2),
 (23, 'Compañía W', 'Paseo del Mercado 103, Rosario', '2425567890', 3),
@@ -66,7 +66,7 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (37, 'Compañía AK', 'Calle de la Esperanza 113, Santo Domingo', '3829901234', 17),
 (38, 'Compañía AL', 'Calle del Amor 114, San Salvador', '3930012345', 18),
 (39, 'Compañía AM', 'Avenida de la Amistad 115, Santa Fe', '4041123456', 19),
-(40, 'Compañía AN', 'Calle del Encuentro 116, Cúcuta', '4152234567', 20),
+(40, 'Compañía AN', 'Calle del Encuentro 116, Cúcuta', '4152234567', 19),
 (41, 'Compañía AO', 'Calle de la Montaña 117, Buenos Aires', '4263345678', 1),
 (42, 'Compañía AP', 'Avenida de la Alegría 118, Córdoba', '4374456789', 2),
 (43, 'Compañía AQ', 'Paseo de los Ríos 119, Rosario', '4485567890', 3),
@@ -78,8 +78,32 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (49, 'Compañía AW', 'Carrera 10 #5-8, Bogotá', '5141123456', 9),
 (50, 'Compañía AX', 'Avenida del Futuro 124, Cali', '5252234567', 10);
 
+INSERT INTO warehouses
+(id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
+VALUES
+    (1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
+    (2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
+    (3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
+    (4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
+    (5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
+    (6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
+    (7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
+    (8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
+    (9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
+    (10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
+    (11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
+    (12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
+    (13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
+    (14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
+    (15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
+    (16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
+    (17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
+    (18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
+    (19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
+    (20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
+
 -- Insert statement for employee
-INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouses_id`) VALUES
+INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouse_id`) VALUES
 (1, 'C0001', 'John', 'Doe', 1),
 (2, 'C0002', 'Jane', 'Smith', 1),
 (3, 'C0003', 'Alice', 'Johnson', 2),
@@ -168,26 +192,28 @@ insert into buyers (id, card_number_id, first_name, last_name) values (8, '162-0
 insert into buyers (id, card_number_id, first_name, last_name) values (9, '750-60-2271', 'Abbye', 'Wedmore');
 insert into buyers (id, card_number_id, first_name, last_name) values (10, '620-25-5585', 'Genny', 'Mothersole');
 
-INSERT INTO warehouses
-(id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
-VALUES
-(1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
-(2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
-(3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
-(4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
-(5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
-(6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
-(7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
-(8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
-(9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
-(10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
-(11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
-(12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
-(13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
-(14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
-(15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
-(16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
-(17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
-(18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
-(19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
-(20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
+
+-- CARRIERS
+INSERT INTO `frescos`.`carriers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALUES
+    (1, 'Transporte Ágil S.A.', 'Av. 68 #22-15', '6015566777', 1);
+
+-- ORDER STATUS
+INSERT INTO `frescos`.`order_status` (`id`, `name`, `description`) VALUES
+                                                                       (1, 'Pendiente', 'La orden está pendiente de procesamiento'),
+                                                                       (2, 'En tránsito', 'La orden ha sido despachada y está en tránsito'),
+                                                                       (3, 'Entregada', 'La orden fue entregada satisfactoriamente');
+
+INSERT INTO `frescos`.`purchase_orders` (
+    `id`, `order_number`, `order_date`, `tracing_code`,
+    `buyer_id`, `warehouse_id`, `carrier_id`, `order_status_id`
+) VALUES
+      (1, 'PO-20250715-001', '2025-07-15 10:00:00', 'TRC001', 1, 1, 1, 1),
+      (2, 'PO-20250715-002', '2025-07-14 14:30:00', 'TRC002', 1, 1, 1, 2),
+      (3, 'PO-20250713-003', '2025-07-13 09:15:00', 'TRC003', 1, 1, 1, 3);
+
+
+INSERT INTO `frescos`.`product_records` (
+    `id`, `last_update`, `purchase_price`, `sale_price`, `product_id`
+) VALUES
+      (1, '2025-07-15 10:00:00', 20.50, 30.00, 1),
+      (2, '2025-07-15 11:30:00', 10.75, 15.99, 2);

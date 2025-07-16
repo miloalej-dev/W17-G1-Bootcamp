@@ -76,8 +76,8 @@ func (l LocalityRepository) Delete(id int) error {
 func (l LocalityRepository) FindByLocality(id int) (map[int]int, error) {
 
 	type Result struct {
-		LocalityID     int `gorm:"column:locality_id"`
-		TotalCarriers  int `gorm:"column:total_carriers"`
+		LocalityID    int `gorm:"column:locality_id"`
+		TotalCarriers int `gorm:"column:total_carriers"`
 	}
 	var results []Result
 	var err error
