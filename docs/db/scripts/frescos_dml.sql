@@ -1,5 +1,7 @@
 -- Insert statements for populating the frescos database
--- Insert statements for populating the frescos database
+
+-- Select the database to use
+USE `frescos`;
 
 -- Insert statements of localities
 INSERT INTO `frescos`.`localities` (`id`, `locality`, `province`, `country`) VALUES
@@ -21,8 +23,7 @@ INSERT INTO `frescos`.`localities` (`id`, `locality`, `province`, `country`) VAL
 (16, 'Quilmes', 'Buenos Aires', 'Argentina'),
 (17, 'Santo Domingo', 'Valle del Cauca', 'Colombia'),
 (18, 'San Salvador', 'San Salvador', 'México'),
-(19, 'Santa Fe', 'Santa Fe', 'Argentina'),
-(20, 'Cúcuta', 'Norte de Santander', 'Colombia');
+(19, 'Santa Fe', 'Santa Fe', 'Argentina');
 
 -- Insert statements of sellers
 INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALUES
@@ -77,31 +78,6 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (49, 'Compañía AW', 'Carrera 10 #5-8, Bogotá', '5141123456', 9),
 (50, 'Compañía AX', 'Avenida del Futuro 124, Cali', '5252234567', 10);
 
--- Insert statement for warehouses;
-
-INSERT INTO `warehouses` (`id`, `address`, `telephone`, `warehouse_code`, `minimum_capacity`, `minimum_temperature`,
-                          `locality_id`)
-VALUES (1, '123 Main St', '555-0001', 'WCODE1', 100, 5, 1),
-       (2, '456 Elm St', '555-0002', 'WCODE2', 200, 10, 1),
-       (3, '789 Oak St', '555-0003', 'WCODE3', 150, 5, 2),
-       (4, '321 Pine St', '555-0004', 'WCODE4', 250, -2, 2),
-       (5, '654 Maple St', '555-0005', 'WCODE5', 300, -5, 3),
-       (6, '987 Cedar St', '555-0006', 'WCODE6', 400, 0, 3),
-       (7, '159 Birch St', '555-0007', 'WCODE7', 175, 5, 4),
-       (8, '246 Spruce St', '555-0008', 'WCODE8', 225, 10, 4),
-       (9, '369 Willow St', '555-0009', 'WCODE9', 180, 15, 5),
-       (10, '753 Fir St', '555-0010', 'WCODE10', 320, 7, 1),
-       (11, '852 Chestnut St', '555-0011', 'WCODE11', 140, 6, 1),
-       (12, '951 Walnut St', '555-0012', 'WCODE12', 290, 8, 2),
-       (13, '159 Ash St', '555-0013', 'WCODE13', 130, 4, 2),
-       (14, '258 Poplar St', '555-0014', 'WCODE14', 210, 12, 3),
-       (15, '357 Palm St', '555-0015', 'WCODE15', 170, 9, 3),
-       (16, '456 Larch St', '555-0016', 'WCODE16', 230, 1, 4),
-       (17, '567 Hemlock St', '555-0017', 'WCODE17', 190, 14, 4),
-       (18, '678 Sycamore St', '555-0018', 'WCODE18', 160, 11, 5),
-       (19, '789 Maplewood St', '555-0019', 'WCODE19', 280, 3, 5),
-       (20, '890 River St', '555-0020', 'WCODE20', 340, 2, 1);
-
 -- Insert statement for employee
 INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouses_id`) VALUES
 (1, 'C0001', 'John', 'Doe', 1),
@@ -155,3 +131,58 @@ INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `war
 (49, 'C0049', 'Ulysses', 'Rogers', 5),
 (50, 'C0050', 'Vera', 'Reed', 1);
 
+-- Step 1: Populate the parent table 'product_type' first.
+-- Note: A placeholder description is used.
+INSERT INTO `product_type` (id, name, description)
+VALUES
+(1, 'Fruits', 'Placeholder Type Description'),
+(2, 'Red Meat', 'Placeholder Type Description'),
+(3, 'Grain', 'Placeholder Type Description'),
+(4, 'Candy', 'Placeholder Type Description'),
+(5, 'Canned food', 'Placeholder Type Description'),
+(6, 'Vegetables', 'Placeholder Type Description');
+
+-- Step 2: Populate the child table 'products'.
+INSERT INTO `products` (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id)
+VALUES
+( 'JKL012', 'Gourmet truffle mashed potatoes', 7.25, 55.19, 133.35, 3.83, 7.51, -13.47, -3.78, 1),
+( 'QRS345', 'Farm-fresh kale', 50.35, 106.70, 15.00, 1.95, 6.60, -14.85, -1.24, 2),
+( 'QRS123', 'Organic arugula and beet salad', 1.59, 27.04, 72.92, 1.76, 2.97, -15.89, -2.38, 3),
+( 'STU789', 'Organic strawberries', 28.42, 49.17, 69.23, 3.82, 9.08, -31.93, 0.35, 4),
+( 'ABC123', 'Hand-rolled sushi combo', 113.96, 75.86, 151.19, 6.74, 2.50, -42.64, -7.91, 5),
+( 'YZA567', 'Handcrafted gluten-free bread', 151.32, 39.27, 105.51, 1.28, 9.44, -40.94, -1.53, 6);
+
+insert into buyers (id, card_number_id, first_name, last_name) values (1, '428-62-7504', 'Gracie', 'Hatter');
+insert into buyers (id, card_number_id, first_name, last_name) values (2, '721-99-3742', 'Tabbitha', 'Cucuzza');
+insert into buyers (id, card_number_id, first_name, last_name) values (3, '299-04-0115', 'Rhonda', 'Houseman');
+insert into buyers (id, card_number_id, first_name, last_name) values (4, '428-04-0662', 'Sharia', 'O''Brogane');
+insert into buyers (id, card_number_id, first_name, last_name) values (5, '702-09-4957', 'Filmore', 'O'' Culligan');
+insert into buyers (id, card_number_id, first_name, last_name) values (6, '123-17-1836', 'Alick', 'Dabnot');
+insert into buyers (id, card_number_id, first_name, last_name) values (7, '730-44-0280', 'Selby', 'Gregson');
+insert into buyers (id, card_number_id, first_name, last_name) values (8, '162-07-6620', 'Lucius', 'Durdle');
+insert into buyers (id, card_number_id, first_name, last_name) values (9, '750-60-2271', 'Abbye', 'Wedmore');
+insert into buyers (id, card_number_id, first_name, last_name) values (10, '620-25-5585', 'Genny', 'Mothersole');
+
+INSERT INTO warehouses
+(id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
+VALUES
+(1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
+(2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
+(3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
+(4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
+(5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
+(6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
+(7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
+(8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
+(9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
+(10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
+(11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
+(12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
+(13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
+(14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
+(15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
+(16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
+(17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
+(18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
+(19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
+(20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
