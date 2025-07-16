@@ -11,20 +11,15 @@ POST localhost:8080/api/v1/sections
 Content-Type: application/json
 
 {
-  "section_number": 104,
-  "current_temperature": 0,
-  "minimum_temperature": 0,
+  "section_number": "11",
+  "current_temperature": 5,
+  "minimum_temperature": 5,
   "current_capacity": 64,
   "minimum_capacity": 9,
   "maximum_capacity": 3,
-  "warehouse_id": 25,
-  "product_type_id": 36,
-  "products_batch": [
-    78,
-    8,
-    35,
-    93
-  ]
+  "warehouse_id": 1,
+  "product_type_id": 1
+
 }
 
 

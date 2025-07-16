@@ -20,7 +20,6 @@ INSERT INTO `frescos`.`sections` (
     `section_number`, `current_capacity`, `current_temperature`,
     `maximum_capacity`, `minimum_capacity`, `minimum_temperature`,
     `product_type_id`, `warehouse_id`)
-
 VALUES
       ('1', 30, 4.00, 50, 10, 2.00, 1, 1),
       ('2', 45, 3.50, 60, 15, 2.00, 1, 1),

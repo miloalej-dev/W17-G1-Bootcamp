@@ -80,8 +80,8 @@ func (r *SectionRepository) PartialUpdate(id int, fields map[string]interface{})
 	if val, ok := fields["maximum_capacity"]; ok {
 		section.MaximumCapacity = int(val.(float64))
 	}
-	if val, ok := fields["warehouses_id"]; ok {
-		section.WarehousesId = int(val.(float64))
+	if val, ok := fields["warehouse_id"]; ok {
+		section.WarehouseId = int(val.(float64))
 	}
 	if val, ok := fields["product_type_id"]; ok {
 		section.ProductTypeId = int(val.(float64))
