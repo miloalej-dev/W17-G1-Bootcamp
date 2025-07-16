@@ -1,0 +1,41 @@
+### GET request to get all inbound-orders
+GET http://localhost:8080/api/v1/inbound-orders
+Content-Type: application/json
+
+### GET request to get an specific inbound-order
+GET http://localhost:8080/api/v1/inbound-orders/1
+Content-Type: application/json
+
+### POST request to create a new inbound-order
+POST localhost:8080/api/v1/inbound-orders
+Content-Type: application/json
+
+{
+  "order_number": "ORDER-2",
+  "employee_id": 2,
+  "product_batch_id": 2,
+  "warehouse_id": 2
+}
+
+### PUT request to update an specific inbound-order
+PUT localhost:8080/api/v1/inbound-orders/2
+Content-Type: application/json
+
+{
+  "order_number": "ORDER-2",
+  "employee_id": 2,
+  "product_batch_id": 2,
+  "warehouse_id": 2
+}
+
+### PATCH request to update an specific inbound-order
+PATCH localhost:8080/api/v1/inbound-orders/2
+Content-Type: application/json
+
+{
+  "employee_id": 3
+}
+
+### DELETE request to delete an specific inbound-order
+DELETE localhost:8080/api/v1/inbound-orders/2
+Content-Type: application/json
