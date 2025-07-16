@@ -18,7 +18,6 @@ type configuration struct {
 }
 
 func configure() (*configuration, error) {
-	// Set environment variables or load from .env file
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")

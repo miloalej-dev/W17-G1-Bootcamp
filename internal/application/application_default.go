@@ -1,18 +1,16 @@
 package application
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
 	"net/http"
-
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -80,12 +78,14 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - repositories
-	productRepository := memory.NewProductMap()
+	productRepository := database.NewProductDB(db)
 	warehouseRepo := database.NewWarehouseDB(db)
+
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 	buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := memory.NewSectionMap(dbSection)
+	localityRepository := database.NewLocalityRepository(db)
 
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
@@ -94,6 +94,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
@@ -102,7 +103,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
-
+	localityHandler := handler.NewLocalityHandler(localityService)
 	// router
 	rt := chi.NewRouter()
 
@@ -119,6 +120,7 @@ func (a *ServerChi) Run() (err error) {
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
+	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return
