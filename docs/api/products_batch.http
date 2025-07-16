@@ -3,7 +3,7 @@ POST http://localhost:8080/api/v1/productBatches
 Content-Type: application/json
 
 {
-    "batch_number": 116,
+    "batch_number": 5,
     "current_quantity": 200,
     "current_temperature": 20,
     "due_date": "2022-04-04",
