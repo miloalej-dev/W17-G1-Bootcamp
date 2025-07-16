@@ -12,5 +12,5 @@ Content-Type: application/json
     "manufacturing_hour": 10,
     "minimum_temperature":5,
     "product_id": 6,
-    "section_id": 99
+    "section_id": 1
 }
