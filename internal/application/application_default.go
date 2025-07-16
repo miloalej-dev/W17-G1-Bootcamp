@@ -82,8 +82,10 @@ func (a *ServerChi) Run() (err error) {
 
 	buyerRepository := database.NewBuyerRepository(db)
 	sectionRepository := database.NewSectionRepository(db)
+
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
 	localityRepository := database.NewLocalityRepository(db)
+	purchaseOrderRepository := database.NewPurchaseOrderRepository(db)
 
 	// - services
 	productService := _default.NewProductDefault(productRepository)
@@ -93,6 +95,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionService(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	purchaseOrderService := _default.NewPurchaseOrderDefault(purchaseOrderRepository)
 	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
 	localityService := _default.NewLocalityService(localityRepository)
 
@@ -104,6 +107,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	purchaseOrderHandler := handler.NewPurchaseOrderDefault(purchaseOrderService)
 	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
 	localityHandler := handler.NewLocalityHandler(localityService)
 
@@ -124,6 +128,7 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.ProductBatchRoutes(rt, productBatchHandler)
+	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
 	route.InboundOrderRoutes(rt, inboundOrderHandler)
 	route.LocalityRoutes(rt, localityHandler)
 

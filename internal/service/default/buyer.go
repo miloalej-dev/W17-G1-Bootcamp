@@ -66,3 +66,11 @@ func (s *BuyerDefault) PartialModify(id int, fields map[string]any) (models.Buye
 
 	return v, nil
 }
+
+func (s *BuyerDefault) RetrieveByPurchaseOrderReport(id int) ([]models.BuyerReport, error) {
+	v, err := s.rp.FindByPurchaseOrderReport(id)
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
+}
