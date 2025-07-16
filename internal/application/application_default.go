@@ -79,8 +79,8 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repositories
 	productRepository := database.NewProductDB(db)
-	warehouseRepo := database.NewWarehouseDB(db)
-	carrierRepo := database.NewCarrierDB(db)
+	warehouseRepository := database.NewWarehouseDB(db)
+	carrierRepository := database.NewCarrierDB(db)
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 	buyerRepository := database.NewBuyerRepository(db)
@@ -90,8 +90,8 @@ func (a *ServerChi) Run() (err error) {
 	// - services
 	buyerService := _default.NewBuyerDefault(buyerRepository)
 	productService := _default.NewProductDefault(productRepository)
-	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
-	carrierServ := _default.NewCarrierDefault(carrierRepo)
+	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
+	carrierService := _default.NewCarrierDefault(carrierRepository)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
@@ -100,8 +100,8 @@ func (a *ServerChi) Run() (err error) {
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
-	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
-	carrierHand := handler.NewCarrierDefault(carrierServ)
+	warehouseHand := handler.NewWarehouseDefault(warehouseService)
+	carrierHand := handler.NewCarrierDefault(carrierService)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
