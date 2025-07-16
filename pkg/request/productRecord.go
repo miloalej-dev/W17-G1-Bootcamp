@@ -10,7 +10,7 @@ type ProductRecordRequest struct {
 	LastUpdate    *string  `json:"last_update"`
 	PurchasePrice *float64 `json:"purchase_price"`
 	SalePrice     *float64 `json:"sale_price"`
-	ProductsId    *int     `json:"products_id"`
+	ProductId     *int     `json:"product_id"`
 }
 
 func (b *ProductRecordRequest) Bind(r *http.Request) error {
@@ -24,7 +24,7 @@ func (b *ProductRecordRequest) Bind(r *http.Request) error {
 	if b.SalePrice == nil || *b.SalePrice < 0 {
 		return errors.New("Sale price must be not null and greater than 0")
 	}
-	if b.ProductsId == nil || *b.ProductsId < 0 {
+	if b.ProductId == nil || *b.ProductId < 0 {
 
 		return errors.New("Products Id must be not null and greater than 0")
 	}

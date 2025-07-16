@@ -5,7 +5,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
@@ -68,46 +67,45 @@ func (a *ServerChi) Run() (err error) {
 		return
 	}
 
-	// - loader
-
-	lfSection := json.NewFile(a.LoaderFilePathSection)
-	dbSection, err := lfSection.LoadSections()
-
-	if err != nil {
-		return
-	}
 
 	// - repositories
 
 	productRecordRepository := database.NewProductRecordRepository(db)
 	productRepository := database.NewProductDB(db)
+	productBatchRepository := database.NewProductBatchDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
-    buyerRepository := database.NewBuyerRepository(db)
-	sectionRepository := memory.NewSectionMap(dbSection)
+	buyerRepository := database.NewBuyerRepository(db)
+	sectionRepository := database.NewSectionRepository(db)
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
 	localityRepository := database.NewLocalityRepository(db)
+	purchaseOrderRepository := database.NewPurchaseOrderRepository(db)
 
 	// - services
-	buyerService := _default.NewBuyerDefault(buyerRepository)
+
 	productRecordService := _default.NewProductRecordDefault(productRecordRepository)
 	productService := _default.NewProductDefault(productRepository)
+	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
+	buyerService := _default.NewBuyerDefault(buyerRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
-	sectionService := _default.NewSectionDefault(sectionRepository)
+	sectionService := _default.NewSectionService(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	purchaseOrderService := _default.NewPurchaseOrderDefault(purchaseOrderRepository)
 	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
 	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
+	productBatchHandler := handler.NewProductBatchDefault(productBatchService)
 	productRecordHandler := handler.NewProductRecordHandler(productRecordService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	purchaseOrderHandler := handler.NewPurchaseOrderDefault(purchaseOrderService)
 	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
 	localityHandler := handler.NewLocalityHandler(localityService)
 
@@ -128,6 +126,8 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.ProductRecordRoutes(rt, productRecordHandler)
+	route.ProductBatchRoutes(rt, productBatchHandler)
+	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
 	route.InboundOrderRoutes(rt, inboundOrderHandler)
 	route.LocalityRoutes(rt, localityHandler)
 

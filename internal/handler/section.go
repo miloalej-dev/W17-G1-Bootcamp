@@ -38,6 +38,7 @@ func (s *SectionHandler) GetSections(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *SectionHandler) GetSection(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
@@ -71,7 +72,6 @@ func (s *SectionHandler) PostSection(w http.ResponseWriter, r *http.Request) {
 		MaximumCapacity:    *data.MaximumCapacity,
 		WarehouseId:        *data.WarehouseId,
 		ProductTypeId:      *data.ProductTypeId,
-		ProductsBatch:      *data.ProductsBatch,
 	}
 
 	createdSection, err := s.sv.Register(section)
@@ -131,4 +131,38 @@ func (s *SectionHandler) DeleteSection(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 
+}
+
+func (h *SectionHandler) GetSectionReportProducts(w http.ResponseWriter, r *http.Request) {
+	// Obtener el ID del query param
+	idParam := r.URL.Query().Get("id")
+
+	var data interface{}
+	var err error
+
+	if idParam != "" {
+		// Si hay un ID, lo convertimos a int
+		id, errConv := strconv.Atoi(idParam)
+		if errConv != nil {
+			// Manejar error de conversión
+			return
+		}
+		// Llamamos al servicio para un ID específico
+		data, err = h.sv.RetrieveSectionReport(&id)
+
+	} else {
+		// Si no hay ID, llamamos al servicio para obtener todos los reportes
+		data, err = h.sv.RetrieveSectionReport(nil)
+	}
+
+	if err != nil {
+		if errors.Is(err, repository.ErrSectionNotFound) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
+	}
+
+	_ = render.Render(w, r, response.NewResponse(data, http.StatusOK))
 }

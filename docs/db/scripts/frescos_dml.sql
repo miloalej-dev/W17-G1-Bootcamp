@@ -1,3 +1,5 @@
+-- Insert statements for populating the frescos database
+
 -- Select the database to use
 USE `frescos`;
 
@@ -112,7 +114,7 @@ VALUES
 (9, '750-60-2271', 'Abbye', 'Wedmore'),
 (10, '620-25-5585', 'Genny', 'Mothersole');
 
-INSERT INTO product_records (id, last_update, purchase_price, sale_price, products_id)
+INSERT INTO product_records (id, last_update, purchase_price, sale_price, product_id)
 VALUES
 (1, '2024-06-11 16:45:00.123456', 3.99, 29.99, 1),
 (2, '2024-06-12 16:45:00.123456', 22.99, 2.79, 2),
@@ -152,8 +154,7 @@ VALUES
 
 
 -- Insert statement for employee
-INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouse_id`)
-VALUES
+INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouse_id`) VALUES
 (1, 'C0001', 'John', 'Doe', 1),
 (2, 'C0002', 'Jane', 'Smith', 1),
 (3, 'C0003', 'Alice', 'Johnson', 2),
@@ -204,3 +205,42 @@ VALUES
 (48, 'C0048', 'Tina', 'Morris', 5),
 (49, 'C0049', 'Ulysses', 'Rogers', 5),
 (50, 'C0050', 'Vera', 'Reed', 1);
+
+
+
+INSERT INTO `frescos`.`sections` (
+    `section_number`, `current_capacity`, `current_temperature`,
+    `maximum_capacity`, `minimum_capacity`, `minimum_temperature`,
+    `product_type_id`, `warehouse_id`)
+
+VALUES
+    ('1', 30, 4.00, 50, 10, 2.00, 1, 1),
+    ('2', 45, 3.50, 60, 15, 2.00, 1, 1),
+    ('3', 25, 5.00, 40, 10, 3.00, 1, 1),
+    ('4', 50, 4.50, 70, 20, 2.50, 1, 1),
+    ('5', 35, 3.80, 50, 15, 1.80, 1, 1),
+    ('6', 40, 4.20, 55, 18, 2.20, 1, 2),
+    ('7', 48, 3.70, 60, 20, 2.00, 1, 2),
+    ('8', 20, 5.10, 35, 8, 3.50, 1, 2),
+    ('9', 32, 4.60, 50, 12, 2.30, 1, 2),
+    ('10', 38, 3.90, 55, 14, 1.90, 1, 2);
+
+
+INSERT INTO `product_batches` (batch_number, current_quantity, current_temperature,due_date,initial_quantity,manufacturing_date,manufacturing_hour,minimum_temperature,section_id,product_id)
+VALUES
+    ( 1, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 2, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 3, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 4, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,2,1),
+    ( 5, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,2,1),
+    ( 6, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,3,1),
+    ( 7, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,4,1),
+    ( 8, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,5,1);
