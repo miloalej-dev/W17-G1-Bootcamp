@@ -42,7 +42,7 @@ func (l *ProductRecordFile) Load() (v map[int]models.ProductRecord, err error) {
 			LastUpdate:    product.LastUpdate,
 			PurchasePrice: product.PurchasePrice,
 			SalePrice:     product.SalePrice,
-			ProductsId:    product.ProductsId,
+			ProductId:     product.ProductId,
 		}
 	}
 
