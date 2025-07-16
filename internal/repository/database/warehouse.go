@@ -2,7 +2,6 @@ package database
 
 import (
 	"gorm.io/gorm"
-	//"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 

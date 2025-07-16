@@ -6,7 +6,6 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
 	"net/http"
@@ -72,11 +71,10 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - repositories
-
 	productRepository := database.NewProductDB(db)
+	warehouseRepository := database.NewWarehouseDB(db)
+	carrierRepository := database.NewCarrierDB(db)
 	productBatchRepository := database.NewProductBatchDB(db)
-	warehouseRepo := memory.NewWarehouseMap()
-
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 
@@ -90,9 +88,10 @@ func (a *ServerChi) Run() (err error) {
 
 	// - services
 	productService := _default.NewProductDefault(productRepository)
+  warehouseService := _default.NewWarehouseDefault(warehouseRepository)
+	carrierService := _default.NewCarrierDefault(carrierRepository)
 	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
 	buyerService := _default.NewBuyerDefault(buyerRepository)
-	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
 	sectionService := _default.NewSectionService(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
@@ -104,7 +103,8 @@ func (a *ServerChi) Run() (err error) {
 	productHandler := handler.NewProductDefault(productService)
 	productBatchHandler := handler.NewProductBatchDefault(productBatchService)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
-	warehouseHand := handler.NewWarehouseDefault(warehouseServ)
+	warehouseHandler := handler.NewWarehouseDefault(warehouseService)
+	carrierHandler := handler.NewCarrierDefault(carrierService)
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
@@ -123,7 +123,8 @@ func (a *ServerChi) Run() (err error) {
 
 	route.DefaultRoutes(rt)
 	route.BuyerRoutes(rt, buyerHandler)
-	route.WarehouseRoutes(rt, warehouseHand)
+	route.WarehouseRoutes(rt, warehouseHandler)
+	route.CarrierRoutes(rt, carrierHandler)
 	route.SellerRoutes(rt, sellerHandler)
 	route.EmployeeRoutes(rt, employeeHandler)
 	route.SectionRoutes(rt, sectionHandler)
