@@ -1,5 +1,3 @@
--- Insert statements for populating the frescos database
-
 -- Select the database to use
 USE `frescos`;
 
@@ -77,6 +75,7 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (48, 'Compañía AV', 'Calle de los Talentos 123, Medellín', '5030012345', 8),
 (49, 'Compañía AW', 'Carrera 10 #5-8, Bogotá', '5141123456', 9),
 (50, 'Compañía AX', 'Avenida del Futuro 124, Cali', '5252234567', 10);
+
 
 INSERT INTO warehouses
 (id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
@@ -176,21 +175,7 @@ VALUES
 ( 'ABC123', 'Hand-rolled sushi combo', 113.96, 75.86, 151.19, 6.74, 2.50, -42.64, -7.91, 5),
 ( 'YZA567', 'Handcrafted gluten-free bread', 151.32, 39.27, 105.51, 1.28, 9.44, -40.94, -1.53, 6);
 
-INSERT INTO `product_batches` (batch_number, current_quantity, current_temperature,due_date,initial_quantity,manufacturing_date,manufacturing_hour,minimum_temperature,section_id,product_id)
-VALUES
-    ( 1, 200,20,"2022-04-04",1000
-    ,"2020-04-04",10,5,1,1);
 
-insert into buyers (id, card_number_id, first_name, last_name) values (1, '428-62-7504', 'Gracie', 'Hatter');
-insert into buyers (id, card_number_id, first_name, last_name) values (2, '721-99-3742', 'Tabbitha', 'Cucuzza');
-insert into buyers (id, card_number_id, first_name, last_name) values (3, '299-04-0115', 'Rhonda', 'Houseman');
-insert into buyers (id, card_number_id, first_name, last_name) values (4, '428-04-0662', 'Sharia', 'O''Brogane');
-insert into buyers (id, card_number_id, first_name, last_name) values (5, '702-09-4957', 'Filmore', 'O'' Culligan');
-insert into buyers (id, card_number_id, first_name, last_name) values (6, '123-17-1836', 'Alick', 'Dabnot');
-insert into buyers (id, card_number_id, first_name, last_name) values (7, '730-44-0280', 'Selby', 'Gregson');
-insert into buyers (id, card_number_id, first_name, last_name) values (8, '162-07-6620', 'Lucius', 'Durdle');
-insert into buyers (id, card_number_id, first_name, last_name) values (9, '750-60-2271', 'Abbye', 'Wedmore');
-insert into buyers (id, card_number_id, first_name, last_name) values (10, '620-25-5585', 'Genny', 'Mothersole');
 
 INSERT INTO carriers (id, cid, name, address, telephone, locality_id) VALUES
 (1, 'CID#1', 'Thoughtstorm', 'PO Box 22954', '288-738-3936', 1),
@@ -238,6 +223,19 @@ VALUES
 (19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
 (20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
 
+INSERT INTO buyers (id, card_number_id, first_name, last_name)
+VALUES
+    (1, '428-62-7504', 'Gracie', 'Hatter'),
+    (2, '721-99-3742', 'Tabbitha', 'Cucuzza'),
+    (3, '299-04-0115', 'Rhonda', 'Houseman'),
+    (4, '428-04-0662', 'Sharia', 'O''Brogane'),
+    (5, '702-09-4957', 'Filmore', 'O'' Culligan'),
+    (6, '123-17-1836', 'Alick', 'Dabnot'),
+    (7, '730-44-0280', 'Selby', 'Gregson'),
+    (8, '162-07-6620', 'Lucius', 'Durdle'),
+    (9, '750-60-2271', 'Abbye', 'Wedmore'),
+    (10, '620-25-5585', 'Genny', 'Mothersole');
+
 -- ORDER STATUS
 INSERT INTO `frescos`.`order_status` (`id`, `name`, `description`) VALUES
                                                                        (1, 'Pendiente', 'La orden está pendiente de procesamiento'),
@@ -254,7 +252,54 @@ INSERT INTO `frescos`.`purchase_orders` (
 
 
 INSERT INTO `frescos`.`product_records` (
-    `id`, `last_update`, `purchase_price`, `sale_price`, `product_id`
+    `id`, `last_update`, `purchase_price`, `sale_price`, `products_id`
 ) VALUES
       (1, '2025-07-15 10:00:00', 20.50, 30.00, 1),
-      (2, '2025-07-15 11:30:00', 10.75, 15.99, 2);
+      (2, '2025-07-15 11:30:00', 10.75, 15.99, 2),
+      (3, '2024-06-13 16:45:00.123456', 59.99, 2.49, 3),
+      (4, '2024-06-14 16:45:00.123456', 59.99, 29.99, 4),
+      (5, '2024-06-15 16:45:00.123456', 2.49, 69.99, 5),
+      (6, '2024-06-16 16:45:00.123456', 6.99, 39.99, 6),
+      (7, '2024-06-17 16:45:00.123456', 5.49, 29.99, 1),
+      (8, '2024-06-18 16:45:00.123456', 18.99, 6.49, 2),
+      (9, '2024-06-19 16:45:00.123456', 5.29, 5.49, 3),
+      (10, '2024-06-20 16:45:00.123456', 64.99, 7.99, 4);
+
+
+INSERT INTO `frescos`.`sections` (
+    `section_number`, `current_capacity`, `current_temperature`,
+    `maximum_capacity`, `minimum_capacity`, `minimum_temperature`,
+    `product_type_id`, `warehouse_id`)
+
+VALUES
+    ('1', 30, 4.00, 50, 10, 2.00, 1, 1),
+    ('2', 45, 3.50, 60, 15, 2.00, 1, 1),
+    ('3', 25, 5.00, 40, 10, 3.00, 1, 1),
+    ('4', 50, 4.50, 70, 20, 2.50, 1, 1),
+    ('5', 35, 3.80, 50, 15, 1.80, 1, 1),
+    ('6', 40, 4.20, 55, 18, 2.20, 1, 2),
+    ('7', 48, 3.70, 60, 20, 2.00, 1, 2),
+    ('8', 20, 5.10, 35, 8, 3.50, 1, 2),
+    ('9', 32, 4.60, 50, 12, 2.30, 1, 2),
+    ('10', 38, 3.90, 55, 14, 1.90, 1, 2);
+
+
+INSERT INTO `product_batches` (batch_number, current_quantity, current_temperature,due_date,initial_quantity,manufacturing_date,manufacturing_hour,minimum_temperature,section_id,product_id)
+VALUES
+    ( 1, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 2, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 3, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,1,1),
+    ( 4, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,2,1),
+    ( 5, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,2,1),
+    ( 6, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,3,1),
+    ( 7, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,4,1),
+    ( 8, 200,20,"2022-04-04",1000
+    ,"2020-04-04",10,5,5,1);
+

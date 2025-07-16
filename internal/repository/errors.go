@@ -17,4 +17,10 @@ var (
 
 	// ErrForeignKeyViolation is returned when a foreing key does not exist
 	ErrForeignKeyViolation = errors.New("referenced entity does note exist")
+
+	// ErrSectionNotFound is returned when a section is not found in get reports
+	ErrSectionNotFound = errors.New("there is no section by that id")
+
+	// ErrNoSectionFound is returned when a section is not found in get reports
+	ErrEmptyReport = errors.New("there is no reports asociated to that section_id")
 )

@@ -200,7 +200,7 @@ DROP TABLE IF EXISTS `frescos`.`sections`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`sections`
 (
-    `id`                  INT            NOT NULL,
+    `id`                  INT AUTO_INCREMENT NOT NULL,
     `section_number`      VARCHAR(64)    NULL DEFAULT NULL,
     `current_capacity`    INT            NULL DEFAULT NULL,
     `current_temperature` DECIMAL(19, 2) NULL DEFAULT NULL,
@@ -218,6 +218,8 @@ CREATE TABLE IF NOT EXISTS `frescos`.`sections`
     CONSTRAINT `fk_sections_warehouses1`
         FOREIGN KEY (`warehouse_id`)
             REFERENCES `frescos`.`warehouses` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
@@ -243,14 +245,14 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `product_id`          INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `uq_batch_number` (`batch_number` ASC) VISIBLE,
-    #INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
+    INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_batches_products`
         FOREIGN KEY (`product_id`)
-            REFERENCES `frescos`.`products` (`id`)
-    #CONSTRAINT `fk_product_batches_sections`
-     #   FOREIGN KEY (`section_id`)
-      #      REFERENCES `frescos`.`sections` (`id`)
+            REFERENCES `frescos`.`products` (`id`),
+    CONSTRAINT `fk_product_batches_sections`
+        FOREIGN KEY (`section_id`)
+            REFERENCES `frescos`.`sections` (`id`)
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
@@ -298,11 +300,11 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_records`
     `last_update`    DATETIME(6)    NULL DEFAULT NULL,
     `purchase_price` DECIMAL(19, 2) NULL DEFAULT NULL,
     `sale_price`     DECIMAL(19, 2) NULL DEFAULT NULL,
-    `product_id`     INT            UNSIGNED NOT NULL,
+    `products_id`     INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_product_records_products_idx` (`product_id` ASC) VISIBLE,
+    INDEX `fk_product_records_products_idx` (`products_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_records_products`
-        FOREIGN KEY (`product_id`)
+        FOREIGN KEY (`products_id`)
             REFERENCES `frescos`.`products` (`id`)
 )
     ENGINE = InnoDB

@@ -5,7 +5,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/application/route"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
@@ -68,11 +67,6 @@ func (a *ServerChi) Run() (err error) {
 		return
 	}
 
-	// - loader
-
-	lfSection := json.NewFile(a.LoaderFilePathSection)
-	dbSection, err := lfSection.LoadSections()
-
 	if err != nil {
 		return
 	}
@@ -84,8 +78,10 @@ func (a *ServerChi) Run() (err error) {
 	productBatchRepository := database.NewProductBatchDB(db)
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
+
 	buyerRepository := database.NewBuyerRepository(db)
-	sectionRepository := memory.NewSectionMap(dbSection)
+	sectionRepository := database.NewSectionRepository(db)
+
 
 	inboundOrderRepository := database.NewInboundOrderRepository(db)
 	localityRepository := database.NewLocalityRepository(db)
@@ -98,7 +94,7 @@ func (a *ServerChi) Run() (err error) {
 	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
 	buyerService := _default.NewBuyerDefault(buyerRepository)
 	sellerService := _default.NewSellerService(sellerRepository)
-	sectionService := _default.NewSectionDefault(sectionRepository)
+	sectionService := _default.NewSectionService(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
 	purchaseOrderService := _default.NewPurchaseOrderDefault(purchaseOrderRepository)
 	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
@@ -135,7 +131,6 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.ProductBatchRoutes(rt, productBatchHandler)
-
 	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
 	route.InboundOrderRoutes(rt, inboundOrderHandler)
 	route.LocalityRoutes(rt, localityHandler)
