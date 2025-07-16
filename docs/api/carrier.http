@@ -1,14 +1,23 @@
-### POST request to create a new warehouse
+### POST request to create a new carrier
 POST http://localhost:8080/api/v1/carriers
 Content-Type: application/json
 
 {
-  "cid": "CID#37",
+  "cid": "CID#38",
   "company_name": "MELI",
+  "telephone": "12345",
   "address": "EcoTower",
   "locality_id": 1
 }
 
-### GET request to get an specific warehouse
+### GET request to get localities by a specific carrier
 GET http://localhost:8080/api/v1/localities/reportCarriers?id=1
+Content-Type: application/json
+
+### GET request to get localities by all carriers
+GET http://localhost:8080/api/v1/localities/reportCarriers
+Content-Type: application/json
+
+### GET request to get localities by a non existent carrier
+GET http://localhost:8080/api/v1/localities/reportCarriers?id=1111
 Content-Type: application/json
