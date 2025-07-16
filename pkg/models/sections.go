@@ -8,6 +8,6 @@ type Section struct {
 	CurrentCapacity    int     `json:"current_capacity"`
 	MinimumCapacity    int     `json:"minimum_capacity"`
 	MaximumCapacity    int     `json:"maximum_capacity"`
-	WarehousesId       int     `json:"warehouses_id"`
+	WarehouseId        int     `json:"warehouse_id"`
 	ProductTypeId      int     `json:"product_type_id"`
 }

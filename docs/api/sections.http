@@ -17,7 +17,7 @@ Content-Type: application/json
   "current_capacity": 64,
   "minimum_capacity": 9,
   "maximum_capacity": 3,
-  "warehouses_id": 1,
+  "warehouse_id": 1,
   "product_type_id": 1
 
 }
