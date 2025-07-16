@@ -7,7 +7,6 @@ import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/handler"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/memory"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"log"
 	"net/http"
