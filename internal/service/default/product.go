@@ -63,3 +63,7 @@ func (s *ProductDefault) RetrieveRecordsCountByProductId(id int) (models.Product
 	}
 	return models.ProductReport{}, service.ErrProductNotFound
 }
+
+func (s *ProductDefault) RetrieveRecordsCount() ([]models.ProductReport, error) {
+	return s.rp.FindRecordsCount()
+}

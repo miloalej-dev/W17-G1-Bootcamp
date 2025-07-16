@@ -140,9 +140,19 @@ func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductDefault) GetProductReport(w http.ResponseWriter, r *http.Request) {
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	idParam := r.URL.Query().Get("id")
+	if idParam == "" {
+
+		value, err := h.sv.RetrieveRecordsCount()
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+			return
+		}
+		_ = render.Render(w, r, response.NewResponse(value, http.StatusOK))
+		return
+	}
 	id, errConverter := strconv.Atoi(idParam)
 	if errConverter != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
