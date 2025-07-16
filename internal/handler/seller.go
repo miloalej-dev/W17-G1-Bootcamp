@@ -64,12 +64,14 @@ func (h *SellerHandler) PostSeller(w http.ResponseWriter, r *http.Request) {
 
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	seller := models.Seller{
-		Name:      *data.Name,
-		Address:   *data.Address,
-		Telephone: *data.Telephone,
+		Name:       *data.Name,
+		Address:    *data.Address,
+		Telephone:  *data.Telephone,
+		LocalityId: *data.LocalityId,
 	}
 
 	createdSeller, err := h.service.Register(seller)
@@ -97,13 +99,15 @@ func (h *SellerHandler) PutSeller(w http.ResponseWriter, r *http.Request) {
 	err = render.Bind(r, data)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	seller := models.Seller{
-		Id:        id,
-		Name:      *data.Name,
-		Address:   *data.Address,
-		Telephone: *data.Telephone,
+		Id:         id,
+		Name:       *data.Name,
+		Address:    *data.Address,
+		Telephone:  *data.Telephone,
+		LocalityId: *data.LocalityId,
 	}
 
 	updatedSeller, err := h.service.Modify(seller)
