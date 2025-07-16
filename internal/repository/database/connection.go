@@ -26,7 +26,7 @@ func configure() (*configuration, error) {
 
 	// Default values
 	if host == "" {
-		host = "database"
+		host = "localhost"
 	}
 	if port == "" {
 		port = "3306"
