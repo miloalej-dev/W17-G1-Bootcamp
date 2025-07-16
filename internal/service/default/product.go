@@ -6,6 +6,7 @@ package _default
 
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -53,4 +54,12 @@ func (s *ProductDefault) PartialModify(id int, fields map[string]any) (models.Pr
 }
 func (s *ProductDefault) Remove(id int) (err error) {
 	return s.rp.Delete(id)
+}
+
+func (s *ProductDefault) RetrieveRecordsCountByProductId(id int) (models.ProductReport, error) {
+
+	if _, err := s.Retrieve(id); err == nil {
+		return s.rp.FindRecordsCountByProductId(id)
+	}
+	return models.ProductReport{}, service.ErrProductNotFound
 }

@@ -1,7 +1,10 @@
 package _default
 
 import (
+	"errors"
+	"github.com/go-sql-driver/mysql"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -25,7 +28,16 @@ func (s ProductRecordDefault) Retrieve(id int) (models.ProductRecord, error) {
 }
 
 func (s ProductRecordDefault) Register(productRecord models.ProductRecord) (models.ProductRecord, error) {
-	return s.rp.Create(productRecord)
+
+	value, err := s.rp.Create(productRecord)
+	var mysqlErr *mysql.MySQLError
+	if err != nil {
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1452 {
+			return models.ProductRecord{}, service.ErrProductIdConflict
+		}
+		return models.ProductRecord{}, err
+	}
+	return value, nil
 }
 
 func (s ProductRecordDefault) Modify(productRecord models.ProductRecord) (models.ProductRecord, error) {

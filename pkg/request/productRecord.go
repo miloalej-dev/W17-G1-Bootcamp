@@ -15,17 +15,18 @@ type ProductRecordRequest struct {
 
 func (b *ProductRecordRequest) Bind(r *http.Request) error {
 
-	if b.LastUpdate == nil {
+	if b.LastUpdate == nil || *b.LastUpdate == "" {
 		return errors.New("Last update date must be not null")
 	}
-	if b.PurchasePrice == nil {
-		return errors.New("Purchase price  must be not null")
+	if b.PurchasePrice == nil || *b.PurchasePrice < 0 {
+		return errors.New("Purchase price  must be not null and greater than 0")
 	}
-	if b.SalePrice == nil {
-		return errors.New("Sale price must be not null")
+	if b.SalePrice == nil || *b.SalePrice < 0 {
+		return errors.New("Sale price must be not null and greater than 0")
 	}
-	if b.ProductsId == nil {
-		return errors.New("Products Id must be not null")
+	if b.ProductsId == nil || *b.ProductsId < 0 {
+
+		return errors.New("Products Id must be not null and greater than 0")
 	}
 
 	return nil

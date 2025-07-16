@@ -28,6 +28,12 @@ type Product struct {
 	SellerId *int `json:"seller_id,omitempty"`
 }
 
+type ProductReport struct {
+	Id           int    `json:"id"`
+	Description  string `json:"description"`
+	RecordsCount int    `json:"records_count"`
+}
+
 // ProductType represents the type of product.
 type ProductType struct {
 	Id          int

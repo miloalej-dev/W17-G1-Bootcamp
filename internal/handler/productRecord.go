@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -63,7 +64,8 @@ func (h *ProductRecordHandler) PostProductRecord(w http.ResponseWriter, r *http.
 	bodyRequest := &request.ProductRecordRequest{}
 
 	if err := render.Bind(r, bodyRequest); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+		return
 	}
 
 	productRecord := models.ProductRecord{
@@ -77,10 +79,15 @@ func (h *ProductRecordHandler) PostProductRecord(w http.ResponseWriter, r *http.
 	value, err := h.service.Register(productRecord)
 
 	if err != nil {
+
+		if errors.Is(err, service.ErrProductIdConflict) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
+			return
+		}
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
-	_ = render.Render(w, r, response.NewResponse(value, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(value, http.StatusCreated))
 
 }
 

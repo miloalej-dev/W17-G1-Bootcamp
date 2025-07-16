@@ -7,4 +7,5 @@ import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 type ProductRepository interface {
 	// Repository is a generic repository interface for CRUD operations
 	Repository[int, models.Product]
+	FindRecordsCountByProductId(id int) (models.ProductReport, error)
 }

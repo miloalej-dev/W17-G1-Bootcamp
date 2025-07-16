@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
@@ -135,4 +137,26 @@ func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusNoContent))
 	return
+}
+
+func (h *ProductDefault) GetProductReport(w http.ResponseWriter, r *http.Request) {
+	
+	w.Header().Set("Content-Type", "application/json")
+	idParam := r.URL.Query().Get("id")
+	id, errConverter := strconv.Atoi(idParam)
+	if errConverter != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+		return
+	}
+
+	value, err := h.sv.RetrieveRecordsCountByProductId(id)
+	if err != nil {
+		if errors.Is(err, service.ErrProductNotFound) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(value, http.StatusOK))
 }
