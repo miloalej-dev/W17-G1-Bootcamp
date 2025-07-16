@@ -145,3 +145,38 @@ func (h *EmployeeHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request)
 
 	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 }
+
+// GetInboundOrdersReport handles GET requests to retrieve inbound orders report
+// If id query parameter is provided, returns report for specific employee, otherwise returns report for all employees
+func (h *EmployeeHandler) GetInboundOrdersReport(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if param := r.URL.Query().Get("id"); param != "" {
+		// Get report for specific employee
+		id, err := strconv.Atoi(param)
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse("id must be a number", http.StatusBadRequest))
+			return
+		}
+
+		report, err := h.service.RetrieveInboundOrdersReportById(id)
+
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+
+		_ = render.Render(w, r, response.NewResponse(report, http.StatusOK))
+
+		return
+	}
+
+	// Get report for all employees
+	report, err := h.service.RetrieveInboundOrdersReport()
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+	_ = render.Render(w, r, response.NewResponse(report, http.StatusOK))
+	return
+}
