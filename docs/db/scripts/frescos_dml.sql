@@ -211,7 +211,7 @@ INSERT INTO `frescos`.`purchase_orders` (
 
 
 INSERT INTO `frescos`.`product_records` (
-    `id`, `last_update`, `purchase_price`, `sale_price`, `product_id`
+    `id`, `last_update`, `purchase_price`, `sale_price`, `products_id`
 ) VALUES
       (1, '2025-07-15 10:00:00', 20.50, 30.00, 1),
       (2, '2025-07-15 11:30:00', 10.75, 15.99, 2),
@@ -224,85 +224,6 @@ INSERT INTO `frescos`.`product_records` (
       (9, '2024-06-19 16:45:00.123456', 5.29, 5.49, 3),
       (10, '2024-06-20 16:45:00.123456', 64.99, 7.99, 4);
 
-INSERT INTO warehouses
-(id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
-VALUES
-    (1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
-    (2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
-    (3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
-    (4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
-    (5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
-    (6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
-    (7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
-    (8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
-    (9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
-    (10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
-    (11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
-    (12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
-    (13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
-    (14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
-    (15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
-    (16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
-    (17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
-    (18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
-    (19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
-    (20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
-
-
-
--- Insert statement for employee
-INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouse_id`)
-VALUES
-    (1, 'C0001', 'John', 'Doe', 1),
-    (2, 'C0002', 'Jane', 'Smith', 1),
-    (3, 'C0003', 'Alice', 'Johnson', 2),
-    (4, 'C0004', 'Bob', 'Brown', 2),
-    (5, 'C0005', 'Charlie', 'Davis', 3),
-    (6, 'C0006', 'Diana', 'Miller', 3),
-    (7, 'C0007', 'Evan', 'Wilson', 4),
-    (8, 'C0008', 'Fiona', 'Taylor', 4),
-    (9, 'C0009', 'George', 'Anderson', 5),
-    (10, 'C0010', 'Hannah', 'Thomas', 5),
-    (11, 'C0011', 'Isaac', 'Jackson', 1),
-    (12, 'C0012', 'Julia', 'White', 1),
-    (13, 'C0013', 'Kyle', 'Harris', 2),
-    (14, 'C0014', 'Laura', 'Martin', 2),
-    (15, 'C0015', 'Michael', 'Thompson', 3),
-    (16, 'C0016', 'Nina', 'Garcia', 3),
-    (17, 'C0017', 'Oscar', 'Martinez', 4),
-    (18, 'C0018', 'Pam', 'Robinson', 4),
-    (19, 'C0019', 'Quinn', 'Clark', 5),
-    (20, 'C0020', 'Ryan', 'Rodriguez', 5),
-    (21, 'C0021', 'Sophia', 'Lewis', 1),
-    (22, 'C0022', 'Tom', 'Lee', 1),
-    (23, 'C0023', 'Uma', 'Walker', 2),
-    (24, 'C0024', 'Victor', 'Hall', 2),
-    (25, 'C0025', 'Wendy', 'Allen', 3),
-    (26, 'C0026', 'Xander', 'Young', 3),
-    (27, 'C0027', 'Yara', 'Hernandez', 4),
-    (28, 'C0028', 'Zach', 'King', 4),
-    (29, 'C0029', 'Amy', 'Wright', 5),
-    (30, 'C0030', 'Brian', 'Scott', 1),
-    (31, 'C0031', 'Clara', 'Adams', 1),
-    (32, 'C0032', 'Daniel', 'Baker', 2),
-    (33, 'C0033', 'Ella', 'Gonzalez', 2),
-    (34, 'C0034', 'Frank', 'Nelson', 3),
-    (35, 'C0035', 'Grace', 'Carter', 3),
-    (36, 'C0036', 'Henry', 'Mitchell', 4),
-    (37, 'C0037', 'Ivy', 'Perez', 4),
-    (38, 'C0038', 'Jack', 'Roberts', 5),
-    (39, 'C0039', 'Kathy', 'Turner', 5),
-    (40, 'C0040', 'Liam', 'Phillips', 1),
-    (41, 'C0041', 'Mia', 'Campbell', 1),
-    (42, 'C0042', 'Noah', 'Parker', 2),
-    (43, 'C0043', 'Olivia', 'Evans', 2),
-    (44, 'C0044', 'Paul', 'Edwards', 3),
-    (45, 'C0045', 'Quincy', 'Collins', 3),
-    (46, 'C0046', 'Rose', 'Stewart', 4),
-    (47, 'C0047', 'Sam', 'Sanchez', 4),
-    (48, 'C0048', 'Tina', 'Morris', 5),
-    (49, 'C0049', 'Ulysses', 'Rogers', 5),
-    (50, 'C0050', 'Vera', 'Reed', 1);
 
 INSERT INTO `frescos`.`sections` (
     `section_number`, `current_capacity`, `current_temperature`,

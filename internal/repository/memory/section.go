@@ -100,7 +100,7 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 			}
 		case "warehouses_id":
 			if warehouses_id, ok := value.(float64); ok {
-				v.WarehousesId = int(warehouses_id)
+				v.WarehouseId = int(warehouses_id)
 			}
 		case "product_type_id":
 			if product_type_id, ok := value.(float64); ok {
