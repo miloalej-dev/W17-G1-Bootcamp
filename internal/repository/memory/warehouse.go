@@ -69,7 +69,7 @@ func (r *WarehouseMap) PartialUpdate(id int, fields map[string]interface{}) (mod
 	}
 
 	if val, ok := fields["code"]; ok {
-		warehouse.Code = val.(string)
+		warehouse.WarehouseCode = val.(string)
 	}
 	if val, ok := fields["address"]; ok {
 		warehouse.Address = val.(string)
