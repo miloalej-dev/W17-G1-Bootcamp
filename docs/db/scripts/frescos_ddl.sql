@@ -142,7 +142,7 @@ DROP TABLE IF EXISTS `frescos`.`sellers`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`sellers`
 (
-    `id`          INT          NOT NULL,
+    `id`          INT     AUTO_INCREMENT     NOT NULL,
     `name`        VARCHAR(64)  NULL DEFAULT NULL,
     `address`     VARCHAR(128) NULL DEFAULT NULL,
     `telephone`   VARCHAR(16)  NULL DEFAULT NULL,
@@ -296,15 +296,15 @@ DROP TABLE IF EXISTS `frescos`.`product_records`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`product_records`
 (
-    `id`             INT            NOT NULL,
+    `id`             INT  AUTO_INCREMENT NOT NULL,
     `last_update`    DATETIME(6)    NULL DEFAULT NULL,
     `purchase_price` DECIMAL(19, 2) NULL DEFAULT NULL,
     `sale_price`     DECIMAL(19, 2) NULL DEFAULT NULL,
-    `products_id`     INT            UNSIGNED NOT NULL,
+    `product_id`     INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_product_records_products_idx` (`products_id` ASC) VISIBLE,
+    INDEX `fk_product_records_products_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_records_products`
-        FOREIGN KEY (`products_id`)
+        FOREIGN KEY (`product_id`)
             REFERENCES `frescos`.`products` (`id`)
 )
     ENGINE = InnoDB

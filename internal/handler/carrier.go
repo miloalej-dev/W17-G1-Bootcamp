@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
-	"errors"
 
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
@@ -28,12 +28,12 @@ func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	carrierJson := &request.CarrierRequest{}
 	if err := render.Bind(r, carrierJson); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 		return
 	}
 
 	carrier := models.NewCarrier(
-		0,							// placeholder, will be overwritten later
+		0, // placeholder, will be overwritten later
 		*carrierJson.CId,
 		*carrierJson.CompanyName,
 		*carrierJson.Address,

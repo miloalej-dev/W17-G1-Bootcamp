@@ -62,7 +62,7 @@ func (h *InboundOrderHandler) PostInboundOrder(w http.ResponseWriter, r *http.Re
 
 	err := render.Bind(r, data)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 	}
 
 	inboundOrder := models.InboundOrder{

@@ -14,4 +14,9 @@ var (
 
 	// ErrEmptyEntity is returned when an entity is empty
 	ErrEmptyEntity = errors.New("empty entity")
+
+	ErrProductIdConflict = errors.New("the product with the given id does not exists")
+	ErrProductNotFound   = errors.New("product not found")
 )
+
+

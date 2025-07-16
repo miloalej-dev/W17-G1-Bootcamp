@@ -76,6 +76,54 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (49, 'Compañía AW', 'Carrera 10 #5-8, Bogotá', '5141123456', 9),
 (50, 'Compañía AX', 'Avenida del Futuro 124, Cali', '5252234567', 10);
 
+-- Step 1: Populate the parent table 'product_type' first.
+-- Note: A placeholder description is used.
+INSERT INTO `product_type` (id, name, description)
+VALUES
+(1, 'Fruits', 'Placeholder Type Description'),
+(2, 'Red Meat', 'Placeholder Type Description'),
+(3, 'Grain', 'Placeholder Type Description'),
+(4, 'Candy', 'Placeholder Type Description'),
+(5, 'Canned food', 'Placeholder Type Description'),
+(6, 'Vegetables', 'Placeholder Type Description');
+
+-- Step 2: Populate the child table 'products'.
+INSERT INTO `products` (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate , product_type_id)
+VALUES
+( 'JKL012', 'Gourmet truffle mashed potatoes', 7.25, 55.19, 133.35, 3.83, 7.51, -13.47, -3.78, 1),
+( 'QRS345', 'Farm-fresh kale', 50.35, 106.70, 15.00, 1.95, 6.60, -14.85, -1.24, 2),
+( 'QRS123', 'Organic arugula and beet salad', 1.59, 27.04, 72.92, 1.76, 2.97, -15.89, -2.38, 3),
+( 'STU789', 'Organic strawberries', 28.42, 49.17, 69.23, 3.82, 9.08, -31.93, 0.35, 4),
+( 'ABC123', 'Hand-rolled sushi combo', 113.96, 75.86, 151.19, 6.74, 2.50, -42.64, -7.91, 5),
+( 'YZA567', 'Handcrafted gluten-free bread', 151.32, 39.27, 105.51, 1.28, 9.44, -40.94, -1.53, 6);
+
+
+
+INSERT INTO buyers (id, card_number_id, first_name, last_name)
+VALUES
+(1, '428-62-7504', 'Gracie', 'Hatter'),
+(2, '721-99-3742', 'Tabbitha', 'Cucuzza'),
+(3, '299-04-0115', 'Rhonda', 'Houseman'),
+(4, '428-04-0662', 'Sharia', 'O''Brogane'),
+(5, '702-09-4957', 'Filmore', 'O'' Culligan'),
+(6, '123-17-1836', 'Alick', 'Dabnot'),
+(7, '730-44-0280', 'Selby', 'Gregson'),
+(8, '162-07-6620', 'Lucius', 'Durdle'),
+(9, '750-60-2271', 'Abbye', 'Wedmore'),
+(10, '620-25-5585', 'Genny', 'Mothersole');
+
+INSERT INTO product_records (id, last_update, purchase_price, sale_price, product_id)
+VALUES
+(1, '2024-06-11 16:45:00.123456', 3.99, 29.99, 1),
+(2, '2024-06-12 16:45:00.123456', 22.99, 2.79, 2),
+(3, '2024-06-13 16:45:00.123456', 59.99, 2.49, 3),
+(4, '2024-06-14 16:45:00.123456', 59.99, 29.99, 4),
+(5, '2024-06-15 16:45:00.123456', 2.49, 69.99, 5),
+(6, '2024-06-16 16:45:00.123456', 6.99, 39.99, 6),
+(7, '2024-06-17 16:45:00.123456', 5.49, 29.99, 1),
+(8, '2024-06-18 16:45:00.123456', 18.99, 6.49, 2),
+(9, '2024-06-19 16:45:00.123456', 5.29, 5.49, 3),
+(10, '2024-06-20 16:45:00.123456', 64.99, 7.99, 4);
 
 INSERT INTO warehouses
 (id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
@@ -154,27 +202,6 @@ INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `war
 (49, 'C0049', 'Ulysses', 'Rogers', 5),
 (50, 'C0050', 'Vera', 'Reed', 1);
 
--- Step 1: Populate the parent table 'product_type' first.
--- Note: A placeholder description is used.
-INSERT INTO `product_type` (id, name, description)
-VALUES
-(1, 'Fruits', 'Placeholder Type Description'),
-(2, 'Red Meat', 'Placeholder Type Description'),
-(3, 'Grain', 'Placeholder Type Description'),
-(4, 'Candy', 'Placeholder Type Description'),
-(5, 'Canned food', 'Placeholder Type Description'),
-(6, 'Vegetables', 'Placeholder Type Description');
-
--- Step 2: Populate the child table 'products'.
-INSERT INTO `products` (product_code, description, width, height, length, net_weight, expiration_rate, recommended_freezing_temperature, freezing_rate, product_type_id)
-VALUES
-( 'JKL012', 'Gourmet truffle mashed potatoes', 7.25, 55.19, 133.35, 3.83, 7.51, -13.47, -3.78, 1),
-( 'QRS345', 'Farm-fresh kale', 50.35, 106.70, 15.00, 1.95, 6.60, -14.85, -1.24, 2),
-( 'QRS123', 'Organic arugula and beet salad', 1.59, 27.04, 72.92, 1.76, 2.97, -15.89, -2.38, 3),
-( 'STU789', 'Organic strawberries', 28.42, 49.17, 69.23, 3.82, 9.08, -31.93, 0.35, 4),
-( 'ABC123', 'Hand-rolled sushi combo', 113.96, 75.86, 151.19, 6.74, 2.50, -42.64, -7.91, 5),
-( 'YZA567', 'Handcrafted gluten-free bread', 151.32, 39.27, 105.51, 1.28, 9.44, -40.94, -1.53, 6);
-
 
 
 INSERT INTO carriers (id, cid, name, address, telephone, locality_id) VALUES
@@ -199,43 +226,6 @@ INSERT INTO carriers (id, cid, name, address, telephone, locality_id) VALUES
 (19, 'CID#19', 'Meedoo', 'PO Box 56809', '971-217-9192', 1),
 (20, 'CID#20', 'Jaxnation', 'Apt 802', '747-275-6029', 1);
 
-INSERT INTO warehouses
-(id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
-VALUES
-(1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
-(2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
-(3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
-(4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
-(5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
-(6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
-(7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
-(8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
-(9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
-(10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
-(11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
-(12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
-(13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
-(14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
-(15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
-(16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
-(17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
-(18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
-(19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
-(20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
-
-INSERT INTO buyers (id, card_number_id, first_name, last_name)
-VALUES
-    (1, '428-62-7504', 'Gracie', 'Hatter'),
-    (2, '721-99-3742', 'Tabbitha', 'Cucuzza'),
-    (3, '299-04-0115', 'Rhonda', 'Houseman'),
-    (4, '428-04-0662', 'Sharia', 'O''Brogane'),
-    (5, '702-09-4957', 'Filmore', 'O'' Culligan'),
-    (6, '123-17-1836', 'Alick', 'Dabnot'),
-    (7, '730-44-0280', 'Selby', 'Gregson'),
-    (8, '162-07-6620', 'Lucius', 'Durdle'),
-    (9, '750-60-2271', 'Abbye', 'Wedmore'),
-    (10, '620-25-5585', 'Genny', 'Mothersole');
-
 -- ORDER STATUS
 INSERT INTO `frescos`.`order_status` (`id`, `name`, `description`) VALUES
                                                                        (1, 'Pendiente', 'La orden está pendiente de procesamiento'),
@@ -250,20 +240,6 @@ INSERT INTO `frescos`.`purchase_orders` (
       (2, 'PO-20250715-002', '2025-07-14 14:30:00', 'TRC002', 1, 1, 1, 2),
       (3, 'PO-20250713-003', '2025-07-13 09:15:00', 'TRC003', 1, 1, 1, 3);
 
-
-INSERT INTO `frescos`.`product_records` (
-    `id`, `last_update`, `purchase_price`, `sale_price`, `products_id`
-) VALUES
-      (1, '2025-07-15 10:00:00', 20.50, 30.00, 1),
-      (2, '2025-07-15 11:30:00', 10.75, 15.99, 2),
-      (3, '2024-06-13 16:45:00.123456', 59.99, 2.49, 3),
-      (4, '2024-06-14 16:45:00.123456', 59.99, 29.99, 4),
-      (5, '2024-06-15 16:45:00.123456', 2.49, 69.99, 5),
-      (6, '2024-06-16 16:45:00.123456', 6.99, 39.99, 6),
-      (7, '2024-06-17 16:45:00.123456', 5.49, 29.99, 1),
-      (8, '2024-06-18 16:45:00.123456', 18.99, 6.49, 2),
-      (9, '2024-06-19 16:45:00.123456', 5.29, 5.49, 3),
-      (10, '2024-06-20 16:45:00.123456', 64.99, 7.99, 4);
 
 
 INSERT INTO `frescos`.`sections` (
@@ -303,3 +279,13 @@ VALUES
     ( 8, 200,20,"2022-04-04",1000
     ,"2020-04-04",10,5,5,1);
 
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (1, '2012-07-16', '263-93-6778', 6, 10, 6);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (2, '2003-11-29', '613-86-9402', 10, 6, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (3, '2018-12-12', '295-32-0720', 9, 5, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (4, '2016-09-22', '426-37-0179', 5, 6, 7);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (5, '2015-09-13', '222-43-4329', 10, 6, 5);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (6, '2012-02-21', '850-02-8615', 9, 6, 5);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (7, '2016-09-17', '430-41-2235', 7, 10, 2);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (8, '2009-01-19', '188-43-1616', 9, 6, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (9, '2008-06-10', '752-18-3288', 3, 2, 1);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (10, '2006-10-09', '284-71-5152', 10, 2, 3);
