@@ -135,7 +135,7 @@ func (a *ServerChi) Run() (err error) {
 	route.ProductBatchRoutes(rt, productBatchHandler)
 
 	route.PurchaseOrderRoutes(rt, purchaseOrderHandler)
-+	route.InboundOrderRoutes(rt, inboundOrderHandler)
+	route.InboundOrderRoutes(rt, inboundOrderHandler)
 	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
