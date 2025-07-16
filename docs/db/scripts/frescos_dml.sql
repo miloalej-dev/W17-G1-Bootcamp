@@ -42,3 +42,28 @@ INSERT INTO `frescos`.`purchase_orders` (
       (1, 'PO-20250715-001', '2025-07-15 10:00:00', 'TRC001', 1, 1, 1, 1),
       (2, 'PO-20250715-002', '2025-07-14 14:30:00', 'TRC002', 1, 1, 1, 2),
       (3, 'PO-20250713-003', '2025-07-13 09:15:00', 'TRC003', 1, 1, 1, 3);
+
+INSERT INTO `frescos`.`sellers` (
+    `id`, `name`, `address`, `telephone`, `locality_id`
+) VALUES
+      (1, 'Frutas El Valle', 'Calle 123 #45-67', '3123456789', 1),
+      (2, 'Verduras La Cosecha', 'Cra 45 #12-34', '3139876543', 1);
+
+INSERT INTO `frescos`.`product_type` (
+    `id`, `description`, `name`
+) VALUES
+      (1, 'Frutas frescas y tropicales', 'Frutas'),
+      (2, 'Hortalizas de hoja', 'Hortalizas');
+
+INSERT INTO `frescos`.`products` (
+    `id`, `product_code`, `description`, `width`, `height`, `length`, `net_weight`,
+    `expiration_rate`, `recommended_freezing_temperature`, `product_type`, `seller_id`, `product_type_id`
+) VALUES
+      (1, 'PRD-001', 'Caja de fresas', 10.5, 5.0, 15.2, 1.2, 0.5, -2.0, 1, 1, 1),
+      (2, 'PRD-002', 'Bolsa de espinacas', 8.0, 4.0, 12.0, 0.8, 0.3, -1.0, 2, 2, 2);
+
+INSERT INTO `frescos`.`product_records` (
+    `id`, `last_update`, `purchase_price`, `sale_price`, `product_id`
+) VALUES
+      (1, '2025-07-15 10:00:00', 20.50, 30.00, 1),
+      (2, '2025-07-15 11:30:00', 10.75, 15.99, 2);

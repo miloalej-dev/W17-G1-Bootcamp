@@ -102,9 +102,13 @@ func (r *BuyerRepository) FindByPurchaseOrderReport(id int) ([]models.BuyerRepor
 			return nil, err
 		}
 	} else {
+		_, err := r.FindById(id)
+		if err != nil {
+			return reports, err
+		}
 		// Obtener un solo buyer con su conteo de órdenes
 		var report models.BuyerReport
-		err := r.db.
+		err = r.db.
 			Table("buyers").
 			Select("buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name,  COUNT(purchase_orders.id) AS purchase_orders_count").
 			Joins("LEFT JOIN purchase_orders ON purchase_orders.buyer_id = buyers.id").

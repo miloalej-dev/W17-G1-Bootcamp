@@ -6,7 +6,6 @@ import (
 )
 
 type OrderDetailRequest struct {
-	ID               *int     `json:"id"`
 	Quantity         *int     `json:"quantity"`
 	CleanLinesStatus *string  `json:"clean_lines_status"`
 	Temperature      *float64 `json:"temperature"`

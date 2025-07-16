@@ -51,6 +51,18 @@ func (h *PurchaseOrderHandler) PostPurchaseOrders(w http.ResponseWriter, r *http
 		return
 	}
 
+	orDetail := make([]models.OrderDetail, 0)
+	for _, or := range *data.OrderDetails {
+		ordt := models.OrderDetail{
+			Id:               0,
+			Quantity:         or.Quantity,
+			CleanLinesStatus: or.CleanLinesStatus,
+			Temperature:      or.Temperature,
+			ProductRecordID:  or.ProductRecordID,
+		}
+		orDetail = append(orDetail, ordt)
+	}
+
 	purchaseOrders := models.PurchaseOrder{
 		OrderNumber:   *data.OrderNumber,
 		OrderDate:     *data.OrderDate,
@@ -59,11 +71,12 @@ func (h *PurchaseOrderHandler) PostPurchaseOrders(w http.ResponseWriter, r *http
 		WarehouseID:   *data.WarehousesID,
 		CarrierID:     *data.CarriersID,
 		OrderStatusID: *data.OrderStatusID,
+		OrderDetails:  &orDetail,
 	}
 
 	createdPurchaseOrder, err := h.sv.Register(purchaseOrders)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(createdPurchaseOrder, http.StatusOK))

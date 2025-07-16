@@ -61,15 +61,15 @@ func (r *OrderDetailRepository) PartialUpdate(id int, fields map[string]interfac
 
 	if val, ok := fields["quantity"]; ok {
 		q := int(val.(float64))
-		od.Quantity = &q
+		od.Quantity = q
 	}
 	if val, ok := fields["clean_lines_status"]; ok {
 		status := val.(string)
-		od.CleanLinesStatus = &status
+		od.CleanLinesStatus = status
 	}
 	if val, ok := fields["temperature"]; ok {
 		t := val.(float64)
-		od.Temperature = &t
+		od.Temperature = t
 	}
 	if val, ok := fields["product_record_id"]; ok {
 		od.ProductRecordID = int(val.(float64))

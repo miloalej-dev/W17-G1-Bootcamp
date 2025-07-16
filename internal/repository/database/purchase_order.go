@@ -40,6 +40,19 @@ func (r *PurchaseOrderRepository) Create(po models.PurchaseOrder) (models.Purcha
 	if result.Error != nil {
 		return models.PurchaseOrder{}, result.Error
 	}
+	orders_details := po.OrderDetails
+	odr := NewOrderDetailRepository(r.db)
+	for _, order_detail := range *orders_details {
+		orCr := order_detail
+		orCr.Id = 0
+		orCr.PurchaseOrderID = po.Id
+		_, err := odr.Create(orCr)
+		if err != nil {
+			return models.PurchaseOrder{}, err
+		}
+	}
+	po.OrderDetails = orders_details
+
 	return po, nil
 }
 
