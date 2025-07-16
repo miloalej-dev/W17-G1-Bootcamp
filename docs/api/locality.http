@@ -1,0 +1,26 @@
+### GET request to get a locality with report sellers
+GET localhost:8080/api/v1/localities/reportSellers?id=1
+
+### POST request to create a new locality
+POST localhost:8080/api/v1/localities
+Content-Type: application/json
+
+{
+    "id": 55,
+    "locality_name": "Centro ventas",
+    "province_name": "Bogotá",
+    "country_name": "Colombia"
+}
+
+### POST request to create a new seller
+POST localhost:8080/api/v1/sellers
+Content-Type: application/json
+
+{
+
+  "cid": 1,
+  "name": "Alkemy",
+  "address": "Monroe 860",
+  "telephone": "47470000",
+  "locality_id": 2
+}

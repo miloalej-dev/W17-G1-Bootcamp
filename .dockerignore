@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+**/*_test.go
+
+# Coverage reports
+*.out
+coverage.html
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+tmp/
+temp/
+
+# Docker files (avoid recursive copying)
+Dockerfile*
+docker-compose*.yml
+compose.yaml
+
+# HTTP test files (not needed in container)
+docs/api/
+*.http
+
+# Database scripts (not needed in runtime)
+docs/db/scripts/
+
+# Vendor directory (if using vendor)
+vendor/
+
+# Go module cache
+go.sum.backup

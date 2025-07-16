@@ -157,6 +157,49 @@ Es una convención para escribir commits en proyectos que utilizan control de ve
 * `perf`: usado para mejoras de rendimiento.
 * `revert`: si el commit revierte un commit anterior. Debería indicarse el hash del commit que se revierte.
 
+## 🔧 Configuración de Variables de Entorno
+
+Este proyecto utiliza variables de entorno para configurar diferentes aspectos de la aplicación y la base de datos. La configuración se gestiona a través de un archivo `.env` que Docker Compose lee automáticamente.
+
+### Archivo .env
+
+El archivo `.env` debe crearse en la raíz del proyecto y contiene todas las variables de configuración necesarias:
+
+```dotenv
+# Database Configuration
+MYSQL_ROOT_PASSWORD=your_root_password_here
+MYSQL_DATABASE=your_database_here
+MYSQL_USER=your_user_here
+MYSQL_PASSWORD=your_password_here
+MYSQL_CHARACTER_SET_SERVER=your_character_set_here
+MYSQL_COLLATION_SERVER=your_collation_here
+MYSQL_PORT=your_mysql_port_here
+
+# Application Configuration
+APP_PORT=your_app_port_here
+```
+
+### Descripción de Variables
+
+#### 🗄️ Configuración de Base de Datos
+
+| Variable                     | Descripción                                   | 
+|------------------------------|-----------------------------------------------|
+| `MYSQL_ROOT_PASSWORD`        | Contraseña del usuario root de MySQL          |
+| `MYSQL_DATABASE`             | Nombre de la base de datos que se creará      |
+| `MYSQL_USER`                 | Usuario de aplicación para conectarse a MySQL |
+| `MYSQL_PASSWORD`             | Contraseña del usuario de aplicación          |
+| `MYSQL_CHARACTER_SET_SERVER` | Conjunto de caracteres del servidor MySQL     |
+| `MYSQL_COLLATION_SERVER`     | Collation del servidor MySQL                  |
+| `MYSQL_PORT`                 | Puerto donde MySQL aceptará las conexiones    |
+
+
+#### 🌐 Configuración de la Aplicación (FRESCOS)
+
+| Variable | Descripción |
+|----------|-------------|
+| `APP_PORT` | Puerto donde se expone la aplicación Go |
+
 ## Estructura del proyecto
 
 ```markdown
@@ -180,6 +223,59 @@ W17-G1-Bootcamp
 └── models
 ```
 
+## 🐳 Docker
+
+Este proyecto incluye configuración completa de Docker para facilitar el desarrollo y despliegue. La aplicación utiliza un build multi-etapa para optimizar el tamaño de la imagen final.
+
+### Prerrequisitos
+
+- Docker Engine 20.10+
+- Docker Compose 2.0+
+
+### Ejecutar con Docker Compose (Recomendado)
+
+La forma más sencilla de ejecutar el proyecto completo (aplicación + base de datos MySQL):
+
+```bash
+# Construir y ejecutar todos los servicios
+docker compose up --build
+
+# Ejecutar en segundo plano (detached mode)
+docker compose up --build -d
+
+# Ver logs
+docker compose logs app
+docker compose logs database
+
+# Detener todos los servicios
+docker compose down
+
+# Detener y eliminar volúmenes (reinicio completo)
+docker compose down --volumes
+```
+
+### Construcción manual con Docker
+
+Si prefieres usar Docker directamente sin Compose:
+
+```bash
+# Construir la imagen
+docker build -t frescos-app .
+
+# Ejecutar el contenedor
+docker run -p 8080:8080 frescos-app
+
+# Ejecutar en segundo plano
+docker run -d -p 8080:8080 --name frescos-container frescos-app
+
+# Ver logs
+docker logs frescos-container
+
+# Detener y eliminar el contenedor
+docker stop frescos-container
+docker rm frescos-container
+```
+
 ## Recursos
 
 1. GitFlow
@@ -192,4 +288,6 @@ W17-G1-Bootcamp
     2. https://dev.to/achamorro_dev/conventional-commits-que-es-y-por-que-deberias-empezar-a-utilizarlo-23an
 3. Mockaroo (generar datos de prueba)
     1. https://www.mockaroo.com/
-
+4. Docker
+   1. https://www.docker.com/101-tutorial/
+   2. https://docs.docker.com/compose/gettingstarted/

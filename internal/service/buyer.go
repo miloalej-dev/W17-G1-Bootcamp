@@ -4,9 +4,11 @@ import "github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 
 // BuyerService is an interface that represents a Buyer Service
 type BuyerService interface {
-	Create(buyer models.BuyerAtributtes) (v *models.Buyer, err error)
-	FindAll() (v map[int]models.Buyer, err error)
-	FindById(id int) (v *models.Buyer, err error)
-	Update(buyer models.Buyer) (*models.Buyer, error)
-	Delete(id int) (v *models.Buyer, err error)
+	Register(buyer models.Buyer) (models.Buyer, error)
+	RetrieveAll() ([]models.Buyer, error)
+	Retrieve(id int) (models.Buyer, error)
+	Modify(buyer models.Buyer) (models.Buyer, error)
+	PartialModify(id int, fields map[string]any) (models.Buyer, error)
+	Remove(id int) error
+	RetrieveByPurchaseOrderReport(id int) ([]models.BuyerReport, error)
 }

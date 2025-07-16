@@ -1,9 +1,8 @@
 package memory
 
 import (
-	"errors"
-	"strconv"
-
+	loader "github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -11,14 +10,27 @@ type EmployeeMap struct {
 	db map[int]models.Employee
 }
 
-func NewEmployeeMap(db map[int]models.Employee) *EmployeeMap {
-	return &EmployeeMap{db: db}
+func NewEmployeeMap() *EmployeeMap {
+
+	defaultDB := make(map[int]models.Employee)
+	ld := loader.NewEmployeeFile("docs/db/json/employee.json")
+	db, err := ld.Load()
+	if err != nil {
+		return &EmployeeMap{db: defaultDB}
+	}
+	if db != nil {
+		defaultDB = db
+	}
+	return &EmployeeMap{db: defaultDB}
 }
 
-func (r *EmployeeMap) FindAll() ([]models.Employee, error) {
-	employees := make([]models.Employee, 0)
-	for _, e := range r.db {
-		employees = append(employees, e)
+func (e *EmployeeMap) FindAll() ([]models.Employee, error) {
+	var employees []models.Employee
+	for _, emp := range e.db {
+		employees = append(employees, emp)
+	}
+	if len(employees) <= 0 {
+		return nil, repository.ErrEntityNotFound
 	}
 	return employees, nil
 }
@@ -26,28 +38,22 @@ func (r *EmployeeMap) FindAll() ([]models.Employee, error) {
 func (e *EmployeeMap) FindById(id int) (models.Employee, error) {
 	employee, exists := e.db[id]
 	if !exists {
-		return models.Employee{}, errors.New("employee no found")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 	return employee, nil
 }
 
 func (e *EmployeeMap) Create(emp models.Employee) (models.Employee, error) {
 	id := len(e.db) + 1
-	newEmployee := models.Employee{
-		Id:           id,
-		CardNumberId: emp.CardNumberId,
-		FirstName:    emp.FirstName,
-		LastName:     emp.LastName,
-		WarehouseId:  emp.WarehouseId,
-	}
-	e.db[id] = newEmployee
-	return newEmployee, nil
+	emp.Id = id
+	e.db[id] = emp
+	return emp, nil
 }
 
 func (e *EmployeeMap) Update(emp models.Employee) (models.Employee, error) {
 	_, exists := e.db[emp.Id]
 	if !exists {
-		return models.Employee{}, errors.New("employee does not exists")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 	e.db[emp.Id] = emp
 	return emp, nil
@@ -57,7 +63,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 	employee, exists := e.db[id]
 
 	if !exists {
-		return models.Employee{}, errors.New("employee Not Found")
+		return models.Employee{}, repository.ErrEntityNotFound
 	}
 
 	if val, ok := fields["card_number_id"]; ok {
@@ -70,8 +76,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 		employee.LastName = val.(string)
 	}
 	if val, ok := fields["warehouse_id"]; ok {
-		idWarehouse, _ := strconv.Atoi(val.(string))
-		employee.WarehouseId = idWarehouse
+		employee.WarehouseId = int(val.(float64))
 	}
 
 	e.db[id] = employee
@@ -81,7 +86,7 @@ func (e *EmployeeMap) PartialUpdate(id int, fields map[string]interface{}) (mode
 func (e *EmployeeMap) Delete(id int) error {
 	_, exists := e.db[id]
 	if !exists {
-		return errors.New("employee not fount")
+		return repository.ErrEntityNotFound
 	}
 	delete(e.db, id)
 	return nil

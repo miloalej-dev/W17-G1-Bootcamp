@@ -1,0 +1,51 @@
+name: frescos
+services:
+  app:
+    build: .
+    container_name: frescos-app
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+        DB_USER: ${MYSQL_USER}
+        DB_PASSWORD: ${MYSQL_PASSWORD}
+        DB_HOST: database # This is the name of the service in the compose file
+        DB_PORT: ${MYSQL_PORT}
+        DB_NAME: ${MYSQL_DATABASE}
+    networks:
+      - frescos-network
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mysql:9.3.0
+    container_name: frescos-database
+    ports:
+      - "${MYSQL_PORT}:3306"
+    environment:  
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_CHARACTER_SET_SERVER: ${MYSQL_CHARACTER_SET_SERVER}
+      MYSQL_COLLATION_SERVER: ${MYSQL_COLLATION_SERVER}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - mysql-data-volume:/var/lib/mysql
+      - ./docs/db/scripts/frescos_ddl.sql:/docker-entrypoint-initdb.d/frescos_ddl.sql:ro
+      - ./docs/db/scripts/frescos_dml.sql:/docker-entrypoint-initdb.d/frescos_dml.sql:ro
+    networks:
+      - frescos-network
+
+volumes:
+    mysql-data-volume:
+      driver: local
+
+networks:
+  frescos-network:
+    driver: bridge

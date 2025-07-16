@@ -1,8 +1,7 @@
 package memory
 
 import (
-	"errors"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/loader/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
@@ -10,6 +9,14 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
+func NewSectionMap(db map[int]models.Section) *SectionMap {
+	// defaultDb is an empty map
+	defaultDB := make(map[int]models.Section)
+	if db != nil {
+		defaultDB = db
+	}
+	return &SectionMap{db: defaultDB}
+}
 func (r *SectionMap) FindAll() ([]models.Section, error) {
 	v := make([]models.Section, 0)
 	// copy db
@@ -23,7 +30,7 @@ func (r *SectionMap) FindById(id int) (models.Section, error) {
 	v, exist := r.db[id]
 
 	if !exist {
-		return models.Section{}, errors.New("Section not found")
+		return models.Section{}, repository.ErrEntityNotFound
 	}
 	return v, nil
 
@@ -35,11 +42,11 @@ func (r *SectionMap) Create(s models.Section) (models.Section, error) {
 	}
 	v, exist := r.db[s.Id]
 	if exist {
-		return v, errors.New("Section already exists")
+		return v, repository.ErrEntityAlreadyExists
 	}
 	sc, err := r.FindBySection(s.SectionNumber)
 	if err == nil {
-		return sc, errors.New("Section already exists")
+		return sc, repository.ErrEntityAlreadyExists
 	}
 	r.db[s.Id] = s
 	return s, nil
@@ -48,70 +55,80 @@ func (r *SectionMap) Create(s models.Section) (models.Section, error) {
 func (r *SectionMap) Update(s models.Section) (models.Section, error) {
 	v, exist := r.db[s.Id]
 	if !exist {
-		return models.Section{}, errors.New("section not found")
+		return models.Section{}, repository.ErrEntityNotFound
 	}
-	if s.SectionNumber != 0 {
-		v.SectionNumber = s.SectionNumber
-	}
-	if s.CurrentTemperature != 0 {
-		v.CurrentTemperature = s.CurrentTemperature
-	}
-	if s.MinimumTemperature != 0 {
-		v.MinimumTemperature = s.MinimumTemperature
-	}
-	if s.CurrentCapacity != 0 {
-		v.CurrentCapacity = s.CurrentCapacity
-	}
-	if s.MinimumCapacity != 0 {
-		v.MinimumCapacity = s.MinimumCapacity
-	}
-	if s.MaximumCapacity != 0 {
-		v.MinimumTemperature = s.MinimumTemperature
-	}
-	if s.WarehouseId != 0 {
-		v.WarehouseId = s.WarehouseId
-	}
-	if s.ProductTypeId != 0 {
-		v.ProductTypeId = s.ProductTypeId
-	}
-	if len(s.ProductsBatch) != 0 {
-		v.ProductsBatch = s.ProductsBatch
-	}
+	r.db[s.Id] = s
 	return v, nil
 }
 
 func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (models.Section, error) {
-	return models.Section{}, nil
+	v, exist := r.db[id]
+	if !exist {
+		return models.Section{}, repository.ErrEntityNotFound
+	}
+	for key, value := range fields {
+		switch key {
+		case "section_number":
+			if section_number, ok := value.(string); ok {
+				_, err := r.FindBySection(section_number)
+				if err == nil {
+					return models.Section{}, repository.ErrInvalidEntity
+
+				} else {
+					v.SectionNumber = section_number
+				}
+			}
+		case "current_temperature":
+			if current_temperature, ok := value.(float64); ok {
+				v.CurrentTemperature = float64(current_temperature)
+			}
+		case "minimum_temperature":
+			if minimum_temperature, ok := value.(float64); ok {
+				v.MinimumTemperature = float64(minimum_temperature)
+			}
+		case "current_capacity":
+			if current_capacity, ok := value.(float64); ok {
+				v.CurrentCapacity = int(current_capacity)
+			}
+		case "minimum_capacity":
+			if minimum_capacity, ok := value.(float64); ok {
+				v.MinimumCapacity = int(minimum_capacity)
+			}
+		case "maximum_capacity":
+			if maximum_capacity, ok := value.(float64); ok {
+				v.MaximumCapacity = int(maximum_capacity)
+			}
+		case "warehouses_id":
+			if warehouses_id, ok := value.(float64); ok {
+				v.WarehouseId = int(warehouses_id)
+			}
+		case "product_type_id":
+			if product_type_id, ok := value.(float64); ok {
+				v.ProductTypeId = int(product_type_id)
+			}
+		}
+
+	}
+	r.db[id] = v
+
+	return v, nil
+
 }
 
 func (r *SectionMap) Delete(id int) error {
 	v, exist := r.db[id]
 	if !exist {
-		return errors.New("Section not found")
+		return repository.ErrEntityNotFound
 	}
 	delete(r.db, v.Id)
 	return nil
 }
 
-func NewSectionMap() *SectionMap {
-	// defaultDb is an empty map
-	defaultDB := make(map[int]models.Section)
-	ld := json.NewSectionFile("docs/db/sections.json")
-	db, err := ld.Load()
-	if err != nil {
-		return nil
-	}
-	if db != nil {
-		defaultDB = db
-	}
-	return &SectionMap{db: defaultDB}
-}
-
-func (r *SectionMap) FindBySection(section int) (models.Section, error) {
+func (r *SectionMap) FindBySection(section string) (models.Section, error) {
 	for _, v := range r.db {
 		if v.SectionNumber == section {
 			return v, nil
 		}
 	}
-	return models.Section{}, errors.New("Section not found")
+	return models.Section{}, repository.ErrEntityNotFound
 }
