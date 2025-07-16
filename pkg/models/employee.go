@@ -7,3 +7,8 @@ type Employee struct {
 	LastName     string `json:"last_name"`
 	WarehouseId  int    `json:"warehouse_id"`
 }
+
+type EmployeeInboundOrdersReport struct {
+	Employee
+	InboundOrdersCount int `json:"inbound_orders_count"`
+}

@@ -14,7 +14,7 @@ Content-Type: application/json
   "last_update": "2024-06-11",
   "purchase_price": 3.99,
   "sale_price": 29.99,
-  "products_id": 1
+  "product_id":2
 }
 
 ### PATCH request to update an specific

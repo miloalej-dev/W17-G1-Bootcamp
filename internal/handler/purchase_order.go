@@ -47,7 +47,7 @@ func (h *PurchaseOrderHandler) PostPurchaseOrders(w http.ResponseWriter, r *http
 
 	data := &request.PurchaseOrderRequest{}
 	if err := render.Bind(r, data); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 		return
 	}
 
@@ -79,6 +79,6 @@ func (h *PurchaseOrderHandler) PostPurchaseOrders(w http.ResponseWriter, r *http
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 		return
 	}
-	_ = render.Render(w, r, response.NewResponse(createdPurchaseOrder, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(createdPurchaseOrder, http.StatusCreated))
 
 }

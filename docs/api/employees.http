@@ -7,7 +7,7 @@ GET http://localhost:8080/api/v1/employees/10
 Content-Type: application/json
 
 ### POST request to create a new employee
-POST localhost:8080/api/v1/employees
+POST http://localhost:8080/api/v1/employees
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ### PATCH request to update an specific employee
-PATCH localhost:8080/api/v1/employees/3
+PATCH http://localhost:8080/api/v1/employees/3
 Content-Type: application/json
 
 {
@@ -29,5 +29,11 @@ Content-Type: application/json
 }
 
 ### DELETE request to delete an specific employee
-DELETE localhost:8080/api/v1/employees/3
+DELETE http://localhost:8080/api/v1/employees/3
 Content-Type: application/json
+
+### GET request to get reports for each employee
+GET http://localhost:8080/api/v1/employees/reportInboundOrders
+
+### GET request to get reports for an specific employee
+GET http://localhost:8080/api/v1/employees/reportInboundOrders?id=1

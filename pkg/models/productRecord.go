@@ -5,7 +5,7 @@ type ProductRecord struct {
 	LastUpdate    string  `json:"last_update"`
 	PurchasePrice float64 `json:"purchase_price"`
 	SalePrice     float64 `json:"sale_price"`
-	ProductsId    int     `json:"products_id"`
+	ProductId     int     `json:"product_id"`
 }
 
 // NewProductRecord is a function that creates a new productRecord
@@ -15,6 +15,6 @@ func NewProductRecord(id int, lastUpdateDate string, purchasePrice float64, sale
 		LastUpdate:    lastUpdateDate,
 		PurchasePrice: purchasePrice,
 		SalePrice:     salePrice,
-		ProductsId:    productId,
+		ProductId:     productId,
 	}
 }

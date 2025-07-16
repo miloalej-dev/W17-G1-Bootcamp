@@ -72,7 +72,7 @@ func (h *ProductRecordHandler) PostProductRecord(w http.ResponseWriter, r *http.
 		LastUpdate:    *bodyRequest.LastUpdate,
 		PurchasePrice: *bodyRequest.PurchasePrice,
 		SalePrice:     *bodyRequest.SalePrice,
-		ProductsId:    *bodyRequest.ProductId,
+		ProductId:     *bodyRequest.ProductId,
 	}
 
 	fmt.Println(productRecord)

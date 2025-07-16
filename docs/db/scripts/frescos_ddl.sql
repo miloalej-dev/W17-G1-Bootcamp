@@ -57,7 +57,8 @@ DROP TABLE IF EXISTS `frescos`.`carriers`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`carriers`
 (
-    `id`          INT          NOT NULL,
+    `id`          INT AUTO_INCREMENT NOT NULL,
+    `cid`         VARCHAR(64)  NULL DEFAULT NULL,
     `name`        VARCHAR(64)  NULL DEFAULT NULL,
     `address`     VARCHAR(128) NULL DEFAULT NULL,
     `telephone`   VARCHAR(16)  NULL DEFAULT NULL,
@@ -141,7 +142,7 @@ DROP TABLE IF EXISTS `frescos`.`sellers`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`sellers`
 (
-    `id`          INT          NOT NULL,
+    `id`          INT     AUTO_INCREMENT     NOT NULL,
     `name`        VARCHAR(64)  NULL DEFAULT NULL,
     `address`     VARCHAR(128) NULL DEFAULT NULL,
     `telephone`   VARCHAR(16)  NULL DEFAULT NULL,

@@ -1,5 +1,3 @@
--- Insert statements for populating the frescos database
-
 -- Select the database to use
 USE `frescos`;
 
@@ -46,7 +44,7 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (17, 'Compañía Q', 'Carrera 5 #10-20, Santo Domingo', '1812901234', 17),
 (18, 'Compañía R', 'Calle 9 #15-30, San Salvador', '1913012345', 18),
 (19, 'Compañía S', 'Avenida Cero 78, Santa Fe', '2023123456', 19),
-(20, 'Compañía T', 'Calle América 42, Cúcuta', '2123234567', 1),
+(20, 'Compañía T', 'Calle América 42, Cúcuta', '2123234567', 19),
 (21, 'Compañía U', 'Calle de los Vendedores 101, Buenos Aires', '2223345678', 1),
 (22, 'Compañía V', 'Avenida del Río 102, Córdoba', '2324456789', 2),
 (23, 'Compañía W', 'Paseo del Mercado 103, Rosario', '2425567890', 3),
@@ -66,7 +64,7 @@ INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALU
 (37, 'Compañía AK', 'Calle de la Esperanza 113, Santo Domingo', '3829901234', 17),
 (38, 'Compañía AL', 'Calle del Amor 114, San Salvador', '3930012345', 18),
 (39, 'Compañía AM', 'Avenida de la Amistad 115, Santa Fe', '4041123456', 19),
-(40, 'Compañía AN', 'Calle del Encuentro 116, Cúcuta', '4152234567', 1),
+(40, 'Compañía AN', 'Calle del Encuentro 116, Cúcuta', '4152234567', 19),
 (41, 'Compañía AO', 'Calle de la Montaña 117, Buenos Aires', '4263345678', 1),
 (42, 'Compañía AP', 'Avenida de la Alegría 118, Córdoba', '4374456789', 2),
 (43, 'Compañía AQ', 'Paseo de los Ríos 119, Rosario', '4485567890', 3),
@@ -130,28 +128,26 @@ VALUES
 INSERT INTO warehouses
 (id, warehouse_code, address, telephone, minimum_capacity, minimum_temperature, locality_id)
 VALUES
-(1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
-(2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
-(3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
-(4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
-(5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
-(6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
-(7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
-(8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
-(9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
-(10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
-(11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
-(12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
-(13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
-(14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
-(15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
-(16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
-(17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
-(18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
-(19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
-(20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
-
-
+    (1, '49349-189', 'Room 1780', '209-196-8436', 18, -4, 1),
+    (2, '49349-790', 'PO Box 60689', '286-543-7343', 100, 52, 1),
+    (3, '48951-7027', 'PO Box 40683', '323-380-2538', 20, 47, 1),
+    (4, '52125-405', 'PO Box 76971', '904-142-2437', 82, 7, 1),
+    (5, '0074-3333', 'Apt 1487', '559-200-1497', 80, -3, 1),
+    (6, '10671-023', '4th Floor', '177-904-1618', 70, -4, 1),
+    (7, '36987-3249', 'Apt 641', '558-424-2815', 24, -7, 1),
+    (8, '34690-8001', 'Suite 90', '108-953-2113', 37, 20, 1),
+    (9, '58281-561', 'Apt 263', '464-599-1731', 17, 24, 1),
+    (10, '65643-336', '17th Floor', '110-222-2797', 60, 66, 1),
+    (11, '0944-8503', 'Room 551', '586-176-1501', 52, -8, 11),
+    (12, '68094-106', 'PO Box 97201', '794-740-7182', 66, 54, 1),
+    (13, '59630-780', 'Apt 1966', '462-468-5531', 70, -9, 1),
+    (14, '55154-7716', '6th Floor', '789-241-4571', 71, 36, 1),
+    (15, '66129-105', 'Suite 92', '108-233-7993', 92, 49, 1),
+    (16, '41163-690', 'Apt 107', '830-926-4604', 74, 16, 1),
+    (17, '37012-647', 'Suite 64', '716-955-5236', 3, -4, 1),
+    (18, '16571-101', '18th Floor', '592-836-0118', 74, -1, 1),
+    (19, '54738-963', '18th Floor', '579-229-6699', 22, -3, 1),
+    (20, '42865-307', '6th Floor', '520-862-2960', 45, 98, 1);
 
 -- Insert statement for employee
 INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `warehouse_id`) VALUES
@@ -208,6 +204,44 @@ INSERT INTO `employees` (`id`, `card_number_id`, `first_name`, `last_name`, `war
 
 
 
+INSERT INTO carriers (id, cid, name, address, telephone, locality_id) VALUES
+(1, 'CID#1', 'Thoughtstorm', 'PO Box 22954', '288-738-3936', 1),
+(2, 'CID#2', 'Browsezoom', 'Suite 35', '940-137-0407', 1),
+(3, 'CID#3', 'Skipstorm', 'Suite 74', '840-873-2923', 1),
+(4, 'CID#4', 'Avamm', 'Apt 640', '847-917-8225', 1),
+(5, 'CID#5', 'Eire', 'PO Box 56757', '384-527-6343', 1),
+(6, 'CID#6', 'JumpXS', '2nd Floor', '551-728-3925', 1),
+(7, 'CID#7', 'Mycat', 'Room 1041', '341-238-3077', 1),
+(8, 'CID#8', 'Tagopia', 'Apt 277', '568-723-2205', 1),
+(9, 'CID#9', 'Edgetag', '19th Floor', '811-992-3510', 1),
+(10, 'CID#10', 'Edgeify', 'Apt 450', '680-505-0391', 1),
+(11, 'CID#11', 'Meevee', '16th Floor', '181-434-3837', 1),
+(12, 'CID#12', 'Mydeo', 'PO Box 4575', '193-669-2263', 1),
+(13, 'CID#13', 'Dynava', 'Apt 197', '538-860-0102', 1),
+(14, 'CID#14', 'Miboo', '2nd Floor', '915-701-5966', 1),
+(15, 'CID#15', 'Yoveo', 'Apt 776', '958-369-9070', 1),
+(16, 'CID#16', 'Tambee', 'Apt 107', '359-918-1051', 1),
+(17, 'CID#17', 'Skidoo', 'Apt 1600', '838-491-7980', 1),
+(18, 'CID#18', 'Yabox', 'PO Box 96159', '922-135-9305', 1),
+(19, 'CID#19', 'Meedoo', 'PO Box 56809', '971-217-9192', 1),
+(20, 'CID#20', 'Jaxnation', 'Apt 802', '747-275-6029', 1);
+
+-- ORDER STATUS
+INSERT INTO `frescos`.`order_status` (`id`, `name`, `description`) VALUES
+                                                                       (1, 'Pendiente', 'La orden está pendiente de procesamiento'),
+                                                                       (2, 'En tránsito', 'La orden ha sido despachada y está en tránsito'),
+                                                                       (3, 'Entregada', 'La orden fue entregada satisfactoriamente');
+
+INSERT INTO `frescos`.`purchase_orders` (
+    `id`, `order_number`, `order_date`, `tracing_code`,
+    `buyer_id`, `warehouse_id`, `carrier_id`, `order_status_id`
+) VALUES
+      (1, 'PO-20250715-001', '2025-07-15 10:00:00', 'TRC001', 1, 1, 1, 1),
+      (2, 'PO-20250715-002', '2025-07-14 14:30:00', 'TRC002', 1, 1, 1, 2),
+      (3, 'PO-20250713-003', '2025-07-13 09:15:00', 'TRC003', 1, 1, 1, 3);
+
+
+
 INSERT INTO `frescos`.`sections` (
     `section_number`, `current_capacity`, `current_temperature`,
     `maximum_capacity`, `minimum_capacity`, `minimum_temperature`,
@@ -244,3 +278,14 @@ VALUES
     ,"2020-04-04",10,5,4,1),
     ( 8, 200,20,"2022-04-04",1000
     ,"2020-04-04",10,5,5,1);
+
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (1, '2012-07-16', '263-93-6778', 6, 10, 6);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (2, '2003-11-29', '613-86-9402', 10, 6, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (3, '2018-12-12', '295-32-0720', 9, 5, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (4, '2016-09-22', '426-37-0179', 5, 6, 7);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (5, '2015-09-13', '222-43-4329', 10, 6, 5);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (6, '2012-02-21', '850-02-8615', 9, 6, 5);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (7, '2016-09-17', '430-41-2235', 7, 10, 2);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (8, '2009-01-19', '188-43-1616', 9, 6, 8);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (9, '2008-06-10', '752-18-3288', 3, 2, 1);
+insert into inbound_orders (id, order_date, order_number, employee_id, warehouse_id, product_batch_id) values (10, '2006-10-09', '284-71-5152', 10, 2, 3);
