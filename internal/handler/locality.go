@@ -19,6 +19,7 @@ func NewLocalityHandler(service *_default.LocalityService) *LocalityHandler {
 }
 
 func (h *LocalityHandler) GetLocalities(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	localities, err := h.service.RetrieveAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
