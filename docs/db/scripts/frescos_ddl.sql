@@ -244,14 +244,14 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     `product_id`          INT            UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `uq_batch_number` (`batch_number` ASC) VISIBLE,
-    #INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
+    INDEX `fk_product_batches_sections_idx` (`section_id` ASC) VISIBLE,
     INDEX `fk_product_batches_products_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_batches_products`
         FOREIGN KEY (`product_id`)
-            REFERENCES `frescos`.`products` (`id`)
-    #CONSTRAINT `fk_product_batches_sections`
-     #   FOREIGN KEY (`section_id`)
-      #      REFERENCES `frescos`.`sections` (`id`)
+            REFERENCES `frescos`.`products` (`id`),
+    CONSTRAINT `fk_product_batches_sections`
+        FOREIGN KEY (`section_id`)
+            REFERENCES `frescos`.`sections` (`id`)
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;

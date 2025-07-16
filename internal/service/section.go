@@ -9,4 +9,5 @@ type SectionService interface {
 	Modify(s models.Section) (models.Section, error)
 	PartialModify(id int, fields map[string]any) (models.Section, error)
 	Remove(id int) error
+	RetrieveSectionReport(sectionId *int) (interface{}, error)
 }

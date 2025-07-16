@@ -7,10 +7,10 @@ import (
 
 type SectionService struct {
 	// rp is the repository that will be used by the service
-	rp repository.Repository[int, models.Section]
+	rp repository.SectionRepository
 }
 
-func NewSectionService(rp repository.Repository[int, models.Section]) *SectionService {
+func NewSectionService(rp repository.SectionRepository) *SectionService {
 	return &SectionService{rp: rp}
 }
 
@@ -34,4 +34,12 @@ func (s *SectionService) PartialModify(id int, fields map[string]any) (models.Se
 }
 func (s *SectionService) Remove(id int) error {
 	return s.rp.Delete(id)
+}
+func (s *SectionService) RetrieveSectionReport(sectionId *int) (interface{}, error) {
+	if sectionId != nil {
+		// if there is an id, Get the specific report for that section
+		return s.rp.FindSectionReport(*sectionId)
+	}
+	// if there is no id then find all reports
+	return s.rp.FindAllSectionReports()
 }

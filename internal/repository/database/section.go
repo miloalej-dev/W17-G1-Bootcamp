@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"gorm.io/gorm"
 	//"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
@@ -97,4 +98,51 @@ func (r *SectionRepository) Delete(id int) error {
 	var section models.Section
 	result := r.db.Delete(&section, id)
 	return result.Error
+}
+
+func (r *SectionRepository) FindSectionReport(id int) (models.SectionReport, error) {
+	var report models.SectionReport
+	var section models.Section
+	exists := r.db.First(&section, id)
+
+	if exists.Error != nil {
+		return models.SectionReport{}, repository.ErrSectionNotFound
+	}
+
+	// gorm query requierment 3
+	result := r.db.Table("sections as s"). // alias for table sections
+						Select("s.id as section_id, s.section_number, COUNT(p.id) as products_count"). // map data found to struct
+						Joins("INNER JOIN product_batches as p ON s.id = p.section_id").               // join product_batches
+						Where("s.id = ?", id).                                                         // filter by id given
+						Group("s.id, s.section_number").                                               // group to make COUNT() work proppertly
+						Scan(&report)                                                                  // scan the result into the model variable
+
+	if result.Error != nil {
+		return models.SectionReport{}, result.Error
+	}
+
+	// if there is no registry, means there is no Section with that id
+	if result.RowsAffected == 0 {
+		return models.SectionReport{}, repository.ErrEmptyReport
+	}
+
+	return report, nil
+}
+
+// GetAllSectionReports obtiene el reporte de productos para TODAS las secciones.
+func (r *SectionRepository) FindAllSectionReports() ([]models.SectionReport, error) {
+	var reports []models.SectionReport
+
+	// La consulta es casi idéntica, pero sin el .Where() y escaneando en un slice.
+	result := r.db.Table("sections as s").
+		Select("s.id as section_id, s.section_number, COUNT(p.id) as products_count").
+		Joins("INNER JOIN product_batches as p ON s.id = p.section_id").
+		Group("s.id, s.section_number").
+		Scan(&reports)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return reports, nil
 }
