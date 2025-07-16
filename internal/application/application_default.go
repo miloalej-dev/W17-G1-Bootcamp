@@ -78,24 +78,32 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - repositories
+
 	productRepository := database.NewProductDB(db)
 	productBatchRepository := database.NewProductBatchDB(db)
 	warehouseRepo := memory.NewWarehouseMap()
+
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 
-  buyerRepository := database.NewBuyerRepository(db)
-  sectionRepository := database.NewSectionRepository(db)
+    buyerRepository := database.NewBuyerRepository(db)
+	sectionRepository := memory.NewSectionMap(dbSection)
+	inboundOrderRepository := database.NewInboundOrderRepository(db)
+	localityRepository := database.NewLocalityRepository(db)
+    sectionRepository := database.NewSectionRepository(db)
 
 
 	// - services
+	buyerService := _default.NewBuyerDefault(buyerRepository)
 	productService := _default.NewProductDefault(productRepository)
 	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
 	buyerService := _default.NewBuyerDefault(buyerRepository)
 	warehouseServ := _default.NewWarehouseDefault(warehouseRepo)
 	sellerService := _default.NewSellerService(sellerRepository)
-	sectionService := _default.NewSectionService(sectionRepository)
+	sectionService := _default.NewSectionDefault(sectionRepository)
 	employeeService := _default.NewEmployeeService(employeeRepository)
+	inboundOrderService := _default.NewInboundOrderService(inboundOrderRepository)
+	localityService := _default.NewLocalityService(localityRepository)
 
 	// - handlers
 	productHandler := handler.NewProductDefault(productService)
@@ -105,6 +113,8 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerHandler(sellerService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
+	localityHandler := handler.NewLocalityHandler(localityService)
 
 	// router
 	rt := chi.NewRouter()
@@ -123,6 +133,8 @@ func (a *ServerChi) Run() (err error) {
 	route.SectionRoutes(rt, sectionHandler)
 	route.ProductRoutes(rt, productHandler)
 	route.ProductBatchRoutes(rt, productBatchHandler)
+	route.InboundOrderRoutes(rt, inboundOrderHandler)
+	route.LocalityRoutes(rt, localityHandler)
 
 	err = http.ListenAndServe(a.serverAddress, rt)
 	return

@@ -7,16 +7,17 @@ import (
 
 // WharehouseRequest is a struct that represents a wharehouse in JSON format
 type WarehouseRequest struct {
-	Code               *string `json:"code"`
-	Address            *string `json:"address"`
-	Telephone          *string `json:"telephone"`
-	MinimumCapacity    *int    `json:"minimum_capacity"`
-	MinimumTemperature *int    `json:"minimum_temperature"`
+	WarehouseCode		*string `json:"warehouse_code"`
+	Address				*string `json:"address"`
+	Telephone			*string `json:"telephone"`
+	MinimumCapacity		*int    `json:"minimum_capacity"`
+	MinimumTemperature	*int    `json:"minimum_temperature"`
+	LocalityId			*int	`json:"locality_id"`
 }
 
 func (p *WarehouseRequest) Bind(r *http.Request) error {
-	if p.Code == nil {
-		return errors.New("code must not be null")
+	if p.WarehouseCode == nil {
+		return errors.New("warehouse code must not be null")
 	}
 	if p.Address == nil {
 		return errors.New("address must not be null")
@@ -29,6 +30,9 @@ func (p *WarehouseRequest) Bind(r *http.Request) error {
 	}
 	if p.MinimumTemperature == nil {
 		return errors.New("minimum Temperature must not be null")
+	}
+	if p.LocalityId == nil {
+		return errors.New("locality id  must not be null")
 	}
 
 	return nil
