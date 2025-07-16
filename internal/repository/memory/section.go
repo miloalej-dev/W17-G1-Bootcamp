@@ -69,22 +69,22 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 	for key, value := range fields {
 		switch key {
 		case "section_number":
-			if section_number, ok := value.(float64); ok {
-				_, err := r.FindBySection(int(section_number))
+			if section_number, ok := value.(string); ok {
+				_, err := r.FindBySection(section_number)
 				if err == nil {
 					return models.Section{}, repository.ErrInvalidEntity
 
 				} else {
-					v.SectionNumber = int(section_number)
+					v.SectionNumber = section_number
 				}
 			}
 		case "current_temperature":
 			if current_temperature, ok := value.(float64); ok {
-				v.CurrentTemperature = int(current_temperature)
+				v.CurrentTemperature = float64(current_temperature)
 			}
 		case "minimum_temperature":
 			if minimum_temperature, ok := value.(float64); ok {
-				v.MinimumTemperature = int(minimum_temperature)
+				v.MinimumTemperature = float64(minimum_temperature)
 			}
 		case "current_capacity":
 			if current_capacity, ok := value.(float64); ok {
@@ -98,9 +98,9 @@ func (r *SectionMap) PartialUpdate(id int, fields map[string]interface{}) (model
 			if maximum_capacity, ok := value.(float64); ok {
 				v.MaximumCapacity = int(maximum_capacity)
 			}
-		case "warehouse_id":
-			if warehouse_id, ok := value.(float64); ok {
-				v.WarehouseId = int(warehouse_id)
+		case "warehouses_id":
+			if warehouses_id, ok := value.(float64); ok {
+				v.WarehouseId = int(warehouses_id)
 			}
 		case "product_type_id":
 			if product_type_id, ok := value.(float64); ok {
@@ -124,7 +124,7 @@ func (r *SectionMap) Delete(id int) error {
 	return nil
 }
 
-func (r *SectionMap) FindBySection(section int) (models.Section, error) {
+func (r *SectionMap) FindBySection(section string) (models.Section, error) {
 	for _, v := range r.db {
 		if v.SectionNumber == section {
 			return v, nil
