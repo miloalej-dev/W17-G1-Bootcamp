@@ -23,4 +23,6 @@ var (
 
 	// ErrNoSectionFound is returned when a section is not found in get reports
 	ErrEmptyReport = errors.New("there is no reports asociated to that section_id")
+
+	ErrProvinceNotFound = errors.New("province not found")
 )
