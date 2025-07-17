@@ -52,14 +52,14 @@ func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	data := &request.LocalityRequest{}
 	if err := render.Bind(r, data); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
 	}
-	locality := models.Locality{
+	locality := models.LocalityDoc{
 		Id:       data.Id,
-		Locality: data.Locality,
-		Province: data.Province,
-		Country:  data.Country,
+		Locality: *data.Locality,
+		Province: *data.Province,
+		Country:  *data.Country,
 	}
 
 	localityCreated, err := h.service.Register(locality)

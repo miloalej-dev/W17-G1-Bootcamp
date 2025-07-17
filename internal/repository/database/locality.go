@@ -45,15 +45,28 @@ func (l LocalityRepository) FindById(id int) (models.Locality, error) {
 	return locality, err
 }
 
-func (l LocalityRepository) Create(locality models.Locality) (models.Locality, error) {
+func (l LocalityRepository) Create(locality models.LocalityDoc) (models.LocalityDoc, error) {
 	var exists models.Locality
 	result := l.db.First(&exists, locality.Id)
 	if result.RowsAffected > 0 {
-		return models.Locality{}, repository.ErrEntityAlreadyExists
+		return models.LocalityDoc{}, repository.ErrEntityAlreadyExists
 	}
-	localityCreated := l.db.Create(&locality)
-	if localityCreated.Error != nil {
-		return models.Locality{}, localityCreated.Error
+	var idProvinceTable int
+	err := l.db.Table("provinces p").
+		Select("p.id").
+		Joins("INNER JOIN countries c ON c.id = p.country_id").
+		Where("p.province = ? AND c.country = ?", locality.Province, locality.Country).Scan(&idProvinceTable).Error
+	if err != nil || idProvinceTable == 0 {
+		return models.LocalityDoc{}, repository.ErrProvinceNotFound
+	}
+	localityCreated := models.Locality{
+		Id:         locality.Id,
+		Locality:   locality.Locality,
+		ProvinceId: idProvinceTable,
+	}
+	result = l.db.Create(&localityCreated)
+	if result.Error != nil {
+		return models.LocalityDoc{}, result.Error
 	}
 	return locality, nil
 }
@@ -76,9 +89,9 @@ func (l LocalityRepository) Delete(id int) error {
 func (l LocalityRepository) FindByLocality(id int) ([]map[string]any, error) {
 
 	type Result struct {
-		LocalityID     int `gorm:"column:locality_id"`
-		LocalityName   string `gorm:"column:locality_name"`
-		TotalCarriers  int `gorm:"column:total_carriers"`
+		LocalityID    int    `gorm:"column:locality_id"`
+		LocalityName  string `gorm:"column:locality_name"`
+		TotalCarriers int    `gorm:"column:total_carriers"`
 	}
 	var results []Result
 	var err error
@@ -108,7 +121,7 @@ func (l LocalityRepository) FindByLocality(id int) ([]map[string]any, error) {
 	carriers := make([]map[string]any, 0)
 	for _, r := range results {
 		carriers = append(carriers, map[string]any{
-			"locality_id": r.LocalityID,
+			"locality_id":   r.LocalityID,
 			"locality_name": r.LocalityName,
 			"carries_count": r.TotalCarriers,
 		})

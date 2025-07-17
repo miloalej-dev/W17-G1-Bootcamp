@@ -25,7 +25,7 @@ func (l LocalityService) Retrieve(id int) (models.Locality, error) {
 func (l LocalityService) RetrieveBySellerId(id int) (models.LocalitySellerCount, error) {
 	return l.rp.FindBySellerId(id)
 }
-func (l LocalityService) Register(seller models.Locality) (models.Locality, error) {
+func (l LocalityService) Register(seller models.LocalityDoc) (models.LocalityDoc, error) {
 	return l.rp.Create(seller)
 }
 
