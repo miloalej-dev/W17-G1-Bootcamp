@@ -32,23 +32,53 @@ CREATE TABLE IF NOT EXISTS `frescos`.`buyers`
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
 
+-- -----------------------------------------------------
+-- Table `frescos`.`countries`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `frescos`.`countries` (
+`id` INT AUTO_INCREMENT NOT NULL,
+`country` VARCHAR(64) NULL,
+PRIMARY KEY (`id`),
+INDEX `idx_country` (`country` ASC) VISIBLE
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `frescos`.`provinces`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `frescos`.`provinces` (
+`id` INT AUTO_INCREMENT NOT NULL,
+`province` VARCHAR(64) NULL,
+`country_id` INT NOT NULL,
+PRIMARY KEY (`id`),
+INDEX `idx_province` (`province` ASC) VISIBLE,
+INDEX `fk_privinces_countries1_idx` (`country_id` ASC) VISIBLE,
+CONSTRAINT `fk_privinces_countries1`
+ FOREIGN KEY (`country_id`)
+     REFERENCES `frescos`.`countries` (`id`)
+     ON DELETE NO ACTION
+     ON UPDATE NO ACTION)
+    ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `frescos`.`localities`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `frescos`.`localities`;
-
-CREATE TABLE IF NOT EXISTS `frescos`.`localities`
-(
-    `id`       INT         NOT NULL,
-    `locality` VARCHAR(64) NULL DEFAULT NULL,
-    `province` VARCHAR(64) NULL DEFAULT NULL,
-    `country`  VARCHAR(64) NULL DEFAULT NULL,
-    PRIMARY KEY (`id`)
-)
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4;
-
+CREATE TABLE IF NOT EXISTS `frescos`.`localities` (
+`id` INT NOT NULL,
+`locality` VARCHAR(64) NULL DEFAULT NULL,
+`province_id` INT NOT NULL,
+PRIMARY KEY (`id`),
+INDEX `fk_localities_provinces1_idx` (`province_id` ASC) VISIBLE,
+CONSTRAINT `fk_localities_provinces1`
+  FOREIGN KEY (`province_id`)
+      REFERENCES `frescos`.`provinces` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION)
+ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
 -- Table `frescos`.`carriers`
@@ -355,7 +385,9 @@ CREATE TABLE IF NOT EXISTS `frescos`.`purchase_orders`
             REFERENCES `frescos`.`carriers` (`id`),
     CONSTRAINT `fk_purchase_orders_order_status`
         FOREIGN KEY (`order_status_id`)
-            REFERENCES `frescos`.`order_status` (`id`),
+            REFERENCES `frescos`.`order_status` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
     CONSTRAINT `fk_purchase_orders_warehouses`
         FOREIGN KEY (`warehouse_id`)
             REFERENCES `frescos`.`warehouses` (`id`)
