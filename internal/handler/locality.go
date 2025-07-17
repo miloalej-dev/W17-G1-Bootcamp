@@ -55,11 +55,11 @@ func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request)
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 		return
 	}
-	locality := models.Locality{
+	locality := models.LocalityDoc{
 		Id:       data.Id,
-		Locality: data.Locality,
-		Province: data.Province,
-		Country:  data.Country,
+		Locality: *data.Locality,
+		Province: *data.Province,
+		Country:  *data.Country,
 	}
 
 	localityCreated, err := h.service.Register(locality)
