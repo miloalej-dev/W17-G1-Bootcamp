@@ -43,12 +43,12 @@ func (h *CarrierDefault) PostCarrier(w http.ResponseWriter, r *http.Request) {
 
 	carrierResponse, err := h.sv.Register(*carrier)
 	if err != nil {
-		if errors.Is(err, service.ErrEntityAlreadyExists) {
+		if errors.Is(err, repository.ErrEntityAlreadyExists) {
 			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 			return
 		}
-		if errors.Is(err, repository.ErrForeignKeyViolation) {
-			_ = render.Render(w, r, response.NewErrorResponse("Specified locality does not exist", http.StatusConflict))
+		if errors.Is(err, repository.ErrLocalityNotFound) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
 			return
 		}
 

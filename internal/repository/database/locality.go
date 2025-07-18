@@ -86,45 +86,43 @@ func (l LocalityRepository) Delete(id int) error {
 	panic("implement me")
 }
 
-func (l LocalityRepository) FindByLocality(id int) ([]map[string]any, error) {
+func (l LocalityRepository) FindAllCarriers() ([]models.LocalityCarrierCount, error) {
 
-	type Result struct {
-		LocalityID    int    `gorm:"column:locality_id"`
-		LocalityName  string `gorm:"column:locality_name"`
-		TotalCarriers int    `gorm:"column:total_carriers"`
-	}
-	var results []Result
-	var err error
-	if id == 0 {
-		err = l.db.Model(&models.Locality{}).
-			Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
-			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
-			Group("localities.id").
-			Find(&results).Error
-	} else {
-		err = l.db.Model(&models.Locality{}).
-			Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
-			Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
-			Where("localities.id = ?", id).
-			Group("localities.id").
-			Find(&results).Error
-	}
+	var carriers []models.LocalityCarrierCount
+	err := l.db.Model(&models.Locality{}).
+		Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
+		Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
+		Group("localities.id").
+		Find(&carriers).Error
 
 	if err != nil {
-		return make([]map[string]any, 0), err
+		return make([]models.LocalityCarrierCount, 0), err
 	}
 
-	if len(results) == 0 {
-		return make([]map[string]any, 0), repository.ErrEntityNotFound
+	if len(carriers) == 0 {
+		return make([]models.LocalityCarrierCount, 0), repository.ErrEntityNotFound
 	}
 
-	carriers := make([]map[string]any, 0)
-	for _, r := range results {
-		carriers = append(carriers, map[string]any{
-			"locality_id":   r.LocalityID,
-			"locality_name": r.LocalityName,
-			"carries_count": r.TotalCarriers,
-		})
+	return carriers, nil
+}
+
+func (l LocalityRepository) FindCarriersByLocality(id int) ([]models.LocalityCarrierCount, error) {
+
+	var carriers []models.LocalityCarrierCount
+	err := l.db.Model(&models.Locality{}).
+		Select("localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers'").
+		Joins("LEFT JOIN carriers ON localities.id = carriers.locality_id").
+		Where("localities.id = ?", id).
+		Group("localities.id").
+		Find(&carriers).Error
+
+	if err != nil {
+		return make([]models.LocalityCarrierCount, 0), err
 	}
+
+	if len(carriers) == 0 {
+		return make([]models.LocalityCarrierCount, 0), repository.ErrEntityNotFound
+	}
+
 	return carriers, nil
 }
