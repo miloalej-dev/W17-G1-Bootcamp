@@ -1,7 +1,7 @@
 package database
 
 import (
-	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -29,7 +29,7 @@ func (r *ProductBatchRepository) FindAll() ([]models.ProductBatch, error) {
 func (r *ProductBatchRepository) Create(body models.ProductBatch) (models.ProductBatch, error) {
 	result := r.db.Create(&body)
 	if result.Error != nil {
-		return models.ProductBatch{}, errors.New(result.Error.Error())
+		return models.ProductBatch{}, repository.ErrProductBatchAlreadyExists
 	}
 	return body, nil
 }
