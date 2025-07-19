@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -26,7 +27,7 @@ func (r *ProductRepository) FindAll() ([]models.Product, error) {
 	// GORM genera: SELECT * FROM products;
 	result := r.db.Find(&products)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, repository.ErrProductNotFound
 	}
 	return products, nil
 }
@@ -43,7 +44,7 @@ func (r *ProductRepository) Create(body models.Product) (models.Product, error) 
 func (r *ProductRepository) Update(body models.Product) (models.Product, error) {
 	result := r.db.Save(body)
 	if result.Error != nil {
-		return models.Product{}, result.Error
+		return models.Product{}, repository.ErrProductAlreadyExists
 	}
 	return body, nil
 }
@@ -55,7 +56,7 @@ func (r *ProductRepository) FindById(id int) (models.Product, error) {
 	result := r.db.First(&product, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return models.Product{}, gorm.ErrRecordNotFound
+			return models.Product{}, repository.ErrProductNotFound
 		}
 		return models.Product{}, result.Error
 	}
@@ -65,15 +66,15 @@ func (r *ProductRepository) FindById(id int) (models.Product, error) {
 // PartialUpdate updates specific fields of an existing product.
 func (r *ProductRepository) PartialUpdate(id int, fields map[string]interface{}) (models.Product, error) {
 	var product models.Product
-	// Primero, busca el producto para asegurarte de que existe.
+	// Search if the prodcut exists
 	if err := r.db.First(&product, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Product{}, gorm.ErrRecordNotFound
+			return models.Product{}, repository.ErrProductNotFound
 		}
 		return models.Product{}, err
 	}
 
-	// Aplica las actualizaciones.
+	// Updates the product
 	if err := r.db.Model(&product).Updates(fields).Error; err != nil {
 		return models.Product{}, err
 	}
@@ -89,7 +90,7 @@ func (r *ProductRepository) Delete(id int) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return repository.ErrProductNotFound
 	}
 	return nil
 }
@@ -98,7 +99,7 @@ func (r *ProductRepository) FindRecordsCountByProductId(id int) (models.ProductR
 	reports := models.ProductReport{}
 	err := r.db.Table("products").Select("products.id, products.description, COUNT(product_records.id) as records_count").Joins("inner join  product_records on product_records.product_id = products.id").Where("products.id = ?", id).Group("products.id").Scan(&reports).Error
 	if err != nil {
-		return models.ProductReport{}, err
+		return models.ProductReport{}, repository.ErrProductReportNotFound
 	}
 	return reports, nil
 }
@@ -107,7 +108,7 @@ func (r *ProductRepository) FindRecordsCount() ([]models.ProductReport, error) {
 	var reports []models.ProductReport
 	err := r.db.Table("products").Select("products.id, products.description, COUNT(product_records.id) as records_count").Joins("inner join  product_records on product_records.product_id = products.id").Group("products.id").Scan(&reports).Error
 	if err != nil {
-		return nil, err
+		return nil, repository.ErrProductReportNotFound
 	}
 	return reports, nil
 }
