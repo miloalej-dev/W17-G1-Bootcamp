@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-chi/render"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	_default "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
@@ -43,7 +44,7 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(repository.ErrIDInvalid.Error(), http.StatusBadRequest))
 		return
 	}
 
