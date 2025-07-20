@@ -100,9 +100,12 @@ func (l LocalityRepository) Create(locality models.LocalityDoc) (models.Locality
 	return locality, nil
 }
 
-func (l LocalityRepository) Update(entity models.Locality) (models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+func (l LocalityRepository) Update(locality models.Locality) (models.Locality, error) {
+	result := l.db.Save(&locality)
+	if result.Error != nil {
+		return models.Locality{}, result.Error
+	}
+	return locality, nil
 }
 
 func (l LocalityRepository) PartialUpdate(id int, fields map[string]interface{}) (models.Locality, error) {
