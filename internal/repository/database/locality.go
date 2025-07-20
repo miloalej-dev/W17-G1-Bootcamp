@@ -122,8 +122,11 @@ func (l LocalityRepository) PartialUpdate(id int, fields map[string]interface{})
 }
 
 func (l LocalityRepository) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	result := l.db.Delete(&models.Locality{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func (l LocalityRepository) FindAllCarriers() ([]models.LocalityCarrierCount, error) {
