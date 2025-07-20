@@ -67,13 +67,11 @@ func (l LocalityRepository) FindAll() ([]models.Locality, error) {
 
 func (l LocalityRepository) FindById(id int) (models.Locality, error) {
 	var locality models.Locality
-
-	err := l.db.Table("localities l").
-		Select("l.id, l.locality, COUNT(s.id) as seller_count").
-		Joins("LEFT JOIN sellers s ON s.locality_id = l.id").
-		Where("l.id = ?", id).Group("l.id").Scan(&locality).Error
-
-	return locality, err
+	result := l.db.First(&locality, id)
+	if result.Error != nil {
+		return models.Locality{}, repository.ErrEntityNotFound
+	}
+	return locality, nil
 }
 
 func (l LocalityRepository) Create(locality models.LocalityDoc) (models.LocalityDoc, error) {
