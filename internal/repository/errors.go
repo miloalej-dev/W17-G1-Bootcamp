@@ -24,4 +24,6 @@ var (
 	ErrEmptyReport = errors.New("there is no reports asociated to that section_id")
 
 	ErrProvinceNotFound = errors.New("province not found")
+
+	ErrIDInvalid = errors.New("invalid ID")
 )
