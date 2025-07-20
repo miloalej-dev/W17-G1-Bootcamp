@@ -16,8 +16,7 @@ var (
 	ErrEmptyEntity = errors.New("empty entity")
 
 	// ErrLocalityNotFound is returned when a locality id does not exists in the database
-	ErrLocalityNotFound = errors.New("specified locality does not exist")
-
+	ErrLocalityNotFound = errors.New("locality not found")
 	// ErrSectionNotFound is returned when a section is not found in get reports
 	ErrSectionNotFound = errors.New("there is no section by that id")
 
