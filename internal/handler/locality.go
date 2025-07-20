@@ -31,13 +31,23 @@ func (h *LocalityHandler) GetLocalities(w http.ResponseWriter, r *http.Request) 
 func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idParam := r.URL.Query().Get("id")
+	if idParam == "" {
+		localites, err := h.service.RetrieveAllLocalitiesBySeller()
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+		_ = render.Render(w, r, response.NewResponse(localites, http.StatusOK))
+		return
+	}
+
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 
-	locality, err := h.service.RetrieveBySellerId(id)
+	locality, err := h.service.RetrieveLocalityBySeller(id)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
