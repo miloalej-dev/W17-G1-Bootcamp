@@ -74,7 +74,7 @@ func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request)
 
 	localityCreated, err := h.service.Register(locality)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(localityCreated, http.StatusCreated))
