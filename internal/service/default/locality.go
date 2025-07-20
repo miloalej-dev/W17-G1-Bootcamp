@@ -19,8 +19,7 @@ func (l LocalityService) RetrieveAll() ([]models.Locality, error) {
 }
 
 func (l LocalityService) Retrieve(id int) (models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+	return l.rp.FindById(id)
 }
 func (l LocalityService) RetrieveLocalityBySeller(id int) (models.LocalitySellerCount, error) {
 	return l.rp.FindLocalityBySeller(id)
@@ -29,19 +28,16 @@ func (l LocalityService) Register(seller models.LocalityDoc) (models.LocalityDoc
 	return l.rp.Create(seller)
 }
 
-func (l LocalityService) Modify(seller models.Locality) (models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+func (l LocalityService) Modify(locality models.Locality) (models.Locality, error) {
+	return l.rp.Update(locality)
 }
 
 func (l LocalityService) PartialModify(id int, fields map[string]any) (models.Locality, error) {
-	//TODO implement me
-	panic("implement me")
+	return l.rp.PartialUpdate(id, fields)
 }
 
 func (l LocalityService) Remove(id int) error {
-	//TODO implement me
-	panic("implement me")
+	return l.rp.Delete(id)
 }
 
 func (l LocalityService) RetrieveCarriers() ([]models.LocalityCarrierCount, error) {
