@@ -22,8 +22,8 @@ func (l LocalityService) Retrieve(id int) (models.Locality, error) {
 	//TODO implement me
 	panic("implement me")
 }
-func (l LocalityService) RetrieveBySellerId(id int) (models.LocalitySellerCount, error) {
-	return l.rp.FindBySellerId(id)
+func (l LocalityService) RetrieveLocalityBySeller(id int) (models.LocalitySellerCount, error) {
+	return l.rp.FindLocalityBySeller(id)
 }
 func (l LocalityService) Register(seller models.LocalityDoc) (models.LocalityDoc, error) {
 	return l.rp.Create(seller)
@@ -50,4 +50,8 @@ func (l LocalityService) RetrieveCarriers() ([]models.LocalityCarrierCount, erro
 
 func (l LocalityService) RetrieveCarriersByLocality(id int) ([]models.LocalityCarrierCount, error) {
 	return l.rp.FindCarriersByLocality(id)
+}
+
+func (l LocalityService) RetrieveAllLocalitiesBySeller() ([]models.LocalitySellerCount, error) {
+	return l.rp.FindAllLocality()
 }
