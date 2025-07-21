@@ -31,9 +31,12 @@ func (l LocalityRepository) FindLocalityBySeller(id int) (models.LocalitySellerC
 
 	err := query.Scan(&locality).Error
 	if err != nil {
-		return models.LocalitySellerCount{}, err
+		return models.LocalitySellerCount{}, repository.ErrSQLQueryExecution
 	}
 	// Verifica si se encontraron resultados
+	if locality.Id == 0 {
+		return models.LocalitySellerCount{}, repository.ErrLocalityNotFound
+	}
 	return locality, err
 }
 
@@ -47,7 +50,7 @@ func (l LocalityRepository) FindAllLocality() ([]models.LocalitySellerCount, err
 		Group("localities.id, localities.locality, p.province, c.country")
 	err := query.Scan(&localitiesSellers).Error
 	if err != nil {
-		return nil, err
+		return nil, repository.ErrSQLQueryExecution
 	}
 	if len(localitiesSellers) == 0 {
 		return nil, repository.ErrEmptyEntity
@@ -84,7 +87,8 @@ func (l LocalityRepository) Create(locality models.LocalityDoc) (models.Locality
 	err := l.db.Table("provinces p").
 		Select("p.id").
 		Joins("INNER JOIN countries c ON c.id = p.country_id").
-		Where("p.province = ? AND c.country = ?", locality.Province, locality.Country).Scan(&idProvinceTable).Error
+		Where("p.province = ? AND c.country = ?", locality.Province, locality.Country).
+		Scan(&idProvinceTable).Error
 	if err != nil || idProvinceTable == 0 {
 		return models.LocalityDoc{}, repository.ErrProvinceNotFound
 	}
@@ -95,7 +99,8 @@ func (l LocalityRepository) Create(locality models.LocalityDoc) (models.Locality
 	}
 	result = l.db.Create(&localityCreated)
 	if result.Error != nil {
-		return models.LocalityDoc{}, result.Error
+
+		return models.LocalityDoc{}, repository.ErrInvalidEntity
 	}
 	return locality, nil
 }
