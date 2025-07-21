@@ -59,7 +59,7 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 	_ = render.Render(w, r, response.NewResponse(res, http.StatusOK))
 }
 
-func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request) {
+func (h *LocalityHandler) PostLocality(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	data := &request.LocalityRequest{}
 	if err := render.Bind(r, data); err != nil {
