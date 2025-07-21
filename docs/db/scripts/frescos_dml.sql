@@ -4,6 +4,30 @@ USE `frescos`;
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
+-- Insert statements for countries
+INSERT INTO `frescos`.`countries` (`id`, `country`) VALUES
+(1, 'Argentina'),
+(2, 'Colombia'),
+(3, 'México');
+
+-- Insert statements for provinces
+INSERT INTO `frescos`.`provinces` (`id`, `province`, `country_id`) VALUES
+(1, 'Buenos Aires', 1),
+(2, 'Córdoba', 1),
+(3, 'Santa Fe', 1),
+(4, 'Mendoza', 1),
+(5, 'Atlántico', 2),
+(6, 'Bolívar', 2),
+(7, 'Antioquia', 2),
+(8, 'Cundinamarca', 2),
+(9, 'Valle del Cauca', 2),
+(10, 'Jalisco', 3),
+(11, 'Nuevo León', 3),
+(12, 'Ciudad de México', 3),
+(13, 'Puebla', 3),
+(14, 'Baja California', 3),
+(15, 'San Salvador', 3);
+
 -- Insert statements of localities
 INSERT INTO `frescos`.`localities` (`id`, `locality`, `province`, `country`) VALUES
 (1, 'Buenos Aires', 'Buenos Aires', 'Argentina'),
