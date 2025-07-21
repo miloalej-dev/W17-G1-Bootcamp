@@ -63,7 +63,7 @@ func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	data := &request.LocalityRequest{}
 	if err := render.Bind(r, data); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(repository.ErrInvalidEntity.Error(), http.StatusBadRequest))
 		return
 	}
 	locality := models.LocalityDoc{
@@ -75,7 +75,7 @@ func (h *LocalityHandler) CreateLocality(w http.ResponseWriter, r *http.Request)
 
 	localityCreated, err := h.service.Register(locality)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(localityCreated, http.StatusCreated))
