@@ -265,13 +265,14 @@ DROP TABLE IF EXISTS `frescos`.`inbound_orders`;
 
 CREATE TABLE IF NOT EXISTS `frescos`.`inbound_orders`
 (
-    `id`               INT         AUTO_INCREMENT NOT NULL,
-    `order_date`       DATETIME(6) NULL DEFAULT NULL,
-    `order_number`     VARCHAR(64) NULL DEFAULT NULL,
+    `id`               INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    `order_date`       DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `order_number`     VARCHAR(64) NOT NULL,
     `employee_id`      INT         NOT NULL,
     `warehouse_id`     INT         NOT NULL,
     `product_batch_id` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `uq_order_number` (`order_number` ASC) VISIBLE,
     INDEX `fk_inbound_orders_employees_idx` (`employee_id` ASC) VISIBLE,
     INDEX `fk_inbound_orders_warehouses_idx` (`warehouse_id` ASC) VISIBLE,
     INDEX `fk_inbound_orders_product_batches_idx` (`product_batch_id` ASC) VISIBLE,

@@ -1,6 +1,9 @@
 -- Select the database to use
 USE `frescos`;
 
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- Insert statements of localities
 INSERT INTO `frescos`.`localities` (`id`, `locality`, `province`, `country`) VALUES
 (1, 'Buenos Aires', 'Buenos Aires', 'Argentina'),
