@@ -1,6 +1,8 @@
 package database
 
 import (
+	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -32,8 +34,8 @@ func (s *SellerRepository) FindById(id int) (models.Seller, error) {
 
 	result := s.db.First(&seller, id)
 
-	if result.Error != nil {
-		return models.Seller{}, result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.Seller{}, repository.ErrEntityNotFound
 	}
 
 	return seller, nil
@@ -42,7 +44,10 @@ func (s *SellerRepository) FindById(id int) (models.Seller, error) {
 func (s *SellerRepository) Create(seller models.Seller) (models.Seller, error) {
 	result := s.db.Create(&seller)
 
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Seller{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Seller{}, result.Error
 	}
 
@@ -52,7 +57,10 @@ func (s *SellerRepository) Create(seller models.Seller) (models.Seller, error) {
 func (s *SellerRepository) Update(seller models.Seller) (models.Seller, error) {
 	result := s.db.Save(&seller)
 
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Seller{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Seller{}, result.Error
 	}
 
@@ -64,13 +72,16 @@ func (s *SellerRepository) PartialUpdate(id int, fields map[string]interface{}) 
 
 	// First, find the seller to update
 	result := s.db.First(&seller, id)
-	if result.Error != nil {
-		return models.Seller{}, result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.Seller{}, repository.ErrEntityNotFound
 	}
 
 	// Update only the specified fields
 	result = s.db.Model(&seller).Updates(fields)
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Seller{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Seller{}, result.Error
 	}
 
@@ -80,8 +91,8 @@ func (s *SellerRepository) PartialUpdate(id int, fields map[string]interface{}) 
 func (s *SellerRepository) Delete(id int) error {
 	result := s.db.Delete(&models.Seller{}, id)
 
-	if result.Error != nil {
-		return result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return repository.ErrEntityNotFound
 	}
 
 	return nil
