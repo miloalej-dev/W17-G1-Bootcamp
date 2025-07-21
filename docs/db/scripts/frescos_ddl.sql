@@ -173,9 +173,9 @@ DROP TABLE IF EXISTS `frescos`.`sellers`;
 CREATE TABLE IF NOT EXISTS `frescos`.`sellers`
 (
     `id`          INT     AUTO_INCREMENT     NOT NULL,
-    `name`        VARCHAR(64)  NULL DEFAULT NULL,
-    `address`     VARCHAR(128) NULL DEFAULT NULL,
-    `telephone`   VARCHAR(16)  NULL DEFAULT NULL,
+    `name`        VARCHAR(64)  NOT NULL,
+    `address`     VARCHAR(128) NOT NULL,
+    `telephone`   VARCHAR(16)  NOT NULL,
     `locality_id` INT          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_sellers_locality_idx` (`locality_id` ASC) VISIBLE,
