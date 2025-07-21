@@ -26,4 +26,6 @@ var (
 	ErrProvinceNotFound = errors.New("province not found")
 
 	ErrIDInvalid = errors.New("invalid ID")
+
+	ErrSQLQueryExecution = errors.New("SQL query execution failed")
 )
