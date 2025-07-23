@@ -32,9 +32,6 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
-# Copy JSON data files (required by the application)
-COPY --from=builder /app/docs/db/json/ ./docs/db/json/
-
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
 
