@@ -178,5 +178,4 @@ func (h *EmployeeHandler) GetInboundOrdersReport(w http.ResponseWriter, r *http.
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(report, http.StatusOK))
-	return
 }

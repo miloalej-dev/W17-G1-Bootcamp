@@ -15,11 +15,11 @@ func NewInboundOrderService(inboundOrderRepository repository.InboundOrderReposi
 }
 
 func (i *InboundOrderService) RetrieveAll() ([]models.InboundOrder, error) {
-	return i.InboundOrderRepository.FindAll()
+	return i.FindAll()
 }
 
 func (i *InboundOrderService) Retrieve(id int) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.FindById(id)
+	return i.FindById(id)
 }
 
 func (i *InboundOrderService) Register(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
@@ -28,17 +28,17 @@ func (i *InboundOrderService) Register(inboundOrder models.InboundOrder) (models
 		inboundOrder.OrderDate = time.Now()
 	}
 
-	return i.InboundOrderRepository.Create(inboundOrder)
+	return i.Create(inboundOrder)
 }
 
 func (i *InboundOrderService) Modify(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.Update(inboundOrder)
+	return i.Update(inboundOrder)
 }
 
 func (i *InboundOrderService) PartialModify(id int, fields map[string]any) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.PartialUpdate(id, fields)
+	return i.PartialUpdate(id, fields)
 }
 
 func (i *InboundOrderService) Remove(id int) error {
-	return i.InboundOrderRepository.Delete(id)
+	return i.Delete(id)
 }
