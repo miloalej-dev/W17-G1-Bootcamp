@@ -88,10 +88,10 @@ DROP TABLE IF EXISTS `frescos`.`carriers`;
 CREATE TABLE IF NOT EXISTS `frescos`.`carriers`
 (
     `id`          INT AUTO_INCREMENT NOT NULL,
-    `cid`         VARCHAR(64)  NULL DEFAULT NULL,
-    `name`        VARCHAR(64)  NULL DEFAULT NULL,
-    `address`     VARCHAR(128) NULL DEFAULT NULL,
-    `telephone`   VARCHAR(16)  NULL DEFAULT NULL,
+    `cid`         VARCHAR(64)  NOT NULL,
+    `name`        VARCHAR(64)  NOT NULL,
+    `address`     VARCHAR(128) NOT NULL,
+    `telephone`   VARCHAR(16)  NOT NULL,
     `locality_id` INT          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_carries_locality_idx` (`locality_id` ASC) VISIBLE,
@@ -111,11 +111,11 @@ DROP TABLE IF EXISTS `frescos`.`warehouses`;
 CREATE TABLE IF NOT EXISTS `frescos`.`warehouses`
 (
     `id`                  INT AUTO_INCREMENT NOT NULL,
-    `address`             VARCHAR(128) NULL DEFAULT NULL,
-    `telephone`           VARCHAR(16)  NULL DEFAULT NULL,
-    `warehouse_code`      VARCHAR(32)  NULL DEFAULT NULL,
-    `minimum_capacity`    INT          NULL DEFAULT NULL,
-    `minimum_temperature` INT          NULL DEFAULT NULL,
+    `address`             VARCHAR(128) NOT NULL,
+    `telephone`           VARCHAR(16)  NOT NULL,
+    `warehouse_code`      VARCHAR(32)  NOT NULL,
+    `minimum_capacity`    INT          NOT NULL,
+    `minimum_temperature` INT          NOT NULL,
     `locality_id`         INT          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_warehouses_locality_idx` (`locality_id` ASC) VISIBLE,

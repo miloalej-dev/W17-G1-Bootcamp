@@ -74,6 +74,9 @@ func (h *LocalityHandler) GetCarrier(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idRequest := r.URL.Query().Get("id")
 	var id int
+
+	// If there is an Id, get all carriers by that locality
+	// If there isn't an id, get all carriers from all localities
 	if idRequest != "" {
 		var err error
 		id, err = strconv.Atoi(idRequest)
@@ -81,9 +84,17 @@ func (h *LocalityHandler) GetCarrier(w http.ResponseWriter, r *http.Request) {
 			_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
 			return
 		}
+
+		carriers, err := h.service.RetrieveCarriersByLocality(id)
+		if err != nil {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+		_ = render.Render(w, r, response.NewResponse(carriers, http.StatusOK))
+		return
 	}
 
-	carriers, err := h.service.RetrieveCarriers(id)
+	carriers, err := h.service.RetrieveCarriers()
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return

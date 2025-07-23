@@ -44,6 +44,10 @@ func (l LocalityService) Remove(id int) error {
 	panic("implement me")
 }
 
-func (l LocalityService) RetrieveCarriers(id int) ([]map[string]any, error) {
-	return l.rp.FindByLocality(id)
+func (l LocalityService) RetrieveCarriers() ([]models.LocalityCarrierCount, error) {
+	return l.rp.FindAllCarriers()
+}
+
+func (l LocalityService) RetrieveCarriersByLocality(id int) ([]models.LocalityCarrierCount, error) {
+	return l.rp.FindCarriersByLocality(id)
 }
