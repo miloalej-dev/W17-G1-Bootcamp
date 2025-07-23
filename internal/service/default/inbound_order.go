@@ -3,6 +3,7 @@ package _default
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"time"
 )
 
 type InboundOrderService struct {
@@ -22,6 +23,11 @@ func (i *InboundOrderService) Retrieve(id int) (models.InboundOrder, error) {
 }
 
 func (i *InboundOrderService) Register(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
+
+	if inboundOrder.OrderDate.IsZero() {
+		inboundOrder.OrderDate = time.Now()
+	}
+
 	return i.InboundOrderRepository.Create(inboundOrder)
 }
 
