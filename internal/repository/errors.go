@@ -35,4 +35,7 @@ var (
 	ErrEmptyReport = errors.New("there is no reports asociated to that section_id")
 
 	ErrProvinceNotFound = errors.New("province not found")
+
+	// ErrForeignKeyViolation is returned when a foreign key does not exist
+	ErrForeignKeyViolation = errors.New("foreign key does not exist")
 )
