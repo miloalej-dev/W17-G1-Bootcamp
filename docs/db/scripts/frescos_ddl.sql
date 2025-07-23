@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `frescos`.`products`
     CONSTRAINT `fk_products_sellers1`
         FOREIGN KEY (`seller_id`)
             REFERENCES `frescos`.`sellers` (`id`)
-            ON DELETE NO ACTION
+            ON DELETE CASCADE
             ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
@@ -279,7 +279,9 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_batches`
     INDEX `fk_product_batches_products_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_batches_products`
         FOREIGN KEY (`product_id`)
-            REFERENCES `frescos`.`products` (`id`),
+            REFERENCES `frescos`.`products` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION,
     CONSTRAINT `fk_product_batches_sections`
         FOREIGN KEY (`section_id`)
             REFERENCES `frescos`.`sections` (`id`)
@@ -310,7 +312,9 @@ CREATE TABLE IF NOT EXISTS `frescos`.`inbound_orders`
             REFERENCES `frescos`.`employees` (`id`),
     CONSTRAINT `fk_inbound_orders_product_batches`
         FOREIGN KEY (`product_batch_id`)
-            REFERENCES `frescos`.`product_batches` (`id`),
+            REFERENCES `frescos`.`product_batches` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION,
     CONSTRAINT `fk_inbound_orders_warehouses`
         FOREIGN KEY (`warehouse_id`)
             REFERENCES `frescos`.`warehouses` (`id`)
@@ -336,6 +340,8 @@ CREATE TABLE IF NOT EXISTS `frescos`.`product_records`
     CONSTRAINT `fk_product_records_products`
         FOREIGN KEY (`product_id`)
             REFERENCES `frescos`.`products` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4;
