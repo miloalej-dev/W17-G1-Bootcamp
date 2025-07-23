@@ -26,8 +26,7 @@ var (
 	ErrEmptyEntity = errors.New("empty entity")
 
 	// ErrLocalityNotFound is returned when a locality id does not exists in the database
-	ErrLocalityNotFound = errors.New("specified locality does not exist")
-
+	ErrLocalityNotFound = errors.New("locality not found")
 	// ErrSectionNotFound is returned when a section is not found in get reports
 	ErrSectionNotFound = errors.New("there is no section by that id")
 
@@ -36,6 +35,9 @@ var (
 
 	ErrProvinceNotFound = errors.New("province not found")
 
+	ErrIDInvalid = errors.New("invalid ID")
+
+	ErrSQLQueryExecution = errors.New("SQL query execution failed")
 	// ErrForeignKeyViolation is returned when a foreign key does not exist
 	ErrForeignKeyViolation = errors.New("foreign key does not exist")
 )

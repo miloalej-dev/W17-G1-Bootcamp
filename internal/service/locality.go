@@ -10,5 +10,6 @@ type LocalityService interface {
 	Modify(seller models.Locality) (models.Locality, error)
 	PartialModify(id int, fields map[string]any) (models.Locality, error)
 	Remove(id int) error
-	RetrieveBySellerId(id int) (models.LocalitySellerCount, error)
+	RetrieveLocalityBySeller(id int) (models.LocalitySellerCount, error)
+	RetrieveAllLocalitiesBySeller() ([]models.LocalitySellerCount, error)
 }
