@@ -1,9 +1,6 @@
 ### GET request to get a locality with report sellers
 GET localhost:8080/api/v1/localities/reportSellers?id=1
 
-### GET request to get all localities with report sellers
-GET localhost:8080/api/v1/localities/reportSellers?id=
-
 ### POST request to create a new locality
 POST localhost:8080/api/v1/localities
 Content-Type: application/json
