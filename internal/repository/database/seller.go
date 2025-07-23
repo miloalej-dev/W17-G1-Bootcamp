@@ -37,6 +37,9 @@ func (s *SellerRepository) FindById(id int) (models.Seller, error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.Seller{}, repository.ErrEntityNotFound
 	}
+	if result.Error != nil {
+		return models.Seller{}, result.Error
+	}
 
 	return seller, nil
 }
@@ -91,7 +94,7 @@ func (s *SellerRepository) PartialUpdate(id int, fields map[string]interface{}) 
 func (s *SellerRepository) Delete(id int) error {
 	result := s.db.Delete(&models.Seller{}, id)
 
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if result.RowsAffected < 1 {
 		return repository.ErrEntityNotFound
 	}
 
