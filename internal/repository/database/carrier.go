@@ -36,43 +36,30 @@ func (r *CarrierDB) FindById(id int) (models.Carrier, error) {
 	return carrier, nil
 }
 
+func (r *CarrierDB) FindByCid(cid string) (models.Carrier, bool, error) {
+	var carrier models.Carrier
+	result := r.db.Where("cid = ?", cid).First(&carrier)
+	if result.Error != nil {
+		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return models.Carrier{}, false, result.Error
+		}
+	}
+	found := result.RowsAffected >= 1
+	return carrier, found, nil
+}
+
 func (r *CarrierDB) Create(carrier models.Carrier) (models.Carrier, error) {
-	// 1- Validate that there is no carrier with this cid already
-	var exists bool
-	err := r.db.Model(&models.Carrier{}).
-		Select("1").
-		Where("cid = ?", carrier.CId).
-		First(&exists).Error
-
-	if err != nil {
-		// Record not found is not an error in this context. Everythinf else is
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Carrier{}, err
-		}
-	}
-
-	if exists {
-		return models.Carrier{}, repository.ErrEntityAlreadyExists
-	}
-
-	// 2- Create carrier
 	result := r.db.Create(&carrier)
-	if result.Error == nil {
-		return carrier, nil
-	}
-
-	// 2.1- Check for MySql specific errors
-	var mysqlErr *mysql.MySQLError
-	if errors.As(result.Error, &mysqlErr) {
-		switch mysqlErr.Number {
-		// Locality does not exist
-		case 1452: 
-			return models.Carrier{}, repository.ErrLocalityNotFound
+	if result.Error != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(result.Error, &mysqlErr) {
+			if mysqlErr.Number == 1452 {
+				return models.Carrier{}, repository.ErrForeignKeyViolation
+			}
 		}
+		return models.Carrier{}, result.Error
 	}
-
-	// Return original error if not handled above
-	return models.Carrier{}, result.Error
+	return carrier, nil
 }
 
 func (r *CarrierDB) Update(carrier models.Carrier) (models.Carrier, error) {

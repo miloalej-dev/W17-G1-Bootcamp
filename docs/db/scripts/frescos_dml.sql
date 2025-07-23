@@ -1,54 +1,27 @@
 -- Select the database to use
 USE `frescos`;
 
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
-
--- Insert statements for countries
-INSERT INTO `frescos`.`countries` (`id`, `country`) VALUES
-(1, 'Argentina'),
-(2, 'Colombia'),
-(3, 'México');
-
--- Insert statements for provinces
-INSERT INTO `frescos`.`provinces` (`id`, `province`, `country_id`) VALUES
-(1, 'Buenos Aires', 1),
-(2, 'Córdoba', 1),
-(3, 'Santa Fe', 1),
-(4, 'Mendoza', 1),
-(5, 'Atlántico', 2),
-(6, 'Bolívar', 2),
-(7, 'Antioquia', 2),
-(8, 'Cundinamarca', 2),
-(9, 'Valle del Cauca', 2),
-(10, 'Jalisco', 3),
-(11, 'Nuevo León', 3),
-(12, 'Ciudad de México', 3),
-(13, 'Puebla', 3),
-(14, 'Baja California', 3),
-(15, 'San Salvador', 3);
-
 -- Insert statements of localities
-INSERT INTO `frescos`.`localities` (`id`, `locality`, `province_id`) VALUES
-(1, 'Buenos Aires', 1),      -- Buenos Aires, Argentina
-(2, 'Córdoba', 2),           -- Córdoba, Argentina
-(3, 'Rosario', 3),           -- Santa Fe, Argentina
-(4, 'Mendoza', 4),           -- Mendoza, Argentina
-(5, 'La Plata', 1),          -- Buenos Aires, Argentina
-(6, 'Barranquilla', 5),      -- Atlántico, Colombia
-(7, 'Cartagena', 6),         -- Bolívar, Colombia
-(8, 'Medellín', 7),          -- Antioquia, Colombia
-(9, 'Bogotá', 8),            -- Cundinamarca, Colombia
-(10, 'Cali', 9),             -- Valle del Cauca, Colombia
-(11, 'Guadalajara', 10),     -- Jalisco, México
-(12, 'Monterrey', 11),       -- Nuevo León, México
-(13, 'Ciudad de México', 12), -- Ciudad de México, México
-(14, 'Puebla', 13),          -- Puebla, México
-(15, 'Tijuana', 14),         -- Baja California, México
-(16, 'Quilmes', 1),          -- Buenos Aires, Argentina
-(17, 'Santo Domingo', 9),    -- Valle del Cauca, Colombia
-(18, 'San Salvador', 15),    -- San Salvador, México
-(19, 'Santa Fe', 3);         -- Santa Fe, Argentina
+INSERT INTO `frescos`.`localities` (`id`, `locality`, `province`, `country`) VALUES
+(1, 'Buenos Aires', 'Buenos Aires', 'Argentina'),
+(2, 'Córdoba', 'Córdoba', 'Argentina'),
+(3, 'Rosario', 'Santa Fe', 'Argentina'),
+(4, 'Mendoza', 'Mendoza', 'Argentina'),
+(5, 'La Plata', 'Buenos Aires', 'Argentina'),
+(6, 'Barranquilla', 'Atlántico', 'Colombia'),
+(7, 'Cartagena', 'Bolívar', 'Colombia'),
+(8, 'Medellín', 'Antioquia', 'Colombia'),
+(9, 'Bogotá', 'Cundinamarca', 'Colombia'),
+(10, 'Cali', 'Valle del Cauca', 'Colombia'),
+(11, 'Guadalajara', 'Jalisco', 'México'),
+(12, 'Monterrey', 'Nuevo León', 'México'),
+(13, 'Ciudad de México', 'Ciudad de México', 'México'),
+(14, 'Puebla', 'Puebla', 'México'),
+(15, 'Tijuana', 'Baja California', 'México'),
+(16, 'Quilmes', 'Buenos Aires', 'Argentina'),
+(17, 'Santo Domingo', 'Valle del Cauca', 'Colombia'),
+(18, 'San Salvador', 'San Salvador', 'México'),
+(19, 'Santa Fe', 'Santa Fe', 'Argentina');
 
 -- Insert statements of sellers
 INSERT INTO `sellers` (`id`, `name`, `address`, `telephone`, `locality_id`) VALUES
