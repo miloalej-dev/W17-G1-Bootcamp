@@ -14,7 +14,7 @@ type LocalityDoc struct {
 }
 
 type LocalitySellerCount struct {
-	Locality
+	LocalityDoc
 	SellerCount *int `json:"sellers_count,omitempty"`
 }
 

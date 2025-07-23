@@ -17,13 +17,13 @@ func (l *LocalityRequest) Bind(r *http.Request) error {
 		return errors.New("locality_id must be greater than 0")
 	}
 	if l.Locality == nil {
-		return errors.New("locality_name")
+		return errors.New("locality_name is required")
 	}
 	if l.Province == nil {
-		return errors.New("province_name")
+		return errors.New("province_name is required")
 	}
 	if l.Country == nil {
-		return errors.New("country_name")
+		return errors.New("country_name is required")
 	}
 	return nil
 }
