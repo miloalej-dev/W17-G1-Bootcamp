@@ -1,6 +1,8 @@
 package database
 
 import (
+	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -30,8 +32,8 @@ func (i *InboundOrderRepository) FindById(id int) (models.InboundOrder, error) {
 
 	result := i.db.First(&inboundOrder, id)
 
-	if result.Error != nil {
-		return models.InboundOrder{}, result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.InboundOrder{}, repository.ErrEntityNotFound
 	}
 
 	return inboundOrder, nil
@@ -40,7 +42,12 @@ func (i *InboundOrderRepository) FindById(id int) (models.InboundOrder, error) {
 func (i *InboundOrderRepository) Create(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
 	result := i.db.Create(&inboundOrder)
 
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.InboundOrder{}, repository.ErrForeignKeyViolation
+	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
+		return models.InboundOrder{}, errors.New("inbound order number already exists, must be unique")
+	case result.Error != nil:
 		return models.InboundOrder{}, result.Error
 	}
 
@@ -50,7 +57,12 @@ func (i *InboundOrderRepository) Create(inboundOrder models.InboundOrder) (model
 func (i *InboundOrderRepository) Update(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
 	result := i.db.Save(&inboundOrder)
 
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.InboundOrder{}, repository.ErrForeignKeyViolation
+	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
+		return models.InboundOrder{}, errors.New("inbound order number already exists, must be unique")
+	case result.Error != nil:
 		return models.InboundOrder{}, result.Error
 	}
 
@@ -62,13 +74,19 @@ func (i *InboundOrderRepository) PartialUpdate(id int, fields map[string]interfa
 
 	// First, find the seller to update
 	result := i.db.First(&inboundOrder, id)
-	if result.Error != nil {
-		return models.InboundOrder{}, result.Error
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.InboundOrder{}, repository.ErrEntityNotFound
 	}
 
 	// Update only the specified fields
 	result = i.db.Model(&inboundOrder).Updates(fields)
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.InboundOrder{}, repository.ErrForeignKeyViolation
+	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
+		return models.InboundOrder{}, errors.New("inbound order number already exists, must be unique")
+	case result.Error != nil:
 		return models.InboundOrder{}, result.Error
 	}
 
@@ -78,8 +96,8 @@ func (i *InboundOrderRepository) PartialUpdate(id int, fields map[string]interfa
 func (i *InboundOrderRepository) Delete(id int) error {
 	result := i.db.Delete(&models.InboundOrder{}, id)
 
-	if result.Error != nil {
-		return result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return repository.ErrEntityNotFound
 	}
 
 	return nil

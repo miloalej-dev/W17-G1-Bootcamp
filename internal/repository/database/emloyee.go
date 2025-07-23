@@ -84,12 +84,12 @@ func (e EmployeeRepository) InboundOrdersReport() ([]models.EmployeeInboundOrder
             e.card_number_id,
             e.first_name,
             e.last_name,
-            w.warehouse_code,
+			e.warehouse_id,
             COUNT(io.id) AS inbound_orders_count
         `).
 		Joins("LEFT JOIN inbound_orders io ON e.id = io.employee_id").
 		Joins("LEFT JOIN warehouses w ON e.warehouse_id = w.id").
-		Group("e.id, e.card_number_id, e.first_name, e.last_name, w.warehouse_code").
+		Group("e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id").
 		Order("e.id").
 		Scan(&reports)
 
@@ -110,13 +110,13 @@ func (e EmployeeRepository) InboundOrdersReportById(id int) (models.EmployeeInbo
             e.card_number_id,
             e.first_name,
             e.last_name,
-            w.warehouse_code,
+			e.warehouse_id,
             COUNT(io.id) AS inbound_orders_count
         `).
 		Joins("LEFT JOIN inbound_orders io ON e.id = io.employee_id").
 		Joins("LEFT JOIN warehouses w ON e.warehouse_id = w.id").
 		Where("e.id = ?", id).
-		Group("e.id, e.card_number_id, e.first_name, e.last_name, w.warehouse_code").
+		Group("e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id").
 		Scan(&report)
 
 	if result.Error != nil {

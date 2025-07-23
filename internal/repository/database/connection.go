@@ -75,6 +75,7 @@ func NewConnection() (*gorm.DB, error) {
 		NowFunc: func() time.Time {
 			return time.Now().Local()
 		},
+		TranslateError: true,
 	})
 
 	if err != nil {
