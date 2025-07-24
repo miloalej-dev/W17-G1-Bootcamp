@@ -103,7 +103,8 @@ func (s *WarehouseRepositoryTestSuite) TestFindAll_Success() {
 	s.NoError(err)
 	s.Len(warehouses, 2)
 	s.Equal(expectedWarehouses, warehouses)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 // Error on retireve all
@@ -118,7 +119,8 @@ func (s *WarehouseRepositoryTestSuite) TestFindAll_DatabaseError() {
 	s.Error(err)
 	s.Nil(warehouses)
 	s.Equal(sql.ErrConnDone, err)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 // Find by Id returns the specified warehouse
@@ -164,7 +166,8 @@ func (s *WarehouseRepositoryTestSuite) TestFindById_Success() {
 	// Assert
 	s.NoError(err)
 	s.Equal(expectedWarehouse, warehouse)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 // Find by a non existent Id returns nothing
@@ -212,7 +215,8 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_Success() {
 	s.Equal(newWarehouse.MinimumCapacity, createdWarehouse.MinimumCapacity)
 	s.Equal(newWarehouse.MinimumTemperature, createdWarehouse.MinimumTemperature)
 	s.Equal(newWarehouse.LocalityId, createdWarehouse.LocalityId)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
@@ -240,7 +244,8 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	s.Error(err)
 	s.Equal(err, repository.ErrLocalityNotFound)
 	s.Equal(models.Warehouse{}, createdWarehouse)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestCreate_AnotherGormError() {
@@ -268,7 +273,8 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_AnotherGormError() {
 	s.Error(err)
 	s.Equal(err, gorm.ErrInvalidValue)
 	s.Equal(models.Warehouse{}, createdWarehouse)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestUpdate_Success() {
@@ -457,7 +463,8 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_DatabaseErrorOnFirst() 
 	s.Error(err)
 	s.ErrorIs(err, gorm.ErrInvalidDB)
 	s.Equal(models.Warehouse{}, updatedWarehouse)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorNotFound() {
@@ -488,7 +495,8 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorNotFound() {
 	s.Error(err)
 	s.ErrorIs(err, repository.ErrEntityNotFound)
 	s.Equal(models.Warehouse{}, updatedWarehouse)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
@@ -582,7 +590,8 @@ func (s *WarehouseRepositoryTestSuite) TestDelete_Success() {
 	err := s.repo.Delete(warehouseID)
 	// Assert
 	s.NoError(err)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestDelete_NotFound() {
@@ -601,7 +610,8 @@ func (s *WarehouseRepositoryTestSuite) TestDelete_NotFound() {
 	// Assert
 	s.Error(err)
 	s.Equal(repository.ErrEntityNotFound, err)
-	s.mock.ExpectationsWereMet()
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 // Run the test suite
