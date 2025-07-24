@@ -51,7 +51,7 @@ func (a *ServerChi) Run() (err error) {
 	// - repositories
 
 	productRecordRepository := database.NewProductRecordRepository(db)
-	productRepository := database.NewProductDB(db)
+	productRepository := database.NewProductRepository(db)
 	warehouseRepository := database.NewWarehouseDB(db)
 	carrierRepository := database.NewCarrierDB(db)
 	productBatchRepository := database.NewProductBatchDB(db)
@@ -67,7 +67,7 @@ func (a *ServerChi) Run() (err error) {
 
 	productRecordService := _default.NewProductRecordDefault(productRecordRepository)
 	productService := _default.NewProductDefault(productRepository)
-  	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
+	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
 	carrierService := _default.NewCarrierDefault(carrierRepository)
 	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
 	buyerService := _default.NewBuyerDefault(buyerRepository)
