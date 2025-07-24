@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
@@ -22,17 +23,19 @@ func (e EmployeeRepository) FindAll() ([]models.Employee, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	if len(employees) == 0 {
-		return nil, repository.ErrEntityNotFound
-	}
+
 	return employees, nil
 }
 
 func (e EmployeeRepository) FindById(id int) (models.Employee, error) {
 	var employee models.Employee
 	result := e.db.First(&employee, id)
-	if result.Error != nil {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.Employee{}, repository.ErrEntityNotFound
+	}
+
+	if result.Error != nil {
+		return models.Employee{}, result.Error
 	}
 	return employee, nil
 }
