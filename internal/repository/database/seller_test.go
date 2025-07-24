@@ -124,7 +124,7 @@ func (s *SellerRepositoryTestSuite) TestFindById_Success() {
 func (s *SellerRepositoryTestSuite) TestFindById_NotFound() {
 	// Arrange
 	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
-		WithArgs(999, 1).WillReturnError(repository.ErrEntityNotFound)
+		WithArgs(999, 1).WillReturnError(gorm.ErrRecordNotFound)
 
 	// Act
 	seller, err := s.repo.FindById(999)
@@ -185,7 +185,7 @@ func (s *SellerRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `sellers` (`name`,`address`,`telephone`,`locality_id`) VALUES (?,?,?,?)")).
 		WithArgs(newSeller.Name, newSeller.Address, newSeller.Telephone, newSeller.LocalityId).
-		WillReturnError(repository.ErrForeignKeyViolation)
+		WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -259,7 +259,7 @@ func (s *SellerRepositoryTestSuite) TestUpdate_ForeignKeyViolated() {
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id` = ?")).
 		WithArgs(existingSeller.Name, existingSeller.Address, existingSeller.Telephone, existingSeller.LocalityId, existingSeller.Id).
-		WillReturnError(repository.ErrForeignKeyViolation)
+		WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -379,7 +379,7 @@ func (s *SellerRepositoryTestSuite) TestPartialUpdate_ForeignKeyViolated() {
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `locality_id`=? WHERE `id` = ?")).
 		WithArgs(fields["locality_id"], sellerID).
-		WillReturnError(repository.ErrForeignKeyViolation)
+		WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
 	// Act
