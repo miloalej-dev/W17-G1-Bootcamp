@@ -520,6 +520,198 @@ func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_DatabaseError() {
 	s.Equal(models.Employee{}, updatedEmployee)
 }
 
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReport_Success() {
+	// Arrange
+	expectedReports := []models.EmployeeInboundOrdersReport{
+		{
+			Employee: models.Employee{
+				Id:           1,
+				CardNumberId: "EMP001",
+				FirstName:    "John",
+				LastName:     "Doe",
+				WarehouseId:  1,
+			},
+			InboundOrdersCount: 5,
+		},
+		{
+			Employee: models.Employee{
+				Id:           2,
+				CardNumberId: "EMP002",
+				FirstName:    "Jane",
+				LastName:     "Smith",
+				WarehouseId:  2,
+			},
+			InboundOrdersCount: 3,
+		},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "card_number_id", "first_name", "last_name", "warehouse_id", "inbound_orders_count"})
+	for _, report := range expectedReports {
+		rows.AddRow(report.Id, report.CardNumberId, report.FirstName, report.LastName, report.WarehouseId, report.InboundOrdersCount)
+	}
+
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id ORDER BY e.id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WillReturnRows(rows)
+
+	// Act
+	reports, err := s.repo.InboundOrdersReport()
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(expectedReports, reports)
+}
+
+// Test InboundOrdersReport - Database Error
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReport_DatabaseError() {
+	// Arrange
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id ORDER BY e.id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	reports, err := s.repo.InboundOrdersReport()
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Nil(reports)
+}
+
+// Test InboundOrdersReport - Empty Result
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReport_EmptyResult() {
+	// Arrange
+	rows := sqlmock.NewRows([]string{"id", "card_number_id", "first_name", "last_name", "warehouse_id", "inbound_orders_count"})
+
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id ORDER BY e.id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WillReturnRows(rows)
+
+	// Act
+	reports, err := s.repo.InboundOrdersReport()
+
+	// Asserts
+	s.NoError(err)
+	s.Empty(reports)
+}
+
+// Test InboundOrdersReportById - Success
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReportById_Success() {
+	// Arrange
+	employeeId := 1
+	expectedReport := models.EmployeeInboundOrdersReport{
+		Employee: models.Employee{
+			Id:           1,
+			CardNumberId: "EMP001",
+			FirstName:    "John",
+			LastName:     "Doe",
+			WarehouseId:  1,
+		},
+		InboundOrdersCount: 5,
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "card_number_id", "first_name", "last_name", "warehouse_id", "inbound_orders_count"}).
+		AddRow(expectedReport.Id, expectedReport.CardNumberId, expectedReport.FirstName, expectedReport.LastName, expectedReport.WarehouseId, expectedReport.InboundOrdersCount)
+
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id WHERE e.id = ? GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WithArgs(employeeId).
+		WillReturnRows(rows)
+
+	// Act
+	report, err := s.repo.InboundOrdersReportById(employeeId)
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(expectedReport, report)
+}
+
+// Test InboundOrdersReportById - Database Error
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReportById_DatabaseError() {
+	// Arrange
+	employeeId := 1
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id WHERE e.id = ? GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WithArgs(employeeId).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	report, err := s.repo.InboundOrdersReportById(employeeId)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.EmployeeInboundOrdersReport{}, report)
+}
+
+// Test InboundOrdersReportById - Employee Not Found
+func (s *EmployeeRepositoryTestSuite) TestInboundOrdersReportById_NotFound() {
+	// Arrange
+	employeeId := 999
+	rows := sqlmock.NewRows([]string{"id", "card_number_id", "first_name", "last_name", "warehouse_id", "inbound_orders_count"})
+
+	expectedQuery := `SELECT
+            e.id,
+            e.card_number_id,
+            e.first_name,
+            e.last_name,
+			e.warehouse_id,
+            COUNT(io.id) AS inbound_orders_count
+         FROM employees e LEFT JOIN inbound_orders io ON e.id = io.employee_id LEFT JOIN warehouses w ON e.warehouse_id = w.id WHERE e.id = ? GROUP BY e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WithArgs(employeeId).
+		WillReturnRows(rows)
+
+	// Act
+	report, err := s.repo.InboundOrdersReportById(employeeId)
+
+	// Asserts
+	s.Error(err) // The method doesn't return error for empty results, just empty struct
+	s.Equal(repository.ErrEntityNotFound, err)
+	s.Equal(models.EmployeeInboundOrdersReport{}, report)
+}
+
 func TestEmployeeRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(EmployeeRepositoryTestSuite))
 }
