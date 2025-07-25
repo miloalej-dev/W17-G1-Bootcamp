@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -13,10 +13,10 @@ import (
 )
 
 type SellerHandler struct {
-	service *_default.SellerService
+	service service.SellerService
 }
 
-func NewSellerHandler(service *_default.SellerService) *SellerHandler {
+func NewSellerHandler(service service.SellerService) *SellerHandler {
 	return &SellerHandler{
 		service: service,
 	}
@@ -42,8 +42,8 @@ func (h *SellerHandler) GetSeller(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -89,8 +89,8 @@ func (h *SellerHandler) PutSeller(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -125,22 +125,21 @@ func (h *SellerHandler) PatchSeller(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(ErrUnexpectedJSON.Error(), http.StatusBadRequest))
 		return
 	}
 
 	updatedSeller, err := h.service.PartialModify(id, fields)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
-		http.Error(w, "Failed to update seller", http.StatusInternalServerError)
 		return
 	}
 
@@ -153,8 +152,8 @@ func (h *SellerHandler) DeleteSeller(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 

@@ -124,7 +124,7 @@ func (s *SellerRepositoryTestSuite) TestFindById_Success() {
 func (s *SellerRepositoryTestSuite) TestFindById_NotFound() {
 	// Arrange
 	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
-		WithArgs(999, 1).WillReturnError(repository.ErrEntityNotFound)
+		WithArgs(999, 1).WillReturnError(gorm.ErrRecordNotFound)
 
 	// Act
 	seller, err := s.repo.FindById(999)
@@ -133,6 +133,20 @@ func (s *SellerRepositoryTestSuite) TestFindById_NotFound() {
 	s.Error(err)
 	s.Equal(repository.ErrEntityNotFound, err)
 	s.Equal(models.Seller{}, seller)
+}
+
+func (s *SellerRepositoryTestSuite) TestFindById_DatabaseError() {
+	// Arrange
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
+		WithArgs(1, 1).WillReturnError(sql.ErrConnDone)
+
+	// Act
+	seller, err := s.repo.FindById(1)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Seller{}, seller)
+	s.Equal(sql.ErrConnDone, err)
 }
 
 func (s *SellerRepositoryTestSuite) TestCreate_Success() {
@@ -171,7 +185,31 @@ func (s *SellerRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `sellers` (`name`,`address`,`telephone`,`locality_id`) VALUES (?,?,?,?)")).
 		WithArgs(newSeller.Name, newSeller.Address, newSeller.Telephone, newSeller.LocalityId).
-		WillReturnError(repository.ErrForeignKeyViolation)
+		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectRollback()
+
+	// Act
+	createdSeller, err := s.repo.Create(newSeller)
+
+	// Assert
+	s.Error(err)
+	s.Equal(repository.ErrForeignKeyViolation, err)
+	s.Equal(models.Seller{}, createdSeller)
+}
+
+func (s *SellerRepositoryTestSuite) TestCreate_DatabaseError() {
+	// Arrange
+	newSeller := models.Seller{
+		Name:       "New Company",
+		Address:    "789 Pine St",
+		Telephone:  "555-0003",
+		LocalityId: 3,
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `sellers` (`name`,`address`,`telephone`,`locality_id`) VALUES (?,?,?,?)")).
+		WithArgs(newSeller.Name, newSeller.Address, newSeller.Telephone, newSeller.LocalityId).
+		WillReturnError(sql.ErrConnDone)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -180,6 +218,7 @@ func (s *SellerRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	// Assert
 	s.Error(err)
 	s.Equal(models.Seller{}, createdSeller)
+	s.Equal(sql.ErrConnDone, err)
 }
 
 func (s *SellerRepositoryTestSuite) TestUpdate_Success() {
@@ -207,6 +246,188 @@ func (s *SellerRepositoryTestSuite) TestUpdate_Success() {
 	s.Equal(existingSeller.Id, updatedSeller.Id)
 }
 
+func (s *SellerRepositoryTestSuite) TestUpdate_ForeignKeyViolated() {
+	// Arrange
+	existingSeller := models.Seller{
+		Id:         1,
+		Name:       "Updated Company",
+		Address:    "Updated Address",
+		Telephone:  "555-9999",
+		LocalityId: 999, // Invalid locality ID
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id` = ?")).
+		WithArgs(existingSeller.Name, existingSeller.Address, existingSeller.Telephone, existingSeller.LocalityId, existingSeller.Id).
+		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedSeller, err := s.repo.Update(existingSeller)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Seller{}, updatedSeller)
+	s.Equal(repository.ErrForeignKeyViolation, err)
+}
+
+func (s *SellerRepositoryTestSuite) TestUpdate_DatabaseError() {
+	// Arrange
+	existingSeller := models.Seller{
+		Id:         1,
+		Name:       "Updated Company",
+		Address:    "Updated Address",
+		Telephone:  "555-9999",
+		LocalityId: 1,
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id` = ?")).
+		WithArgs(existingSeller.Name, existingSeller.Address, existingSeller.Telephone, existingSeller.LocalityId, existingSeller.Id).
+		WillReturnError(sql.ErrConnDone)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedSeller, err := s.repo.Update(existingSeller)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Seller{}, updatedSeller)
+	s.Equal(sql.ErrConnDone, err)
+}
+
+func (s *SellerRepositoryTestSuite) TestPartialUpdate_Success() {
+	// Arrange
+	sellerID := 1
+	fields := map[string]interface{}{
+		"name":    "Partially Updated Company",
+		"address": "New Address",
+	}
+
+	expectedSeller := models.Seller{
+		Id:         sellerID,
+		Name:       "Partially Updated Company",
+		Address:    "New Address",
+		Telephone:  "555-0001",
+		LocalityId: 1,
+	}
+
+	// First query to find the seller
+	rows := s.mock.NewRows([]string{"id", "name", "address", "telephone", "locality_id"}).
+		AddRow(expectedSeller.Id, "Old Company", "Old Address", expectedSeller.Telephone, expectedSeller.LocalityId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
+		WithArgs(sellerID, 1).WillReturnRows(rows)
+
+	// Update query
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `address`=?,`name`=? WHERE `id` = ?")).
+		WithArgs(fields["address"], fields["name"], sellerID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.mock.ExpectCommit()
+
+	// Act
+	updatedSeller, err := s.repo.PartialUpdate(sellerID, fields)
+
+	// Assert
+	s.NoError(err)
+	s.Equal(sellerID, updatedSeller.Id)
+}
+
+func (s *SellerRepositoryTestSuite) TestPartialUpdate_NotFound() {
+	// Arrange
+	sellerID := 999
+	fields := map[string]interface{}{
+		"name": "Updated Name",
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
+		WithArgs(sellerID, 1).WillReturnError(gorm.ErrRecordNotFound)
+
+	// Act
+	updatedSeller, err := s.repo.PartialUpdate(sellerID, fields)
+
+	// Assert
+	s.Error(err)
+	s.Equal(repository.ErrEntityNotFound, err)
+	s.Equal(models.Seller{}, updatedSeller)
+}
+
+func (s *SellerRepositoryTestSuite) TestPartialUpdate_ForeignKeyViolated() {
+	// Arrange
+	sellerID := 1
+	fields := map[string]interface{}{
+		"locality_id": 999, // Invalid locality ID
+	}
+
+	expectedSeller := models.Seller{
+		Id:         sellerID,
+		Name:       "Company A",
+		Address:    "123 Main St",
+		Telephone:  "555-0001",
+		LocalityId: 1,
+	}
+
+	// First query to find the seller
+	rows := s.mock.NewRows([]string{"id", "name", "address", "telephone", "locality_id"}).
+		AddRow(expectedSeller.Id, expectedSeller.Name, expectedSeller.Address, expectedSeller.Telephone, expectedSeller.LocalityId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
+		WithArgs(sellerID, 1).WillReturnRows(rows)
+
+	// Update query with foreign key violation
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `locality_id`=? WHERE `id` = ?")).
+		WithArgs(fields["locality_id"], sellerID).
+		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedSeller, err := s.repo.PartialUpdate(sellerID, fields)
+
+	// Assert
+	s.Error(err)
+	s.Equal(repository.ErrForeignKeyViolation, err)
+	s.Equal(models.Seller{}, updatedSeller)
+}
+
+func (s *SellerRepositoryTestSuite) TestPartialUpdate_DatabaseError() {
+	// Arrange
+	sellerID := 1
+	fields := map[string]interface{}{
+		"name": "Updated Name",
+	}
+
+	expectedSeller := models.Seller{
+		Id:         sellerID,
+		Name:       "Company A",
+		Address:    "123 Main St",
+		Telephone:  "555-0001",
+		LocalityId: 1,
+	}
+
+	// First query to find the seller
+	rows := s.mock.NewRows([]string{"id", "name", "address", "telephone", "locality_id"}).
+		AddRow(expectedSeller.Id, expectedSeller.Name, expectedSeller.Address, expectedSeller.Telephone, expectedSeller.LocalityId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `sellers` WHERE `sellers`.`id` = ? ORDER BY `sellers`.`id` LIMIT ?")).
+		WithArgs(sellerID, 1).WillReturnRows(rows)
+
+	// Update query with database error
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `sellers` SET `name`=? WHERE `id` = ?")).
+		WithArgs(fields["name"], sellerID).
+		WillReturnError(sql.ErrConnDone)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedSeller, err := s.repo.PartialUpdate(sellerID, fields)
+
+	// Assert
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.Seller{}, updatedSeller)
+}
 func (s *SellerRepositoryTestSuite) TestDelete_Success() {
 	// Arrange
 	sellerID := 1
