@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
@@ -78,30 +79,36 @@ func (l LocalityRepository) FindById(id int) (models.Locality, error) {
 }
 
 func (l LocalityRepository) Create(locality models.LocalityDoc) (models.LocalityDoc, error) {
-	var exists models.Locality
-	result := l.db.First(&exists, locality.Id)
-	if result.RowsAffected > 0 {
-		return models.LocalityDoc{}, repository.ErrEntityAlreadyExists
-	}
-	var idProvinceTable int
-	err := l.db.Table("provinces p").
-		Select("p.id").
-		Joins("INNER JOIN countries c ON c.id = p.country_id").
-		Where("p.province = ? AND c.country = ?", locality.Province, locality.Country).
-		Scan(&idProvinceTable).Error
-	if err != nil || idProvinceTable == 0 {
+	// Obtener el ID de la provincia usando GORM de forma más limpia
+	var province models.Province
+	result := l.db.Joins("INNER JOIN countries ON countries.id = provinces.country_id").
+		Where("provinces.province = ? AND countries.country = ?", locality.Province, locality.Country).
+		First(&province)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.LocalityDoc{}, repository.ErrProvinceNotFound
 	}
+	if result.Error != nil {
+		return models.LocalityDoc{}, result.Error
+	}
+
+	// Crear la locality usando el province_id encontrado
 	localityCreated := models.Locality{
 		Id:         locality.Id,
 		Locality:   locality.Locality,
-		ProvinceId: idProvinceTable,
+		ProvinceId: province.Id,
 	}
-	result = l.db.Create(&localityCreated)
-	if result.Error != nil {
 
-		return models.LocalityDoc{}, repository.ErrInvalidEntity
+	result = l.db.Create(&localityCreated)
+	switch {
+	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
+		return models.LocalityDoc{}, repository.ErrEntityAlreadyExists
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.LocalityDoc{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
+		return models.LocalityDoc{}, result.Error
 	}
+
 	return locality, nil
 }
 
