@@ -132,14 +132,15 @@ func (l LocalityRepository) PartialUpdate(id int, fields map[string]interface{})
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.Locality{}, repository.ErrEntityNotFound
 	}
-	if errors.Is(result.Error, gorm.ErrForeignKeyViolated) {
-		return models.Locality{}, repository.ErrForeignKeyViolation
-	}
 	if result.Error != nil {
 		return models.Locality{}, result.Error
 	}
+
 	result = l.db.Model(&locality).Updates(fields)
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Locality{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Locality{}, result.Error
 	}
 	return locality, nil
@@ -147,8 +148,8 @@ func (l LocalityRepository) PartialUpdate(id int, fields map[string]interface{})
 
 func (l LocalityRepository) Delete(id int) error {
 	result := l.db.Delete(&models.Locality{}, id)
-	if result.Error != nil {
-		return result.Error
+	if result.RowsAffected < 1 {
+		return repository.ErrEntityNotFound
 	}
 	return nil
 }
