@@ -16,45 +16,42 @@ func NewLocalityRepository(db *gorm.DB) *LocalityRepository {
 }
 
 func (l LocalityRepository) FindLocalityBySeller(id int) (models.LocalitySellerCount, error) {
-	var exists int64
-	l.db.Model(&models.Locality{}).Where("id = ?", id).Count(&exists)
-	if exists == 0 {
-		return models.LocalitySellerCount{}, repository.ErrLocalityNotFound
-	}
 	var locality models.LocalitySellerCount
-	query := l.db.Table("localities").
-		Select("localities.id as id ,localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count").
+
+	result := l.db.Model(&models.Locality{}).
+		Select("localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count").
 		Joins("JOIN provinces p ON localities.province_id = p.id").
 		Joins("JOIN countries c ON p.country_id = c.id").
 		Joins("LEFT JOIN sellers s ON localities.id = s.locality_id").
 		Where("localities.id = ?", id).
-		Group("localities.id, localities.locality, p.province, c.country")
+		Group("localities.id, localities.locality, p.province, c.country").
+		Find(&locality)
 
-	err := query.Scan(&locality).Error
-	if err != nil {
-		return models.LocalitySellerCount{}, repository.ErrSQLQueryExecution
+	switch {
+	case errors.Is(result.Error, gorm.ErrRecordNotFound):
+		return models.LocalitySellerCount{}, repository.ErrEntityNotFound
+	case result.Error != nil:
+		return models.LocalitySellerCount{}, result.Error
+	case result.RowsAffected == 0:
+		return models.LocalitySellerCount{}, repository.ErrEntityNotFound
 	}
-	// Verifica si se encontraron resultados
-	if locality.Id == 0 {
-		return models.LocalitySellerCount{}, repository.ErrLocalityNotFound
-	}
-	return locality, err
+
+	return locality, nil
 }
 
 func (l LocalityRepository) FindAllLocality() ([]models.LocalitySellerCount, error) {
 	var localitiesSellers []models.LocalitySellerCount
-	query := l.db.Table("localities").
-		Select("localities.id as id ,localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count").
+
+	result := l.db.Model(&models.Locality{}).
+		Select("localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count").
 		Joins("JOIN provinces p ON localities.province_id = p.id").
 		Joins("JOIN countries c ON p.country_id = c.id").
 		Joins("LEFT JOIN sellers s ON localities.id = s.locality_id").
-		Group("localities.id, localities.locality, p.province, c.country")
-	err := query.Scan(&localitiesSellers).Error
-	if err != nil {
-		return nil, repository.ErrSQLQueryExecution
-	}
-	if len(localitiesSellers) == 0 {
-		return nil, repository.ErrEmptyEntity
+		Group("localities.id, localities.locality, p.province, c.country").
+		Find(&localitiesSellers)
+
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return localitiesSellers, nil
