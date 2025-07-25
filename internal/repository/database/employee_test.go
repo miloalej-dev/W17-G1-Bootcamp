@@ -481,6 +481,44 @@ func (s *EmployeeRepositoryTestSuite) TestDelete_DatabaseError() {
 	s.Error(err)
 	s.Equal(sql.ErrConnDone, err)
 }
+func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_DatabaseError() {
+	// Arrange
+	employeeId := 1
+	fields := map[string]interface{}{
+		"first_name": "John Updated",
+	}
+
+	existingEmployee := models.Employee{
+		Id:           1,
+		CardNumberId: "EMP001",
+		FirstName:    "John",
+		LastName:     "Doe",
+		WarehouseId:  1,
+	}
+
+	// Primero busca el empleado existente exitosamente
+	rows := sqlmock.NewRows([]string{"id", "card_number_id", "first_name", "last_name", "warehouse_id"}).
+		AddRow(existingEmployee.Id, existingEmployee.CardNumberId, existingEmployee.FirstName, existingEmployee.LastName, existingEmployee.WarehouseId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `employees` WHERE `employees`.`id` = ? ORDER BY `employees`.`id` LIMIT ?")).
+		WithArgs(employeeId, 1).
+		WillReturnRows(rows)
+
+	// Falla en la actualización con un error genérico (NO foreign key)
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `employees` SET `first_name`=? WHERE `id` = ?")).
+		WithArgs(fields["first_name"], employeeId).
+		WillReturnError(sql.ErrTxDone) // Error genérico diferente a ForeignKey
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedEmployee, err := s.repo.PartialUpdate(employeeId, fields)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrTxDone, err)
+	s.Equal(models.Employee{}, updatedEmployee)
+}
 
 func TestEmployeeRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(EmployeeRepositoryTestSuite))
