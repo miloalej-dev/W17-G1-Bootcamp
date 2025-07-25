@@ -372,6 +372,79 @@ func (s *LocalityRepositoryTestSuite) TestFindAll_DatabaseError() {
 	s.Nil(localities)
 }
 
+// Test Update - Success
+func (s *LocalityRepositoryTestSuite) TestUpdate_Success() {
+	// Arrange
+	localityToUpdate := models.Locality{
+		Id:         1,
+		Locality:   "Buenos Aires Updated",
+		ProvinceId: 1,
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
+		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.mock.ExpectCommit()
+
+	// Act
+	updatedLocality, err := s.repo.Update(localityToUpdate)
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(localityToUpdate.Id, updatedLocality.Id)
+	s.Equal(localityToUpdate.Locality, updatedLocality.Locality)
+	s.Equal(localityToUpdate.ProvinceId, updatedLocality.ProvinceId)
+}
+
+// Test Update - Foreign Key Violation
+func (s *LocalityRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
+	// Arrange
+	localityToUpdate := models.Locality{
+		Id:         1,
+		Locality:   "Buenos Aires",
+		ProvinceId: 999, // Province ID que no existe
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
+		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
+		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedLocality, err := s.repo.Update(localityToUpdate)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrForeignKeyViolation, err)
+	s.Equal(models.Locality{}, updatedLocality)
+}
+
+// Test Update - Database Error
+func (s *LocalityRepositoryTestSuite) TestUpdate_DatabaseError() {
+	// Arrange
+	localityToUpdate := models.Locality{
+		Id:         1,
+		Locality:   "Buenos Aires",
+		ProvinceId: 1,
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
+		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
+		WillReturnError(sql.ErrConnDone)
+	s.mock.ExpectRollback()
+
+	// Act
+	updatedLocality, err := s.repo.Update(localityToUpdate)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.Locality{}, updatedLocality)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
