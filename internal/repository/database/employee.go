@@ -137,12 +137,11 @@ func (e EmployeeRepository) InboundOrdersReportById(id int) (models.EmployeeInbo
 		Group("e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id").
 		Scan(&report)
 
-	if result.Error != nil {
-		return models.EmployeeInboundOrdersReport{}, result.Error
-	}
-
-	if result.RowsAffected == 0 {
+	switch {
+	case result.RowsAffected == 0:
 		return models.EmployeeInboundOrdersReport{}, repository.ErrEntityNotFound
+	case result.Error != nil:
+		return models.EmployeeInboundOrdersReport{}, result.Error
 	}
 
 	return report, nil
