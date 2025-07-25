@@ -247,6 +247,64 @@ func (s *LocalityRepositoryTestSuite) TestCreate_DatabaseError() {
 	s.Equal(models.LocalityDoc{}, createdLocality)
 }
 
+// Test FindById - Success
+func (s *LocalityRepositoryTestSuite) TestFindById_Success() {
+	// Arrange
+	expectedLocality := models.Locality{
+		Id:         1,
+		Locality:   "Buenos Aires",
+		ProvinceId: 1,
+	}
+
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"}).
+		AddRow(expectedLocality.Id, expectedLocality.Locality, expectedLocality.ProvinceId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
+		WithArgs(1, 1).
+		WillReturnRows(localityRows)
+
+	// Act
+	locality, err := s.repo.FindById(1)
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(expectedLocality.Id, locality.Id)
+	s.Equal(expectedLocality.Locality, locality.Locality)
+	s.Equal(expectedLocality.ProvinceId, locality.ProvinceId)
+}
+
+// Test FindById - Entity Not Found
+func (s *LocalityRepositoryTestSuite) TestFindById_EntityNotFound() {
+	// Arrange
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
+		WithArgs(999, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	// Act
+	locality, err := s.repo.FindById(999)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrEntityNotFound, err)
+	s.Equal(models.Locality{}, locality)
+}
+
+// Test FindById - Database Error
+func (s *LocalityRepositoryTestSuite) TestFindById_DatabaseError() {
+	// Arrange
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
+		WithArgs(1, 1).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	locality, err := s.repo.FindById(1)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.Locality{}, locality)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
