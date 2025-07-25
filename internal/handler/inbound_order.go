@@ -40,8 +40,8 @@ func (h *InboundOrderHandler) GetInboundOrder(w http.ResponseWriter, r *http.Req
 
 	param := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(param)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -62,7 +62,8 @@ func (h *InboundOrderHandler) PostInboundOrder(w http.ResponseWriter, r *http.Re
 
 	err := render.Bind(r, data)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	inboundOrder := models.InboundOrder{
@@ -87,8 +88,8 @@ func (h *InboundOrderHandler) PutInboundOrder(w http.ResponseWriter, r *http.Req
 
 	param := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(param)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -97,6 +98,7 @@ func (h *InboundOrderHandler) PutInboundOrder(w http.ResponseWriter, r *http.Req
 	err = render.Bind(r, data)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	inboundOrder := models.InboundOrder{
@@ -121,22 +123,21 @@ func (h *InboundOrderHandler) PatchInboundOrder(w http.ResponseWriter, r *http.R
 
 	param := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(param)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(ErrUnexpectedJSON.Error(), http.StatusBadRequest))
 		return
 	}
 
 	updatedInboundOrder, err := h.service.PartialModify(id, fields)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
-		http.Error(w, "Failed to update seller", http.StatusInternalServerError)
 		return
 	}
 
@@ -148,8 +149,8 @@ func (h *InboundOrderHandler) DeleteInboundOrder(w http.ResponseWriter, r *http.
 
 	param := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(param)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
