@@ -5,5 +5,10 @@ import (
 )
 
 type CarrierService interface {
-	Register(seller models.Carrier) (models.Carrier, error)
+	RetrieveAll() ([]models.Carrier, error)
+	Retrieve(id int) (models.Carrier, error)
+	Register(carrier models.Carrier) (models.Carrier, error)
+	Modify(carrier models.Carrier) (models.Carrier, error)
+	PartialModify(id int, fields map[string]any) (models.Carrier, error)
+	Remove(id int) error
 }

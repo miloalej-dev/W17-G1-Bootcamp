@@ -330,6 +330,11 @@ func (s *CarrierRepositoryTestSuite) TestUpdate_Success() {
 		LocalityId:         1,
 	}
 
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("CID#01", 1, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
+
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
 		"UPDATE `carriers` SET `cid`=?,`name`=?,`address`=?,`telephone`=?,`locality_id`=? WHERE `id` = ?",
@@ -356,6 +361,58 @@ func (s *CarrierRepositoryTestSuite) TestUpdate_Success() {
 	s.NoError(err)
 }
 
+func (s *CarrierRepositoryTestSuite) TestUpdate_CIdAlreadyExists() {
+	// Arrange
+	existingCarrier := models.Carrier{
+		ID:                 1,
+		CId:				"CID#01",
+		CompanyName:        "Meli",
+		Address:            "Boulevard",
+		Telephone:          "123-456789",
+		LocalityId:         1,
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("CID#01", 1, 1).
+		WillReturnRows(s.mock.NewRows([]string{"1"}).AddRow(1))
+
+	updatedCarrier, err := s.repo.Update(existingCarrier)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Carrier{}, updatedCarrier)
+
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *CarrierRepositoryTestSuite) TestUpdate_ErrorOnCIdValidation() {
+	// Arrange
+	existingCarrier := models.Carrier{
+		ID:                 1,
+		CId:				"CID#01",
+		CompanyName:        "Meli",
+		Address:            "Boulevard",
+		Telephone:          "123-456789",
+		LocalityId:         1,
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("CID#01", 1, 1).
+		WillReturnError(gorm.ErrInvalidDB)
+
+	updatedCarrier, err := s.repo.Update(existingCarrier)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Carrier{}, updatedCarrier)
+
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
 func (s *CarrierRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
 	// Arrange
 	existingCarrier := models.Carrier{
@@ -366,6 +423,11 @@ func (s *CarrierRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
 		Telephone:          "123-456789",
 		LocalityId:         1,
 	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("CID#01", 1, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
@@ -421,6 +483,11 @@ func (s *CarrierRepositoryTestSuite) TestPartialUpdate_Success() {
 		"telephone",
 		"locality_id",
 	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("NEW-CODE", id, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `carriers` WHERE `carriers`.`id` = ? ORDER BY `carriers`.`id` LIMIT ?",
@@ -482,6 +549,11 @@ func (s *CarrierRepositoryTestSuite) TestPartialUpdate_DatabaseErrorOnFirst() {
 	}
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("NEW-CODE", id, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `carriers` WHERE `carriers`.`id` = ? ORDER BY `carriers`.`id` LIMIT ?",
 	)).WithArgs(id, 1).
 		WillReturnError(gorm.ErrInvalidDB)
@@ -516,6 +588,11 @@ func (s *CarrierRepositoryTestSuite) TestPartialUpdate_ErrorNotFound() {
 		"telephone",
 		"locality_id",
 	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("NEW-CODE", id, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `carriers` WHERE `carriers`.`id` = ? ORDER BY `carriers`.`id` LIMIT ?",
@@ -562,6 +639,11 @@ func (s *CarrierRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
 	}
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("NEW-CODE", id, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `carriers` WHERE `carriers`.`id` = ? ORDER BY `carriers`.`id` LIMIT ?",
 	)).
 		WithArgs(id, 1).
@@ -599,6 +681,61 @@ func (s *CarrierRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
 		).
 		WillReturnError(gorm.ErrInvalidValue)
 	s.mock.ExpectRollback()
+
+	// Act
+	result, err := s.repo.PartialUpdate(id, fields)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Carrier{}, result)
+	s.NoError(s.mock.ExpectationsWereMet())
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *CarrierRepositoryTestSuite) TestPartialUpdate_CIdAlreadyExists() {
+	// Arrange
+	id := 1
+
+	fields := map[string]interface{}{
+		"cid":			"CID#01",
+		"company_name":	"LibreMercado",
+		"address":		"New Address",
+		"telephone":	"123-321",
+		"locality_id":	float64(2),
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("CID#01", id, 1).
+		WillReturnRows(s.mock.NewRows([]string{"1"}).AddRow(1))
+
+	// Act
+	result, err := s.repo.PartialUpdate(id, fields)
+
+	// Assert
+	s.Error(err)
+	s.Equal(models.Carrier{}, result)
+	s.NoError(s.mock.ExpectationsWereMet())
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *CarrierRepositoryTestSuite) TestPartialUpdate_ErrorOnCIdValidation() {
+	// Arrange
+	id := 1
+	fields := map[string]interface{}{
+		"cid":			"NEW-CODE",
+		"company_name":	"LibreMercado",
+		"address":		"New Address",
+		"telephone":	"123-321",
+		"locality_id":	float64(2),
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT 1 FROM `carriers` WHERE `carriers`.`cid` = ? AND `carriers`.`id` <> ? ORDER BY `carriers`.`id` LIMIT ?",
+	)).WithArgs("NEW-CODE", id, 1).
+		WillReturnError(gorm.ErrInvalidValue)
 
 	// Act
 	result, err := s.repo.PartialUpdate(id, fields)

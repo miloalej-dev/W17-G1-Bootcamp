@@ -11,6 +11,14 @@ type CarrierDefault struct {
 	rp repository.CarrierRepository
 }
 
+func (s *CarrierDefault) RetrieveAll() ([]models.Carrier, error) {
+	return s.rp.FindAll()
+}
+
+func (s *CarrierDefault) Retrieve(id int) (models.Carrier, error) {
+	return s.rp.FindById(id)
+}
+
 // NewCarrierDefault is a function that returns a new instance of CarrierDefault
 func NewCarrierDefault(rp repository.CarrierRepository) *CarrierDefault {
 	return &CarrierDefault{rp: rp}
@@ -18,4 +26,16 @@ func NewCarrierDefault(rp repository.CarrierRepository) *CarrierDefault {
 
 func (s *CarrierDefault) Register(entity models.Carrier) (models.Carrier, error) {
 	return s.rp.Create(entity)
+}
+
+func (s *CarrierDefault) Modify(entity models.Carrier) (models.Carrier, error) {
+	return s.rp.Update(entity)
+}
+
+func (s *CarrierDefault) PartialModify(id int, fields map[string]interface{}) (models.Carrier, error) {
+	return s.rp.PartialUpdate(id, fields)
+}
+
+func (s *CarrierDefault) Remove(id int) error {
+	return s.rp.Delete(id)
 }
