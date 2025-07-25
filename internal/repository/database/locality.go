@@ -148,7 +148,10 @@ func (l LocalityRepository) PartialUpdate(id int, fields map[string]interface{})
 
 func (l LocalityRepository) Delete(id int) error {
 	result := l.db.Delete(&models.Locality{}, id)
-	if result.RowsAffected < 1 {
+	switch {
+	case result.Error != nil:
+		return result.Error
+	case result.RowsAffected < 1:
 		return repository.ErrEntityNotFound
 	}
 	return nil
