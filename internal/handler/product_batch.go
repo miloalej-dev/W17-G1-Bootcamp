@@ -48,5 +48,4 @@ func (h *ProductBatchDefault) PostProductBatch(w http.ResponseWriter, r *http.Re
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(createdProductBatch, http.StatusCreated))
-	return
 }

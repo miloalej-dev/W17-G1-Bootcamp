@@ -15,18 +15,10 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the warehouses
-	LoaderFilePathEmployee string
-	// LoaderFilePath is the path to the file that contains the sections
-	LoaderFilePathSection string
 }
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
-	// loaderFilePathProducts is the path to the file that contains the buyers
-
-	loaderFilePathEmployee string
-	LoaderFilePathSection  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -39,20 +31,10 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePathEmployee != "" {
-			defaultConfig.LoaderFilePathEmployee = cfg.LoaderFilePathEmployee
-		}
-
-		if cfg.LoaderFilePathSection != "" {
-			defaultConfig.LoaderFilePathSection = cfg.LoaderFilePathSection
-		}
-
 	}
 
 	return &ServerChi{
-		serverAddress:          defaultConfig.ServerAddress,
-		loaderFilePathEmployee: defaultConfig.LoaderFilePathEmployee,
-		LoaderFilePathSection:  defaultConfig.LoaderFilePathSection,
+		serverAddress: defaultConfig.ServerAddress,
 	}
 }
 
@@ -65,7 +47,6 @@ func (a *ServerChi) Run() (err error) {
 		log.Fatal(err.Error())
 		return
 	}
-
 
 	// - repositories
 
@@ -86,7 +67,7 @@ func (a *ServerChi) Run() (err error) {
 
 	productRecordService := _default.NewProductRecordDefault(productRecordRepository)
 	productService := _default.NewProductDefault(productRepository)
-  	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
+	warehouseService := _default.NewWarehouseDefault(warehouseRepository)
 	carrierService := _default.NewCarrierDefault(carrierRepository)
 	productBatchService := _default.NewProductBatchDefault(productBatchRepository)
 	buyerService := _default.NewBuyerDefault(buyerRepository)

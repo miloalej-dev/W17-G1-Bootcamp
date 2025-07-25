@@ -16,19 +16,19 @@ type OrderDetailRequest struct {
 func (o *OrderDetailRequest) Bind(r *http.Request) error {
 
 	if o.Quantity == nil {
-		return errors.New("Quantity must not be null")
+		return errors.New("quantity must not be null")
 	}
 	if o.CleanLinesStatus == nil {
-		return errors.New("CleanLinesStatus must not be null")
+		return errors.New("clean line status must not be null")
 	}
 	if o.Temperature == nil {
-		return errors.New("Temperature must not be null")
+		return errors.New("temperature must not be null")
 	}
 	if o.ProductRecordID == nil {
-		return errors.New("ProductRecordID must not be null")
+		return errors.New("product record Id must not be null")
 	}
 	if o.PurchaseOrderID == nil {
-		return errors.New("PurchaseOrderID must not be null")
+		return errors.New("purchase order Id must not be null")
 	}
 	return nil
 }
