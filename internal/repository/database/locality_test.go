@@ -42,7 +42,7 @@ func (s *LocalityRepositoryTestSuite) SetupSuite() {
 	s.repo = NewLocalityRepository(s.db)
 }
 
-// Test Create - Caso exitoso: crea una locality
+// Test Create - Success
 func (s *LocalityRepositoryTestSuite) TestCreate_Success() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -58,7 +58,6 @@ func (s *LocalityRepositoryTestSuite) TestCreate_Success() {
 		CountryId: 1,
 	}
 
-	// Mock para buscar la provincia
 	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
 		AddRow(expectedProvince.Id, expectedProvince.Province, expectedProvince.CountryId)
 
@@ -66,10 +65,9 @@ func (s *LocalityRepositoryTestSuite) TestCreate_Success() {
 		WithArgs(newLocality.Province, newLocality.Country, 1).
 		WillReturnRows(provinceRows)
 
-	// Mock para crear la locality
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`id`,`locality`,`province_id`) VALUES (?,?,?)")).
-		WithArgs(newLocality.Id, newLocality.Locality, expectedProvince.Id).
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocality.Locality, expectedProvince.Id, newLocality.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
 
@@ -84,7 +82,7 @@ func (s *LocalityRepositoryTestSuite) TestCreate_Success() {
 	s.Equal(newLocality.Country, createdLocality.Country)
 }
 
-// Test Create - Province no encontrada
+// Test Create - Province notFound
 func (s *LocalityRepositoryTestSuite) TestCreate_ProvinceNotFound() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -94,7 +92,6 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ProvinceNotFound() {
 		Country:  "NonExistent Country",
 	}
 
-	// Mock para buscar provincia que no existe
 	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"})
 	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
 		WithArgs(newLocality.Province, newLocality.Country, 1).
@@ -109,7 +106,7 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ProvinceNotFound() {
 	s.Equal(models.LocalityDoc{}, createdLocality)
 }
 
-// Test Create - Error de base de datos al buscar provincia
+// Test Create - Error connected to db
 func (s *LocalityRepositoryTestSuite) TestCreate_ProvinceFindDatabaseError() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -133,7 +130,7 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ProvinceFindDatabaseError() {
 	s.Equal(models.LocalityDoc{}, createdLocality)
 }
 
-// Test Create - Locality ya existe (Duplicate Key)
+// Test Create - Locality al ready exist (Duplicate Key)
 func (s *LocalityRepositoryTestSuite) TestCreate_DuplicatedKey() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -159,8 +156,8 @@ func (s *LocalityRepositoryTestSuite) TestCreate_DuplicatedKey() {
 
 	// Mock para crear locality que ya existe
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`id`,`locality`,`province_id`) VALUES (?,?,?)")).
-		WithArgs(newLocality.Id, newLocality.Locality, expectedProvince.Id).
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocality.Locality, expectedProvince.Id, newLocality.Id).
 		WillReturnError(gorm.ErrDuplicatedKey)
 	s.mock.ExpectRollback()
 
@@ -173,7 +170,7 @@ func (s *LocalityRepositoryTestSuite) TestCreate_DuplicatedKey() {
 	s.Equal(models.LocalityDoc{}, createdLocality)
 }
 
-// Test Create - Foreign Key Violation
+// Test Create - Foreign key violation
 func (s *LocalityRepositoryTestSuite) TestCreate_ForeignKeyViolation() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -184,12 +181,11 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ForeignKeyViolation() {
 	}
 
 	expectedProvince := models.Province{
-		Id:        999, // ID que causará violación de FK
+		Id:        999,
 		Province:  "Buenos Aires",
 		CountryId: 999,
 	}
 
-	// Mock para buscar la provincia exitosamente
 	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
 		AddRow(expectedProvince.Id, expectedProvince.Province, expectedProvince.CountryId)
 
@@ -197,10 +193,9 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ForeignKeyViolation() {
 		WithArgs(newLocality.Province, newLocality.Country, 1).
 		WillReturnRows(provinceRows)
 
-	// Mock para crear locality con violación de FK
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`id`,`locality`,`province_id`) VALUES (?,?,?)")).
-		WithArgs(newLocality.Id, newLocality.Locality, expectedProvince.Id).
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocality.Locality, expectedProvince.Id, newLocality.Id).
 		WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
@@ -213,7 +208,7 @@ func (s *LocalityRepositoryTestSuite) TestCreate_ForeignKeyViolation() {
 	s.Equal(models.LocalityDoc{}, createdLocality)
 }
 
-// Test Create - Error genérico de base de datos durante creación
+// Test Create - Error generic database
 func (s *LocalityRepositoryTestSuite) TestCreate_DatabaseError() {
 	// Arrange
 	newLocality := models.LocalityDoc{
@@ -229,7 +224,6 @@ func (s *LocalityRepositoryTestSuite) TestCreate_DatabaseError() {
 		CountryId: 1,
 	}
 
-	// Mock para buscar la provincia exitosamente
 	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
 		AddRow(expectedProvince.Id, expectedProvince.Province, expectedProvince.CountryId)
 
@@ -239,8 +233,8 @@ func (s *LocalityRepositoryTestSuite) TestCreate_DatabaseError() {
 
 	// Mock para error genérico durante creación
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`id`,`locality`,`province_id`) VALUES (?,?,?)")).
-		WithArgs(newLocality.Id, newLocality.Locality, expectedProvince.Id).
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocality.Locality, expectedProvince.Id, newLocality.Id).
 		WillReturnError(sql.ErrConnDone)
 	s.mock.ExpectRollback()
 
