@@ -450,6 +450,77 @@ func (s *LocalityRepositoryTestSuite) TestFindAllLocality_DatabaseError() {
 	s.Nil(localities)
 }
 
+// Test FindLocalityBySeller - Success
+func (s *LocalityRepositoryTestSuite) TestFindLocalityBySeller_Success() {
+	// Arrange
+	localityId := 1
+	expectedLocality := models.LocalitySellerCount{
+		LocalityDoc: models.LocalityDoc{
+			Id:       1,
+			Locality: "Buenos Aires",
+			Province: "Buenos Aires",
+			Country:  "Argentina",
+		},
+		SellerCount: func() *int { count := 5; return &count }(),
+	}
+
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province", "country", "seller_count"}).
+		AddRow(expectedLocality.Id, expectedLocality.Locality, expectedLocality.Province, expectedLocality.Country, *expectedLocality.SellerCount)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id WHERE localities.id = ? GROUP BY localities.id, localities.locality, p.province, c.country")).
+		WithArgs(localityId).
+		WillReturnRows(localityRows)
+
+	// Act
+	locality, err := s.repo.FindLocalityBySeller(localityId)
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(expectedLocality.Id, locality.Id)
+	s.Equal(expectedLocality.Locality, locality.Locality)
+	s.Equal(expectedLocality.Province, locality.Province)
+	s.Equal(expectedLocality.Country, locality.Country)
+	s.Equal(*expectedLocality.SellerCount, *locality.SellerCount)
+}
+
+// Test FindLocalityBySeller - Entity Not Found (No Rows)
+func (s *LocalityRepositoryTestSuite) TestFindLocalityBySeller_EntityNotFound() {
+	// Arrange
+	localityId := 999
+
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province", "country", "seller_count"})
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id WHERE localities.id = ? GROUP BY localities.id, localities.locality, p.province, c.country")).
+		WithArgs(localityId).
+		WillReturnRows(localityRows)
+
+	// Act
+	locality, err := s.repo.FindLocalityBySeller(localityId)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrEntityNotFound, err)
+	s.Equal(models.LocalitySellerCount{}, locality)
+}
+
+// Test FindLocalityBySeller - Database Error
+func (s *LocalityRepositoryTestSuite) TestFindLocalityBySeller_DatabaseError() {
+	// Arrange
+	localityId := 1
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id WHERE localities.id = ? GROUP BY localities.id, localities.locality, p.province, c.country")).
+		WithArgs(localityId).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	locality, err := s.repo.FindLocalityBySeller(localityId)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.LocalitySellerCount{}, locality)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
