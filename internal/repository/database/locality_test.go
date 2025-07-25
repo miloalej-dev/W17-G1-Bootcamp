@@ -372,305 +372,82 @@ func (s *LocalityRepositoryTestSuite) TestFindAll_DatabaseError() {
 	s.Nil(localities)
 }
 
-// Test Update - Success
-func (s *LocalityRepositoryTestSuite) TestUpdate_Success() {
+// Test FindAllLocality - Success
+func (s *LocalityRepositoryTestSuite) TestFindAllLocality_Success() {
 	// Arrange
-	localityToUpdate := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires Updated",
-		ProvinceId: 1,
+	expectedLocalities := []models.LocalitySellerCount{
+		{
+			LocalityDoc: models.LocalityDoc{
+				Id:       1,
+				Locality: "Buenos Aires",
+				Province: "Buenos Aires",
+				Country:  "Argentina",
+			},
+			SellerCount: func() *int { count := 5; return &count }(),
+		},
+		{
+			LocalityDoc: models.LocalityDoc{
+				Id:       2,
+				Locality: "Córdoba",
+				Province: "Córdoba",
+				Country:  "Argentina",
+			},
+			SellerCount: func() *int { count := 3; return &count }(),
+		},
 	}
 
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
-		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	s.mock.ExpectCommit()
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province", "country", "seller_count"}).
+		AddRow(expectedLocalities[0].Id, expectedLocalities[0].Locality, expectedLocalities[0].Province, expectedLocalities[0].Country, *expectedLocalities[0].SellerCount).
+		AddRow(expectedLocalities[1].Id, expectedLocalities[1].Locality, expectedLocalities[1].Province, expectedLocalities[1].Country, *expectedLocalities[1].SellerCount)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id GROUP BY localities.id, localities.locality, p.province, c.country")).
+		WillReturnRows(localityRows)
 
 	// Act
-	updatedLocality, err := s.repo.Update(localityToUpdate)
+	localities, err := s.repo.FindAllLocality()
 
 	// Asserts
 	s.NoError(err)
-	s.Equal(localityToUpdate.Id, updatedLocality.Id)
-	s.Equal(localityToUpdate.Locality, updatedLocality.Locality)
-	s.Equal(localityToUpdate.ProvinceId, updatedLocality.ProvinceId)
+	s.Len(localities, 2)
+	s.Equal(expectedLocalities[0].Id, localities[0].Id)
+	s.Equal(expectedLocalities[0].Locality, localities[0].Locality)
+	s.Equal(expectedLocalities[0].Province, localities[0].Province)
+	s.Equal(expectedLocalities[0].Country, localities[0].Country)
+	s.Equal(*expectedLocalities[0].SellerCount, *localities[0].SellerCount)
+	s.Equal(expectedLocalities[1].Id, localities[1].Id)
+	s.Equal(expectedLocalities[1].Locality, localities[1].Locality)
 }
 
-// Test Update - Foreign Key Violation
-func (s *LocalityRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
+// Test FindAllLocality - Success Empty Result
+func (s *LocalityRepositoryTestSuite) TestFindAllLocality_SuccessEmptyResult() {
 	// Arrange
-	localityToUpdate := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires",
-		ProvinceId: 999, // Province ID que no existe
-	}
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province", "country", "seller_count"})
 
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
-		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
-		WillReturnError(gorm.ErrForeignKeyViolated)
-	s.mock.ExpectRollback()
-
-	// Act
-	updatedLocality, err := s.repo.Update(localityToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(repository.ErrForeignKeyViolation, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test Update - Database Error
-func (s *LocalityRepositoryTestSuite) TestUpdate_DatabaseError() {
-	// Arrange
-	localityToUpdate := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires",
-		ProvinceId: 1,
-	}
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=?,`province_id`=? WHERE `id` = ?")).
-		WithArgs(localityToUpdate.Locality, localityToUpdate.ProvinceId, localityToUpdate.Id).
-		WillReturnError(sql.ErrConnDone)
-	s.mock.ExpectRollback()
-
-	// Act
-	updatedLocality, err := s.repo.Update(localityToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(sql.ErrConnDone, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test PartialUpdate - Success
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_Success() {
-	// Arrange
-	localityId := 1
-	fieldsToUpdate := map[string]interface{}{
-		"locality": "Buenos Aires Updated",
-	}
-
-	existingLocality := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires",
-		ProvinceId: 1,
-	}
-
-	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"}).
-		AddRow(existingLocality.Id, existingLocality.Locality, existingLocality.ProvinceId)
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id GROUP BY localities.id, localities.locality, p.province, c.country")).
 		WillReturnRows(localityRows)
 
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=? WHERE `id` = ?")).
-		WithArgs(fieldsToUpdate["locality"], localityId).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	s.mock.ExpectCommit()
-
 	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
+	localities, err := s.repo.FindAllLocality()
 
 	// Asserts
 	s.NoError(err)
-	s.Equal(localityId, updatedLocality.Id)
-	s.Equal(fieldsToUpdate["locality"], updatedLocality.Locality)
-	s.Equal(existingLocality.ProvinceId, updatedLocality.ProvinceId)
+	s.Empty(localities)
+	s.Len(localities, 0)
 }
 
-// Test PartialUpdate - Entity Not Found
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_EntityNotFound() {
+// Test FindAllLocality - Database Error
+func (s *LocalityRepositoryTestSuite) TestFindAllLocality_DatabaseError() {
 	// Arrange
-	localityId := 999
-	fieldsToUpdate := map[string]interface{}{
-		"locality": "Non Existent",
-	}
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
-		WillReturnError(gorm.ErrRecordNotFound)
-
-	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(repository.ErrEntityNotFound, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test PartialUpdate - Find Database Error
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_FindDatabaseError() {
-	// Arrange
-	localityId := 1
-	fieldsToUpdate := map[string]interface{}{
-		"locality": "Buenos Aires Updated",
-	}
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT localities.id as id, localities.locality as locality, p.province as province, c.country as country, COUNT(DISTINCT s.id) as seller_count FROM `localities` JOIN provinces p ON localities.province_id = p.id JOIN countries c ON p.country_id = c.id LEFT JOIN sellers s ON localities.id = s.locality_id GROUP BY localities.id, localities.locality, p.province, c.country")).
 		WillReturnError(sql.ErrConnDone)
 
 	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
+	localities, err := s.repo.FindAllLocality()
 
 	// Asserts
 	s.Error(err)
 	s.Equal(sql.ErrConnDone, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test PartialUpdate - Find Foreign Key Violation
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_FindForeignKeyViolation() {
-	// Arrange
-	localityId := 1
-	fieldsToUpdate := map[string]interface{}{
-		"locality": "Buenos Aires Updated",
-	}
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
-		WillReturnError(gorm.ErrForeignKeyViolated)
-
-	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(repository.ErrForeignKeyViolation, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test PartialUpdate - Update Foreign Key Violation
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_UpdateForeignKeyViolation() {
-	// Arrange
-	localityId := 1
-	fieldsToUpdate := map[string]interface{}{
-		"province_id": 999, // Province ID que no existe
-	}
-
-	existingLocality := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires",
-		ProvinceId: 1,
-	}
-
-	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"}).
-		AddRow(existingLocality.Id, existingLocality.Locality, existingLocality.ProvinceId)
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
-		WillReturnRows(localityRows)
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `province_id`=? WHERE `id` = ?")).
-		WithArgs(fieldsToUpdate["province_id"], localityId).
-		WillReturnError(gorm.ErrForeignKeyViolated)
-	s.mock.ExpectRollback()
-
-	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(repository.ErrForeignKeyViolation, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test PartialUpdate - Update Database Error
-func (s *LocalityRepositoryTestSuite) TestPartialUpdate_UpdateDatabaseError() {
-	// Arrange
-	localityId := 1
-	fieldsToUpdate := map[string]interface{}{
-		"locality": "Buenos Aires Updated",
-	}
-
-	existingLocality := models.Locality{
-		Id:         1,
-		Locality:   "Buenos Aires",
-		ProvinceId: 1,
-	}
-
-	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"}).
-		AddRow(existingLocality.Id, existingLocality.Locality, existingLocality.ProvinceId)
-
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities` WHERE `localities`.`id` = ? ORDER BY `localities`.`id` LIMIT ?")).
-		WithArgs(localityId, 1).
-		WillReturnRows(localityRows)
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `localities` SET `locality`=? WHERE `id` = ?")).
-		WithArgs(fieldsToUpdate["locality"], localityId).
-		WillReturnError(sql.ErrConnDone)
-	s.mock.ExpectRollback()
-
-	// Act
-	updatedLocality, err := s.repo.PartialUpdate(localityId, fieldsToUpdate)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(sql.ErrConnDone, err)
-	s.Equal(models.Locality{}, updatedLocality)
-}
-
-// Test Delete - Success
-func (s *LocalityRepositoryTestSuite) TestDelete_Success() {
-	// Arrange
-	localityId := 1
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
-		WithArgs(localityId).
-		WillReturnResult(sqlmock.NewResult(1, 1)) // 1 row affected
-	s.mock.ExpectCommit()
-
-	// Act
-	err := s.repo.Delete(localityId)
-
-	// Asserts
-	s.NoError(err)
-}
-
-// Test Delete - Entity Not Found
-func (s *LocalityRepositoryTestSuite) TestDelete_EntityNotFound() {
-	// Arrange
-	localityId := 999
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
-		WithArgs(localityId).
-		WillReturnResult(sqlmock.NewResult(1, 0)) // 0 rows affected
-	s.mock.ExpectCommit()
-
-	// Act
-	err := s.repo.Delete(localityId)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(repository.ErrEntityNotFound, err)
-}
-
-// Test Delete - Database Error
-func (s *LocalityRepositoryTestSuite) TestDelete_DatabaseError() {
-	// Arrange
-	localityId := 1
-
-	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
-		WithArgs(localityId).
-		WillReturnError(sql.ErrConnDone)
-	s.mock.ExpectRollback()
-
-	// Act
-	err := s.repo.Delete(localityId)
-
-	// Asserts
-	s.Error(err)
-	s.Equal(sql.ErrConnDone, err)
+	s.Nil(localities)
 }
 
 func TestLocalityRepositoryTestSuite(t *testing.T) {
