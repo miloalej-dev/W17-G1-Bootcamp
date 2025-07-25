@@ -157,8 +157,9 @@ func (s *WarehouseRepositoryTestSuite) TestFindById_Success() {
 			expectedWarehouse.LocalityId,
 		)
 
-	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `warehouses` WHERE `warehouses`.`id` = ? ORDER BY `warehouses`.`id` LIMIT ?")).
-		WithArgs(1, 1).WillReturnRows(rows)
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT * FROM `warehouses` WHERE `warehouses`.`id` = ? ORDER BY `warehouses`.`id` LIMIT ?",
+	)).  WithArgs(1, 1).WillReturnRows(rows)
 
 	// Act
 	warehouse, err := s.repo.FindById(1)
@@ -185,6 +186,8 @@ func (s *WarehouseRepositoryTestSuite) TestFindById_NotFound() {
 	s.Error(err)
 	s.Equal(gorm.ErrRecordNotFound, err)
 	s.Equal(models.Warehouse{}, result)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestCreate_Success() {
@@ -199,9 +202,11 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_Success() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)")).
-		WithArgs(newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.mock.ExpectExec(regexp.QuoteMeta(
+		"INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)",
+	)).WithArgs(
+		newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId,
+	).WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
 
 	// Act
@@ -222,7 +227,6 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_Success() {
 func (s *WarehouseRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	// Arrange
 	newWarehouse := models.Warehouse{
-		//Id:					1,
 		WarehouseCode:      "CID#01",
 		Address:            "Boulevard",
 		Telephone:          "123-456789",
@@ -232,9 +236,11 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)")).
-		WithArgs(newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId).
-		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectExec(regexp.QuoteMeta(
+		"INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)",
+	)).WithArgs(
+		newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId,
+	).WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -248,10 +254,9 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_ForeignKeyViolated() {
 	s.NoError(err)
 }
 
-func (s *WarehouseRepositoryTestSuite) TestCreate_AnotherGormError() {
+func (s *WarehouseRepositoryTestSuite) TestCreate_ErrorOnSave() {
 	// Arrange
 	newWarehouse := models.Warehouse{
-		//Id:					1,
 		WarehouseCode:      "CID#01",
 		Address:            "Boulevard",
 		Telephone:          "123-456789",
@@ -261,9 +266,11 @@ func (s *WarehouseRepositoryTestSuite) TestCreate_AnotherGormError() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)")).
-		WithArgs(newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId).
-		WillReturnError(gorm.ErrInvalidValue)
+	s.mock.ExpectExec(regexp.QuoteMeta(
+		"INSERT INTO `warehouses` (`warehouse_code`,`address`,`telephone`,`minimum_capacity`,`minimum_temperature`,`locality_id`) VALUES (?,?,?,?,?,?)",
+	)).WithArgs(
+		newWarehouse.WarehouseCode, newWarehouse.Address, newWarehouse.Telephone, newWarehouse.MinimumCapacity, newWarehouse.MinimumTemperature, newWarehouse.LocalityId,
+	).WillReturnError(gorm.ErrInvalidValue)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -289,7 +296,6 @@ func (s *WarehouseRepositoryTestSuite) TestUpdate_Success() {
 		LocalityId:         1,
 	}
 
-	// Match the UPDATE SQL GORM will use
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
 		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?",
@@ -303,7 +309,7 @@ func (s *WarehouseRepositoryTestSuite) TestUpdate_Success() {
 			existingWarehouse.LocalityId,
 			existingWarehouse.Id,
 		).
-		WillReturnResult(sqlmock.NewResult(1, 1)) // result: row affected
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	s.mock.ExpectCommit()
 
@@ -314,7 +320,6 @@ func (s *WarehouseRepositoryTestSuite) TestUpdate_Success() {
 	s.NoError(err)
 	s.Equal(existingWarehouse, updatedWarehouse)
 
-	// Verify all expectations were met
 	err = s.mock.ExpectationsWereMet()
 	s.NoError(err)
 }
@@ -331,7 +336,6 @@ func (s *WarehouseRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
 		LocalityId:         1,
 	}
 
-	// Match the UPDATE SQL GORM will use
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
 		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?",
@@ -355,7 +359,6 @@ func (s *WarehouseRepositoryTestSuite) TestUpdate_ForeignKeyViolation() {
 	s.Error(err)
 	s.Equal(models.Warehouse{}, updatedWarehouse)
 
-	// Verify all expectations were met
 	err = s.mock.ExpectationsWereMet()
 	s.NoError(err)
 }
@@ -373,22 +376,25 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_Success() {
 		LocalityId:         1,
 	}
 
-	// These are the fields we'll update
 	fields := map[string]interface{}{
-		"code":               "NEW-CODE",
-		"address":            "New Address",
-		"telephone":		  "123-321",
-		"minimum_capacity":   float64(99), // float64 is common from JSON/mapstructure
-		"minimum_temperature": float64(5),
+		"code":					"NEW-CODE",
+		"address":				"New Address",
+		"telephone":			"123-321",
+		"minimum_capacity":		float64(99),
+		"minimum_temperature":	float64(5),
 		"locality_id":			float64(2),
 	}
 
 	columns := []string{
-		"id", "warehouse_code", "address", "telephone",
-		"minimum_capacity", "minimum_temperature", "locality_id",
+		"id",
+		"warehouse_code",
+		"address",
+		"telephone",
+		"minimum_capacity",
+		"minimum_temperature",
+		"locality_id",
 	}
 
-	// Mock the SELECT FROM warehouses WHERE id=?
 	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `warehouses` WHERE `warehouses`.`id` = ? ORDER BY `warehouses`.`id` LIMIT ?",
 	)).WithArgs(id, 1).
@@ -404,22 +410,20 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_Success() {
 			),
 		)
 
-	// The updated struct as expected in DB after field change
 	expectedUpdatedWarehouse := models.Warehouse{
-		Id:                 id,
-		WarehouseCode:      "NEW-CODE",
-		Address:            "New Address",
-		Telephone:          "123-321",
-		MinimumCapacity:    99,
-		MinimumTemperature: 5,
-		LocalityId:         2,
+		Id:					id,
+		WarehouseCode:		"NEW-CODE",
+		Address:			"New Address",
+		Telephone:			"123-321",
+		MinimumCapacity:	99,
+		MinimumTemperature:	5,
+		LocalityId:			2,
 	}
 
-	// Mock the UPDATE. GORM uses UPDATE with SET ... WHERE id = ?
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
-		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?")).
-		WithArgs(
+		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?",
+	)).WithArgs(
 			expectedUpdatedWarehouse.WarehouseCode,
 			expectedUpdatedWarehouse.Address,
 			expectedUpdatedWarehouse.Telephone,
@@ -434,21 +438,23 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_Success() {
 	// Act
 	result, err := s.repo.PartialUpdate(id, fields)
 
-	// Assert
 	s.NoError(err)
 	s.Equal(expectedUpdatedWarehouse, result)
+
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_DatabaseErrorOnFirst() {
 	// Arrange
 	id := 1
 	fields := map[string]any{
-		"code":     		  "CID#01",
-		"address":            "Boulevard plaza",
-		"telephone":          "123-456789",
-		"minimum_capacity":    float64(200),
-		"minimum_temperature": float64(15),
-		"locality_id":         float64(1),
+		"code":					"CID#01",
+		"address":				"Boulevard plaza",
+		"telephone":			"123-456789",
+		"minimum_capacity":		float64(200),
+		"minimum_temperature":	float64(15),
+		"locality_id":			float64(1),
 	}
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
@@ -471,17 +477,22 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorNotFound() {
 	// Arrange
 	id := 1111
 	fields := map[string]any{
-		"code":     		  "CID#01",
-		"address":            "Boulevard plaza",
-		"telephone":          "123-456789",
-		"minimum_capacity":    float64(200),
-		"minimum_temperature": float64(15),
-		"locality_id":         float64(1),
+		"code":					"CID#01",
+		"address":				"Boulevard plaza",
+		"telephone":			"123-456789",
+		"minimum_capacity":		float64(200),
+		"minimum_temperature":	float64(15),
+		"locality_id":			float64(1),
 	}
 
 	columns := []string{
-		"id", "warehouse_code", "address", "telephone",
-		"minimum_capacity", "minimum_temperature", "locality_id",
+		"id",
+		"warehouse_code",
+		"address",
+		"telephone",
+		"minimum_capacity",
+		"minimum_temperature",
+		"locality_id",
 	}
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(
@@ -512,22 +523,25 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
 		LocalityId:         1,
 	}
 
-	// These are the fields we'll update
 	fields := map[string]interface{}{
-		"code":               "NEW-CODE",
-		"address":            "New Address",
-		"telephone":		  "123-321",
-		"minimum_capacity":   float64(99), // float64 is common from JSON/mapstructure
-		"minimum_temperature": float64(5),
+		"code":					"NEW-CODE",
+		"address":				"New Address",
+		"telephone":			"123-321",
+		"minimum_capacity":		float64(99),
+		"minimum_temperature":	float64(5),
 		"locality_id":			float64(2),
 	}
 
 	columns := []string{
-		"id", "warehouse_code", "address", "telephone",
-		"minimum_capacity", "minimum_temperature", "locality_id",
+		"id",
+		"warehouse_code",
+		"address",
+		"telephone",
+		"minimum_capacity",
+		"minimum_temperature",
+		"locality_id",
 	}
 
-	// Mock the SELECT FROM warehouses WHERE id=?
 	s.mock.ExpectQuery(regexp.QuoteMeta(
 		"SELECT * FROM `warehouses` WHERE `warehouses`.`id` = ? ORDER BY `warehouses`.`id` LIMIT ?",
 	)).WithArgs(id, 1).
@@ -543,22 +557,20 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
 			),
 		)
 
-	// The updated struct as expected in DB after field change
 	expectedUpdatedWarehouse := models.Warehouse{
-		Id:                 id,
-		WarehouseCode:      "NEW-CODE",
-		Address:            "New Address",
-		Telephone:          "123-321",
-		MinimumCapacity:    99,
-		MinimumTemperature: 5,
-		LocalityId:         2,
+		Id:					id,
+		WarehouseCode:		"NEW-CODE",
+		Address:			"New Address",
+		Telephone:			"123-321",
+		MinimumCapacity:	99,
+		MinimumTemperature:	5,
+		LocalityId:			2,
 	}
 
-	// Mock the UPDATE. GORM uses UPDATE with SET ... WHERE id = ?
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
-		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?")).
-		WithArgs(
+		"UPDATE `warehouses` SET `warehouse_code`=?,`address`=?,`telephone`=?,`minimum_capacity`=?,`minimum_temperature`=?,`locality_id`=? WHERE `id` = ?",
+	)).WithArgs(
 			expectedUpdatedWarehouse.WarehouseCode,
 			expectedUpdatedWarehouse.Address,
 			expectedUpdatedWarehouse.Telephone,
@@ -576,18 +588,23 @@ func (s *WarehouseRepositoryTestSuite) TestPartialUpdate_ErrorOnSave() {
 	// Assert
 	s.Error(err)
 	s.Equal(models.Warehouse{}, result)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 }
 
 func (s *WarehouseRepositoryTestSuite) TestDelete_Success() {
 	// Arrange
 	warehouseID := 1
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `warehouses` WHERE `warehouses`.`id` = ?")).
-		WithArgs(warehouseID).
+	s.mock.ExpectExec(regexp.QuoteMeta(
+		"DELETE FROM `warehouses` WHERE `warehouses`.`id` = ?",
+	)).WithArgs(warehouseID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
+
 	// Act
 	err := s.repo.Delete(warehouseID)
+
 	// Assert
 	s.NoError(err)
 	err = s.mock.ExpectationsWereMet()
@@ -599,9 +616,10 @@ func (s *WarehouseRepositoryTestSuite) TestDelete_NotFound() {
 	warehouseID := 999
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `warehouses` WHERE `warehouses`.`id` = ?")).
-		WithArgs(warehouseID).
-		WillReturnResult(sqlmock.NewResult(1, 0)) // 0 rows affected
+	s.mock.ExpectExec(regexp.QuoteMeta(
+		"DELETE FROM `warehouses` WHERE `warehouses`.`id` = ?",
+	)).WithArgs(warehouseID).
+		WillReturnResult(sqlmock.NewResult(1, 0))
 	s.mock.ExpectCommit()
 
 	// Act
