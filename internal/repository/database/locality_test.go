@@ -617,6 +617,62 @@ func (s *LocalityRepositoryTestSuite) TestPartialUpdate_UpdateDatabaseError() {
 	s.Equal(models.Locality{}, updatedLocality)
 }
 
+// Test Delete - Success
+func (s *LocalityRepositoryTestSuite) TestDelete_Success() {
+	// Arrange
+	localityId := 1
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
+		WithArgs(localityId).
+		WillReturnResult(sqlmock.NewResult(1, 1)) // 1 row affected
+	s.mock.ExpectCommit()
+
+	// Act
+	err := s.repo.Delete(localityId)
+
+	// Asserts
+	s.NoError(err)
+}
+
+// Test Delete - Entity Not Found
+func (s *LocalityRepositoryTestSuite) TestDelete_EntityNotFound() {
+	// Arrange
+	localityId := 999
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
+		WithArgs(localityId).
+		WillReturnResult(sqlmock.NewResult(1, 0)) // 0 rows affected
+	s.mock.ExpectCommit()
+
+	// Act
+	err := s.repo.Delete(localityId)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrEntityNotFound, err)
+}
+
+// Test Delete - Database Error
+func (s *LocalityRepositoryTestSuite) TestDelete_DatabaseError() {
+	// Arrange
+	localityId := 1
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `localities` WHERE `localities`.`id` = ?")).
+		WithArgs(localityId).
+		WillReturnError(sql.ErrConnDone)
+	s.mock.ExpectRollback()
+
+	// Act
+	err := s.repo.Delete(localityId)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
