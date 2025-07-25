@@ -370,11 +370,34 @@ func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_NotFound() {
 	s.Equal(models.Employee{}, updatedEmployee)
 }
 
-func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_UpdateErrorGeneric() {
+// Test PartialUpdate - Error genérico durante la búsqueda inicial (NO record not found)
+func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_FindDatabaseError() {
 	// Arrange
 	employeeId := 1
 	fields := map[string]interface{}{
 		"first_name": "John Updated",
+	}
+
+	// Simula un error de conexión durante la búsqueda inicial
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `employees` WHERE `employees`.`id` = ? ORDER BY `employees`.`id` LIMIT ?")).
+		WithArgs(employeeId, 1).
+		WillReturnError(sql.ErrConnDone) // Error genérico de BD, NO gorm.ErrRecordNotFound
+
+	// Act
+	updatedEmployee, err := s.repo.PartialUpdate(employeeId, fields)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err) // Debe retornar el error original
+	s.Equal(models.Employee{}, updatedEmployee)
+}
+
+// Test PartialUpdate - Error de Foreign Key durante Updates
+func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_ForeignKeyViolation() {
+	// Arrange
+	employeeId := 1
+	fields := map[string]interface{}{
+		"warehouse_id": 999, // Warehouse ID que no existe
 	}
 
 	existingEmployee := models.Employee{
@@ -393,11 +416,11 @@ func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_UpdateErrorGeneric() {
 		WithArgs(employeeId, 1).
 		WillReturnRows(rows)
 
-	// Falla en la actualización con un error genérico (NO foreign key)
+	// Falla en la actualización por foreign key
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `employees` SET `first_name`=? WHERE `id` = ?")).
-		WithArgs(fields["first_name"], employeeId).
-		WillReturnError(sql.ErrTxDone) // Error genérico diferente a ForeignKey
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `employees` SET `warehouse_id`=? WHERE `id` = ?")).
+		WithArgs(fields["warehouse_id"], employeeId).
+		WillReturnError(gorm.ErrForeignKeyViolated)
 	s.mock.ExpectRollback()
 
 	// Act
@@ -405,7 +428,7 @@ func (s *EmployeeRepositoryTestSuite) TestPartialUpdate_UpdateErrorGeneric() {
 
 	// Asserts
 	s.Error(err)
-	s.Equal(sql.ErrTxDone, err)
+	s.Equal(repository.ErrForeignKeyViolation, err)
 	s.Equal(models.Employee{}, updatedEmployee)
 }
 
