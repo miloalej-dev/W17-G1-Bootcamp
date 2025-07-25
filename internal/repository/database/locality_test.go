@@ -305,6 +305,73 @@ func (s *LocalityRepositoryTestSuite) TestFindById_DatabaseError() {
 	s.Equal(models.Locality{}, locality)
 }
 
+// Test FindAll - Success
+func (s *LocalityRepositoryTestSuite) TestFindAll_Success() {
+	// Arrange
+	expectedLocalities := []models.Locality{
+		{
+			Id:         1,
+			Locality:   "Buenos Aires",
+			ProvinceId: 1,
+		},
+		{
+			Id:         2,
+			Locality:   "Córdoba",
+			ProvinceId: 2,
+		},
+	}
+
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"}).
+		AddRow(expectedLocalities[0].Id, expectedLocalities[0].Locality, expectedLocalities[0].ProvinceId).
+		AddRow(expectedLocalities[1].Id, expectedLocalities[1].Locality, expectedLocalities[1].ProvinceId)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities`")).
+		WillReturnRows(localityRows)
+
+	// Act
+	localities, err := s.repo.FindAll()
+
+	// Asserts
+	s.NoError(err)
+	s.Len(localities, 2)
+	s.Equal(expectedLocalities[0].Id, localities[0].Id)
+	s.Equal(expectedLocalities[0].Locality, localities[0].Locality)
+	s.Equal(expectedLocalities[1].Id, localities[1].Id)
+	s.Equal(expectedLocalities[1].Locality, localities[1].Locality)
+}
+
+// Test FindAll - Success Empty Result
+func (s *LocalityRepositoryTestSuite) TestFindAll_SuccessEmptyResult() {
+	// Arrange
+	localityRows := sqlmock.NewRows([]string{"id", "locality", "province_id"})
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities`")).
+		WillReturnRows(localityRows)
+
+	// Act
+	localities, err := s.repo.FindAll()
+
+	// Asserts
+	s.NoError(err)
+	s.Empty(localities)
+	s.Len(localities, 0)
+}
+
+// Test FindAll - Database Error
+func (s *LocalityRepositoryTestSuite) TestFindAll_DatabaseError() {
+	// Arrange
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `localities`")).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	localities, err := s.repo.FindAll()
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Nil(localities)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
