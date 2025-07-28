@@ -35,6 +35,9 @@ func (i *InboundOrderRepository) FindById(id int) (models.InboundOrder, error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.InboundOrder{}, repository.ErrEntityNotFound
 	}
+	if result.Error != nil {
+		return models.InboundOrder{}, result.Error
+	}
 
 	return inboundOrder, nil
 }
@@ -96,7 +99,7 @@ func (i *InboundOrderRepository) PartialUpdate(id int, fields map[string]interfa
 func (i *InboundOrderRepository) Delete(id int) error {
 	result := i.db.Delete(&models.InboundOrder{}, id)
 
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if result.RowsAffected < 1 {
 		return repository.ErrEntityNotFound
 	}
 
