@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"net/http"
@@ -298,6 +299,53 @@ func (s *WarehouseHandlerTestSuite) TestPostWarehouse_BadRequest_MissingCode() {
 	}
 	expectedResponse := response.Response{Message: "warehouse code must not be null", StatusCode: http.StatusBadRequest}
 	expectedBody, _ = json.Marshal(expectedResponse)
+
+	requestBodyBytes, _ := json.Marshal(requestBody)
+	request := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBuffer(requestBodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.PostWarehouse(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+
+	// Assert
+	s.Equal(http.StatusBadRequest, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *WarehouseHandlerTestSuite) TestPostWarehouse_LocalityNotFound() {
+	// Arrange
+	var expectedBody []byte
+	warehouseCode := "AAA-111"
+	address := "Boulevard"
+	telephone := "123-456789"
+	minimumCapacity := 10
+	minimumTemperature := 10
+	localityId := 11111
+
+	requestBody := map[string]interface{}{
+		"warehouse_code":		warehouseCode,
+		"address":				address,
+		"telephone":			telephone,
+		"minimum_capacity":		minimumCapacity,
+		"minimum_temperature":	minimumTemperature,
+		"locality_id":			localityId,
+	}
+
+
+	expectedError := repository.ErrLocalityNotFound
+
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusBadRequest}
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	inputWarehouse := models.Warehouse{
+		WarehouseCode: warehouseCode, Address: address, Telephone: telephone, MinimumCapacity: minimumCapacity, MinimumTemperature: minimumTemperature, LocalityId: localityId,
+	}
+
+	s.mock.On("Register", inputWarehouse).Return(models.Warehouse{}, expectedError)
 
 	requestBodyBytes, _ := json.Marshal(requestBody)
 	request := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBuffer(requestBodyBytes))
@@ -713,6 +761,41 @@ func (s *WarehouseHandlerTestSuite) TestPatchWarehouse_BadRequest() {
 	expectedBody, _ = json.Marshal(expectedResponse)
 
 	request := httptest.NewRequest(http.MethodPatch, fmt.Sprint(s.path, "/", id), bytes.NewBuffer([]byte("invalid json")))
+	request.Header.Set("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	// Add chi context for URL parameters
+	ctx := chi.NewRouteContext()
+	ctx.URLParams.Add("id", strconv.Itoa(id))
+	request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, ctx))
+
+	// Act
+	s.handler.PatchWarehouse(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+
+	// Assert
+	s.Equal(http.StatusBadRequest, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *WarehouseHandlerTestSuite) TestPatchWarehouse_LocalityNotFound() {
+	// Arrange
+	var expectedBody []byte
+	id := 1
+	fields := map[string]interface{}{
+		"address": "Partially Updated Company",
+	}
+
+	expectedError := repository.ErrEntityNotFound
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusInternalServerError}
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	s.mock.On("PartialModify", id, fields).Return(models.Warehouse{}, expectedError)
+
+	requestBodyBytes, _ := json.Marshal(fields)
+	request := httptest.NewRequest(http.MethodPatch, fmt.Sprint(s.path, "/", id), bytes.NewBuffer(requestBodyBytes))
 	request.Header.Set("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
 
