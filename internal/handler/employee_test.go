@@ -804,6 +804,154 @@ func (s *EmployeeHandlerTestSuite) TestDeleteEmployee_InternalError() {
 	s.JSONEq(string(expectedBody), recorder.Body.String())
 }
 
+// GetInboundOrdersReport tests
+
+func (s *EmployeeHandlerTestSuite) TestGetInboundOrdersReport_AllEmployees_Ok() {
+	// Arrange
+	var expectedBody []byte
+	expectedReports := []models.EmployeeInboundOrdersReport{
+		{
+			Employee: models.Employee{
+				Id:           1,
+				CardNumberId: "123456789",
+				FirstName:    "John",
+				LastName:     "Doe",
+				WarehouseId:  1,
+			},
+			InboundOrdersCount: 5,
+		},
+		{
+			Employee: models.Employee{
+				Id:           2,
+				CardNumberId: "987654321",
+				FirstName:    "Jane",
+				LastName:     "Smith",
+				WarehouseId:  2,
+			},
+			InboundOrdersCount: 3,
+		},
+	}
+
+	expectedResponse := response.Response{Data: expectedReports, StatusCode: http.StatusOK}
+
+	s.mock.On("RetrieveInboundOrdersReport").Return(expectedReports, nil)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(s.path, "/reportInboundOrders"), nil)
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetInboundOrdersReport(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	s.Equal(http.StatusOK, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *EmployeeHandlerTestSuite) TestGetInboundOrdersReport_AllEmployees_InternalError() {
+	// Arrange
+	var expectedBody []byte
+	expectedError := errors.New("database connection failed")
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusInternalServerError}
+
+	s.mock.On("RetrieveInboundOrdersReport").Return([]models.EmployeeInboundOrdersReport{}, expectedError)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(s.path, "/reportInboundOrders"), nil)
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetInboundOrdersReport(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	s.Equal(http.StatusInternalServerError, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *EmployeeHandlerTestSuite) TestGetInboundOrdersReport_SpecificEmployee_Ok() {
+	// Arrange
+	var expectedBody []byte
+	employeeId := 1
+	expectedReport := models.EmployeeInboundOrdersReport{
+		Employee: models.Employee{
+			Id:           1,
+			CardNumberId: "123456789",
+			FirstName:    "John",
+			LastName:     "Doe",
+			WarehouseId:  1,
+		},
+		InboundOrdersCount: 5,
+	}
+
+	expectedResponse := response.Response{Data: expectedReport, StatusCode: http.StatusOK}
+
+	s.mock.On("RetrieveInboundOrdersReportById", employeeId).Return(expectedReport, nil)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(s.path, "/reportInboundOrders?id=", employeeId), nil)
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetInboundOrdersReport(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	s.Equal(http.StatusOK, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *EmployeeHandlerTestSuite) TestGetInboundOrdersReport_SpecificEmployee_NotFound() {
+	// Arrange
+	var expectedBody []byte
+	employeeId := 999
+	expectedError := errors.New("employee not found")
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusNotFound}
+
+	s.mock.On("RetrieveInboundOrdersReportById", employeeId).Return(models.EmployeeInboundOrdersReport{}, expectedError)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(s.path, "/reportInboundOrders?id=", employeeId), nil)
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetInboundOrdersReport(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	s.Equal(http.StatusNotFound, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (s *EmployeeHandlerTestSuite) TestGetInboundOrdersReport_InvalidId() {
+	// Arrange
+	var expectedBody []byte
+	expectedResponse := response.Response{Message: "id must be a number", StatusCode: http.StatusBadRequest}
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(s.path, "/reportInboundOrders?id=invalid"), nil)
+	recorder := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetInboundOrdersReport(recorder, request)
+
+	var resp response.Response
+	_ = json.Unmarshal(recorder.Body.Bytes(), &resp)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	s.Equal(http.StatusBadRequest, recorder.Code)
+	s.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
 func TestEmployeeHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(EmployeeHandlerTestSuite))
 }
