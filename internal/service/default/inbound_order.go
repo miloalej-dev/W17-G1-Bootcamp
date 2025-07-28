@@ -3,6 +3,7 @@ package _default
 import (
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"time"
 )
 
 type InboundOrderService struct {
@@ -14,25 +15,30 @@ func NewInboundOrderService(inboundOrderRepository repository.InboundOrderReposi
 }
 
 func (i *InboundOrderService) RetrieveAll() ([]models.InboundOrder, error) {
-	return i.InboundOrderRepository.FindAll()
+	return i.FindAll()
 }
 
 func (i *InboundOrderService) Retrieve(id int) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.FindById(id)
+	return i.FindById(id)
 }
 
 func (i *InboundOrderService) Register(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.Create(inboundOrder)
+
+	if inboundOrder.OrderDate.IsZero() {
+		inboundOrder.OrderDate = time.Now()
+	}
+
+	return i.Create(inboundOrder)
 }
 
 func (i *InboundOrderService) Modify(inboundOrder models.InboundOrder) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.Update(inboundOrder)
+	return i.Update(inboundOrder)
 }
 
 func (i *InboundOrderService) PartialModify(id int, fields map[string]any) (models.InboundOrder, error) {
-	return i.InboundOrderRepository.PartialUpdate(id, fields)
+	return i.PartialUpdate(id, fields)
 }
 
 func (i *InboundOrderService) Remove(id int) error {
-	return i.InboundOrderRepository.Delete(id)
+	return i.Delete(id)
 }

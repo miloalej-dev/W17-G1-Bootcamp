@@ -26,7 +26,7 @@ func configure() (*configuration, error) {
 
 	// Default values
 	if host == "" {
-		host = "database"
+		host = "localhost"
 	}
 	if port == "" {
 		port = "3306"
@@ -75,6 +75,7 @@ func NewConnection() (*gorm.DB, error) {
 		NowFunc: func() time.Time {
 			return time.Now().Local()
 		},
+		TranslateError: true,
 	})
 
 	if err != nil {

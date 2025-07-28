@@ -3,12 +3,13 @@ module github.com/miloalej-dev/W17-G1-Bootcamp
 go 1.24
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-chi/render v1.0.3
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/stretchr/testify v1.10.0
 	gorm.io/driver/mysql v1.6.0
-	gorm.io/gorm v1.30.0
+	gorm.io/gorm v1.30.1
 )
 
 require (

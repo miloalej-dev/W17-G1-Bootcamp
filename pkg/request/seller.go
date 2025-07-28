@@ -6,9 +6,10 @@ import (
 )
 
 type SellerRequest struct {
-	Name      *string `json:"name"`      // Name is the name of the seller company
-	Address   *string `json:"address"`   // Address is the address of the seller company
-	Telephone *string `json:"telephone"` // Telephone is the telephone of the seller company
+	Name       *string `json:"name"`        // Name is the name of the seller company
+	Address    *string `json:"address"`     // Address is the address of the seller company
+	Telephone  *string `json:"telephone"`   // Telephone is the telephone of the seller company
+	LocalityId *int    `json:"locality_id"` // LocalityId is the locality id of the seller company
 }
 
 func (p *SellerRequest) Bind(r *http.Request) error {
@@ -20,6 +21,9 @@ func (p *SellerRequest) Bind(r *http.Request) error {
 	}
 	if p.Telephone == nil {
 		return errors.New("telephone must not be null")
+	}
+	if p.LocalityId == nil {
+		return errors.New("locality_id must not be null")
 	}
 	return nil
 }
