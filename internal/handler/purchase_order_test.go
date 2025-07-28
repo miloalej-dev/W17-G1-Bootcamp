@@ -68,7 +68,7 @@ func (s *PurchaseOrderHandlerTestSuite) SetupTest() {
 }
 
 // Run the test suite
-func TestSellerHandlerTestSuite(t *testing.T) {
+func TestPurchaseOrderHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(PurchaseOrderHandlerTestSuite))
 }
 
