@@ -524,6 +524,110 @@ func (s *BuyerHandlerTestSuite) TestDeleteBuyer_InternalError() {
 	s.JSONEq(string(expectedBody), recorder.Body.String())
 }
 
+func (s *BuyerHandlerTestSuite) TestGetBuyerPurchaseOrderReport_SuccessAll() {
+	expected := []models.BuyerReport{
+		{
+			Buyer: models.Buyer{
+				Id:           1,
+				CardNumberId: "111",
+				FirstName:    "John",
+				LastName:     "Doe",
+			},
+			PurchaseOrdersCount: 3,
+		},
+		{
+			Buyer: models.Buyer{
+				Id:           2,
+				CardNumberId: "222",
+				FirstName:    "Jane",
+				LastName:     "Smith",
+			},
+			PurchaseOrdersCount: 2,
+		},
+	}
+	expectedResponse := response.Response{
+		Data:       expected,
+		StatusCode: http.StatusOK,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("RetrieveByPurchaseOrderReport", 0).Return(expected, nil)
+
+	req := httptest.NewRequest(http.MethodGet, s.path, nil) // sin query param
+	res := httptest.NewRecorder()
+
+	s.handler.GetBuyerPurchaseOrderReport(res, req)
+
+	s.Equal(http.StatusOK, res.Code)
+	s.JSONEq(string(expectedBody), res.Body.String())
+}
+
+func (s *BuyerHandlerTestSuite) TestGetBuyerPurchaseOrderReport_SuccessWithId() {
+	id := 1
+	expected := []models.BuyerReport{
+		{
+			Buyer: models.Buyer{
+				Id:           1,
+				CardNumberId: "189-58-5819",
+				FirstName:    "Donnamarie",
+				LastName:     "Sharpless",
+			},
+			PurchaseOrdersCount: 5,
+		},
+	}
+	expectedResponse := response.Response{
+		Data:       expected,
+		StatusCode: http.StatusOK,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("RetrieveByPurchaseOrderReport", id).Return(expected, nil)
+
+	req := httptest.NewRequest(http.MethodGet, s.path+"?id=1", nil)
+	res := httptest.NewRecorder()
+
+	s.handler.GetBuyerPurchaseOrderReport(res, req)
+
+	s.Equal(http.StatusOK, res.Code)
+	s.JSONEq(string(expectedBody), res.Body.String())
+}
+
+func (s *BuyerHandlerTestSuite) TestGetBuyerPurchaseOrderReport_ServiceError() {
+	id := 99
+	expectedErr := errors.New("buyer not found")
+	expectedResponse := response.Response{
+		Message:    expectedErr.Error(),
+		StatusCode: http.StatusNotFound,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("RetrieveByPurchaseOrderReport", id).Return([]models.BuyerReport(nil), expectedErr)
+
+	req := httptest.NewRequest(http.MethodGet, s.path+"?id=99", nil)
+	res := httptest.NewRecorder()
+
+	s.handler.GetBuyerPurchaseOrderReport(res, req)
+
+	s.Equal(http.StatusNotFound, res.Code)
+	s.JSONEq(string(expectedBody), res.Body.String())
+}
+
+func (s *BuyerHandlerTestSuite) TestGetBuyerPurchaseOrderReport_BadRequest() {
+	expectedResponse := response.Response{
+		Message:    "abc",
+		StatusCode: http.StatusBadRequest,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	req := httptest.NewRequest(http.MethodGet, s.path+"?id=abc", nil)
+	res := httptest.NewRecorder()
+
+	s.handler.GetBuyerPurchaseOrderReport(res, req)
+
+	s.Equal(http.StatusBadRequest, res.Code)
+	s.JSONEq(string(expectedBody), res.Body.String())
+}
+
 // Run the test suite
 func TestBuyerHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(BuyerHandlerTestSuite))

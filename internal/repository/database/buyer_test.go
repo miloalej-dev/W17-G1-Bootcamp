@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
@@ -366,7 +367,6 @@ func (s *BuyerRepositoryTestSuite) TestDelete_NotFound() {
 	s.Equal(repository.ErrEntityNotFound, err)
 }
 
-/*
 func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_AllBuyers_Success() {
 
 	expectedBuyerReport := []models.BuyerReport{
@@ -395,8 +395,8 @@ func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_AllBuyers_Succe
 	}).AddRow(expectedBuyerReport[0].Id, expectedBuyerReport[0].CardNumberId, expectedBuyerReport[0].FirstName, expectedBuyerReport[0].LastName, expectedBuyerReport[0].PurchaseOrdersCount).
 		AddRow(expectedBuyerReport[1].Id, expectedBuyerReport[1].CardNumberId, expectedBuyerReport[1].FirstName, expectedBuyerReport[1].LastName, expectedBuyerReport[1].PurchaseOrdersCount)
 
-	s.mock.ExpectQuery(
-		"SELECT buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name, COUNT(purchase_orders.id) AS purchase_orders_count FROM `buyers` LEFT JOIN purchase_orders ON purchase_orders.buyers_id = buyers.id GROUP BY `buyers`.`id`").
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name, COUNT(purchase_orders.id) AS purchase_orders_count FROM `buyers` LEFT JOIN purchase_orders ON purchase_orders.buyer_id = buyers.id GROUP BY `buyers`.`id`")).
 		WillReturnRows(rows)
 
 	// Act
@@ -411,7 +411,107 @@ func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_AllBuyers_Succe
 	s.Equal(expectedBuyerReport[1].PurchaseOrdersCount, result[1].PurchaseOrdersCount)
 }
 
-*/
+func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_SingleBuyer_Success() {
+	id := 1
+	expected := models.BuyerReport{
+		Buyer: models.Buyer{
+			Id:           id,
+			CardNumberId: "189-58",
+			FirstName:    "Donna",
+			LastName:     "Sharp",
+		},
+		PurchaseOrdersCount: 4,
+	}
+
+	// Mock para FindById (nota el LIMIT ?)
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT * FROM `buyers` WHERE `buyers`.`id` = ? ORDER BY `buyers`.`id` LIMIT ?",
+	)).WithArgs(id, 1).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "card_number_id", "first_name", "last_name",
+		}).AddRow(
+			expected.Id, expected.CardNumberId, expected.FirstName, expected.LastName,
+		))
+
+	// Mock para query de reporte individual (solo un argumento: id)
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name,  COUNT(purchase_orders.id) AS purchase_orders_count FROM `buyers` LEFT JOIN purchase_orders ON purchase_orders.buyers_id = buyers.id WHERE buyers.id = ? GROUP BY `buyers`.`id`",
+	)).WithArgs(id).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "card_number_id", "first_name", "last_name", "purchase_orders_count",
+		}).AddRow(
+			expected.Id, expected.CardNumberId, expected.FirstName, expected.LastName, expected.PurchaseOrdersCount,
+		))
+
+	// Act
+	result, err := s.repo.FindByPurchaseOrderReport(id)
+
+	// Assert
+	s.NoError(err)
+	s.Len(result, 1)
+	s.Equal(expected.FirstName, result[0].FirstName)
+	s.Equal(expected.PurchaseOrdersCount, result[0].PurchaseOrdersCount)
+}
+
+func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_SingleBuyer_NotFound() {
+	id := 42
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT * FROM `buyers` WHERE `buyers`.`id` = ? ORDER BY `buyers`.`id` LIMIT ?",
+	)).WithArgs(id, 1).
+		WillReturnRows(sqlmock.NewRows([]string{})) // sin filas
+
+	// Act
+	result, err := s.repo.FindByPurchaseOrderReport(id)
+
+	// Assert
+	s.Error(err)
+	s.Contains(err.Error(), "record not found")
+	s.Empty(result)
+}
+
+func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_SingleBuyer_ScanError() {
+	id := 1
+
+	// Mock para FindById exitoso
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT * FROM `buyers` WHERE `buyers`.`id` = ? ORDER BY `buyers`.`id` LIMIT ?",
+	)).WithArgs(id, 1).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "card_number_id", "first_name", "last_name",
+		}).AddRow(id, "X", "John", "Doe"))
+
+	// Mock para query del reporte con error
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name,  COUNT(purchase_orders.id) AS purchase_orders_count FROM `buyers` LEFT JOIN purchase_orders ON purchase_orders.buyers_id = buyers.id WHERE buyers.id = ? GROUP BY `buyers`.`id`",
+	)).WithArgs(id).
+		WillReturnError(errors.New("scan failed"))
+
+	// Act
+	result, err := s.repo.FindByPurchaseOrderReport(id)
+
+	// Assert
+	s.Error(err)
+	s.Contains(err.Error(), "scan failed")
+	s.Empty(result)
+}
+
+func (s *BuyerRepositoryTestSuite) TestFindByPurchaseOrderReport_AllBuyers_QueryError() {
+	// id == 0 → se ejecuta la rama que consulta todos los buyers
+	errExpected := errors.New("db failed")
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name, COUNT(purchase_orders.id) AS purchase_orders_count FROM `buyers` LEFT JOIN purchase_orders ON purchase_orders.buyer_id = buyers.id GROUP BY `buyers`.`id`",
+	)).WillReturnError(errExpected)
+
+	// Act
+	result, err := s.repo.FindByPurchaseOrderReport(0)
+
+	// Assert
+	s.Error(err)
+	s.EqualError(err, "db failed")
+	s.Empty(result)
+}
 
 // Run the test suite
 func TestBuyerRepositoryTestSuite(t *testing.T) {
