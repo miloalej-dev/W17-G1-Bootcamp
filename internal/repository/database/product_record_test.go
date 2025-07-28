@@ -387,6 +387,6 @@ func (s *ProductRecordRepositoryTestSuite) TestDelete_NotFound() {
 }
 
 // Run the test suite
-func TestBuyerRepositoryTestSuite(t *testing.T) {
+func TestProductRecordRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(ProductRecordRepositoryTestSuite))
 }
