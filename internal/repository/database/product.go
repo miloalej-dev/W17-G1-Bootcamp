@@ -123,7 +123,7 @@ func (r *ProductRepository) FindRecordsCount() ([]models.ProductReport, error) {
 		Scan(&reports).Error
 
 	if err != nil {
-		return nil, repository.ErrProductReportNotFound
+		return []models.ProductReport{}, repository.ErrProductReportNotFound
 	}
 	return reports, nil
 }

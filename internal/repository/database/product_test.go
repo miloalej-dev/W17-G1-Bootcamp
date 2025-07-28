@@ -516,6 +516,85 @@ func (p *ProductRepositoryTestSuite) TestDelete_NotFound() {
 	p.Equal(repository.ErrProductNotFound, err)
 }
 
+func (s *ProductRepositoryTestSuite) TestFindRecordsCountByProductId_Success() {
+	id := 1
+
+	expected := models.ProductReport{
+		Id:           id,
+		Description:  " generic description",
+		RecordsCount: 2,
+	}
+
+	rows := s.mock.NewRows([]string{"id", "description", "records_count"}).
+		AddRow(expected.Id, expected.Description, expected.RecordsCount)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT products.id, products.description, COUNT(product_records.id) as records_count FROM `products` inner join product_records on product_records.product_id = products.id WHERE products.id = ? GROUP BY `products`.`id`")).
+		WithArgs(id).
+		WillReturnRows(rows)
+
+	report, err := s.repo.FindRecordsCountByProductId(id)
+	s.NoError(err)
+	s.Equal(expected, report)
+}
+
+func (s *ProductRepositoryTestSuite) TestFindRecordsCountByProductId_NotFound() {
+	id := 99
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT products.id, products.description, COUNT(product_records.id) as records_count FROM `products` inner join product_records on product_records.product_id = products.id WHERE products.id = ? GROUP BY `products`.`id`")).
+		WithArgs(id).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	report, err := s.repo.FindRecordsCountByProductId(id)
+
+	s.Error(err)
+	s.Equal(repository.ErrProductReportNotFound, err)
+	s.Equal(models.ProductReport{}, report)
+}
+
+func (s *ProductRepositoryTestSuite) TestFindRecordsCount_Success() {
+
+	expected := []models.ProductReport{
+		{
+			Id:           1,
+			Description:  "generic description",
+			RecordsCount: 2,
+		},
+		{
+			Id:           2,
+			Description:  "another description",
+			RecordsCount: 4,
+		},
+	}
+
+	rows := s.mock.NewRows([]string{"id", "description", "records_count"}).
+		AddRow(expected[0].Id, expected[0].Description, expected[0].RecordsCount).
+		AddRow(expected[1].Id, expected[1].Description, expected[1].RecordsCount)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT products.id, products.description, COUNT(product_records.id) as records_count FROM `products` inner join product_records on product_records.products_id = products.id GROUP BY `products`.`id`")).
+		WillReturnRows(rows)
+
+	report, err := s.repo.FindRecordsCount()
+
+	s.NoError(err)
+	s.Equal(expected, report)
+}
+
+func (s *ProductRepositoryTestSuite) TestFindRecordsCount_NotFound() {
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT products.id, products.description, COUNT(product_records.id) as records_count FROM `products` inner join product_records on product_records.products_id = products.id GROUP BY `products`.`id`")).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	report, err := s.repo.FindRecordsCount()
+
+	s.Error(err)
+	s.Equal(repository.ErrProductReportNotFound, err)
+	s.Equal([]models.ProductReport{}, report)
+}
+
 // Run the test suite
 func TestProductRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(ProductRepositoryTestSuite))
