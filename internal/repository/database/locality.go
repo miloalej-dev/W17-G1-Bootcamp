@@ -78,35 +78,25 @@ func (l LocalityRepository) FindById(id int) (models.Locality, error) {
 	return locality, nil
 }
 
-func (l LocalityRepository) Create(locality models.LocalityDoc) (models.LocalityDoc, error) {
-	// Obtener el ID de la provincia usando GORM de forma más limpia
+func (l LocalityRepository) Create(locality models.Locality) (models.Locality, error) {
 	var province models.Province
-	result := l.db.Joins("INNER JOIN countries ON countries.id = provinces.country_id").
-		Where("provinces.province = ? AND countries.country = ?", locality.Province, locality.Country).
-		First(&province)
+	result := l.db.First(&province, locality.ProvinceId)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return models.LocalityDoc{}, repository.ErrProvinceNotFound
+		return models.Locality{}, repository.ErrForeignKeyViolation
 	}
 	if result.Error != nil {
-		return models.LocalityDoc{}, result.Error
+		return models.Locality{}, result.Error
 	}
 
-	// Crear la locality usando el province_id encontrado
-	localityCreated := models.Locality{
-		Id:         locality.Id,
-		Locality:   locality.Locality,
-		ProvinceId: province.Id,
-	}
-
-	result = l.db.Create(&localityCreated)
+	result = l.db.Create(&locality)
 	switch {
 	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
-		return models.LocalityDoc{}, repository.ErrEntityAlreadyExists
+		return models.Locality{}, repository.ErrEntityAlreadyExists
 	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
-		return models.LocalityDoc{}, repository.ErrForeignKeyViolation
+		return models.Locality{}, repository.ErrForeignKeyViolation
 	case result.Error != nil:
-		return models.LocalityDoc{}, result.Error
+		return models.Locality{}, result.Error
 	}
 
 	return locality, nil
@@ -193,4 +183,37 @@ func (l LocalityRepository) FindCarriersByLocality(id int) ([]models.LocalityCar
 	}
 
 	return carriers, nil
+}
+
+func (l LocalityRepository) CreateWithNames(locality models.LocalityDoc) (models.LocalityDoc, error) {
+	var province models.Province
+	result := l.db.Joins("INNER JOIN countries ON countries.id = provinces.country_id").
+		Where("provinces.province = ? AND countries.country = ?", locality.Province, locality.Country).
+		First(&province)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.LocalityDoc{}, repository.ErrProvinceNotFound
+	}
+	if result.Error != nil {
+		return models.LocalityDoc{}, result.Error
+	}
+
+	// Crear la locality usando el province_id encontrado
+	localityCreated := models.Locality{
+		Id:         locality.Id,
+		Locality:   locality.Locality,
+		ProvinceId: province.Id,
+	}
+
+	result = l.db.Create(&localityCreated)
+	switch {
+	case errors.Is(result.Error, gorm.ErrDuplicatedKey):
+		return models.LocalityDoc{}, repository.ErrEntityAlreadyExists
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.LocalityDoc{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
+		return models.LocalityDoc{}, result.Error
+	}
+
+	return locality, nil
 }
