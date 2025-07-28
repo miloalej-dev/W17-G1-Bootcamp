@@ -25,6 +25,16 @@ type LocalityCarrierCount struct {
 	TotalCarriers int    `gorm:"column:total_carriers"`
 }
 
+type Province struct {
+	Id        int    `json:"id" gorm:"primaryKey"`
+	Province  string `json:"province"`
+	CountryId int    `json:"country_id" gorm:"column:country_id"`
+}
+
+func (Province) TableName() string {
+	return "provinces"
+}
+
 func (Locality) TableName() string {
 	return "localities"
 }

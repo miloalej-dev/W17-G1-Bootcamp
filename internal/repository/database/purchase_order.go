@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 	"time"
@@ -19,7 +20,7 @@ func (r *PurchaseOrderRepository) FindAll() ([]models.PurchaseOrder, error) {
 	purchaseOrders := make([]models.PurchaseOrder, 0)
 	result := r.db.Find(&purchaseOrders)
 	if result.Error != nil {
-		return []models.PurchaseOrder{}, result.Error
+		return nil, result.Error
 	}
 	return purchaseOrders, nil
 }
@@ -36,22 +37,41 @@ func (r *PurchaseOrderRepository) FindById(id int) (models.PurchaseOrder, error)
 
 // Create inserts a new purchase order
 func (r *PurchaseOrderRepository) Create(po models.PurchaseOrder) (models.PurchaseOrder, error) {
-	result := r.db.Create(&po)
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return models.PurchaseOrder{}, tx.Error
+	}
+	ordersDetails := po.OrderDetails
+
+	po.OrderDetails = nil
+	result := tx.Create(&po)
 	if result.Error != nil {
+		tx.Rollback()
 		return models.PurchaseOrder{}, result.Error
 	}
-	orders_details := po.OrderDetails
-	odr := NewOrderDetailRepository(r.db)
-	for _, order_detail := range *orders_details {
-		orCr := order_detail
-		orCr.Id = 0
-		orCr.PurchaseOrderID = po.Id
-		_, err := odr.Create(orCr)
+
+	po.OrderDetails = ordersDetails
+	odr := NewOrderDetailRepository(tx)
+
+	if po.OrderDetails == nil || len(*po.OrderDetails) == 0 {
+		tx.Rollback()
+		return models.PurchaseOrder{}, repository.ErrInvalidEntity
+	}
+	for _, detail := range *ordersDetails {
+		d := detail
+		d.Id = 0
+		d.PurchaseOrderID = po.Id
+		_, err := odr.Create(d)
 		if err != nil {
+			tx.Rollback()
 			return models.PurchaseOrder{}, err
 		}
 	}
-	po.OrderDetails = orders_details
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return models.PurchaseOrder{}, err
+	}
 
 	return po, nil
 }
