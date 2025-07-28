@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -110,5 +112,192 @@ func (s *PurchaseOrderHandlerTestSuite) TestGetPurchaseOrdersReport_Ok() {
 
 	// Assert
 	s.Equal(http.StatusOK, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestGetPurchaseOrdersReport_InvalidID() {
+	expectedResponse := response.Response{
+		Message:    "invalid", // Actualización clave aquí
+		StatusCode: http.StatusBadRequest,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("%s/report?id=invalid", s.path), nil)
+	rec := httptest.NewRecorder()
+
+	s.handler.GetPurchaseOrdersReport(rec, req)
+
+	s.Equal(http.StatusBadRequest, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestGetPurchaseOrdersReport_NotFound() {
+	// Arrange
+	id := 999
+	expectedErr := errors.New("purchase orders not found")
+	expectedResponse := response.Response{
+		Message:    expectedErr.Error(),
+		StatusCode: http.StatusNotFound,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("RetrieveByBuyer", id).Return([]models.PurchaseOrder{}, expectedErr) // ✅ CORREGIDO
+
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("%s/report?id=%d", s.path, id), nil)
+	rec := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetPurchaseOrdersReport(rec, req)
+
+	// Assert
+	s.Equal(http.StatusNotFound, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestGetPurchaseOrdersReport_WithoutID() {
+	// Arrange
+	id := 0
+	expectedErr := errors.New("purchase orders not found")
+	expectedResponse := response.Response{
+		Message:    expectedErr.Error(),
+		StatusCode: http.StatusNotFound,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("RetrieveByBuyer", id).Return([]models.PurchaseOrder{}, expectedErr)
+
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("%s/report", s.path), nil)
+	rec := httptest.NewRecorder()
+
+	// Act
+	s.handler.GetPurchaseOrdersReport(rec, req)
+
+	// Assert
+	s.Equal(http.StatusNotFound, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestPostPurchaseOrders_Success() {
+	// Arrange
+	payload := `{
+		"order_number": "PO123",
+		"order_date": "2025-07-28T00:00:00Z",
+		"tracing_code": "ABC123",
+		"buyer_id": 1,
+		"warehouse_id": 1,
+		"carrier_id": 2,
+		"order_status_id": 1,
+		"order_details": [{
+			"quantity": 10,
+			"clean_lines_status": "clean",
+			"temperature": 4.5,
+			"product_record_id": 1001
+		}]
+	}`
+
+	expectedOrder := models.PurchaseOrder{
+		OrderNumber:   "PO123",
+		OrderDate:     time.Date(2025, 7, 28, 0, 0, 0, 0, time.UTC),
+		TracingCode:   "ABC123",
+		BuyerID:       1,
+		WarehouseID:   1,
+		CarrierID:     2,
+		OrderStatusID: 1,
+		OrderDetails: &[]models.OrderDetail{
+			{
+				Quantity:         10,
+				CleanLinesStatus: "clean",
+				Temperature:      4.5,
+				ProductRecordID:  1001,
+			},
+		},
+	}
+
+	// Esperado como respuesta
+	expectedResponse := response.Response{
+		Data:       expectedOrder,
+		Message:    "",
+		StatusCode: http.StatusCreated,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	s.mock.On("Register", mock.AnythingOfType("models.PurchaseOrder")).Return(expectedOrder, nil)
+
+	req := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBufferString(payload))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	// Act
+	s.handler.PostPurchaseOrders(rec, req)
+
+	// Assert
+	s.Equal(http.StatusCreated, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestPostPurchaseOrders_BindError() {
+	// Arrange: JSON inválido (comilla faltante)
+	payload := `{
+		"order_number": "PO123,
+		"order_date": "2025-07-28T00:00:00Z"
+	}`
+
+	expectedResponse := response.Response{
+		Data:       nil,
+		Message:    "invalid character '\\n' in string literal",
+		StatusCode: http.StatusUnprocessableEntity,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	req := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBufferString(payload))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	// Act
+	s.handler.PostPurchaseOrders(rec, req)
+
+	// Assert
+	s.Equal(http.StatusUnprocessableEntity, rec.Code)
+	s.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (s *PurchaseOrderHandlerTestSuite) TestPostPurchaseOrders_RegisterConflict() {
+	// Arrange
+	payload := `{
+		"order_number": "PO123",
+		"order_date": "2025-07-28T00:00:00Z",
+		"tracing_code": "ABC123",
+		"buyer_id": 1,
+		"warehouse_id": 1,
+		"carrier_id": 2,
+		"order_status_id": 1,
+		"order_details": [{
+			"quantity": 10,
+			"clean_lines_status": "clean",
+			"temperature": 4.5,
+			"product_record_id": 1001
+		}]
+	}`
+
+	expectedErr := errors.New("order number already exists")
+
+	s.mock.On("Register", mock.AnythingOfType("models.PurchaseOrder")).Return(models.PurchaseOrder{}, expectedErr)
+
+	expectedResponse := response.Response{
+		Data:       nil,
+		Message:    expectedErr.Error(),
+		StatusCode: http.StatusConflict,
+	}
+	expectedBody, _ := json.Marshal(expectedResponse)
+
+	req := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBufferString(payload))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	// Act
+	s.handler.PostPurchaseOrders(rec, req)
+
+	// Assert
+	s.Equal(http.StatusConflict, rec.Code)
 	s.JSONEq(string(expectedBody), rec.Body.String())
 }
