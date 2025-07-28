@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 
 	"fmt"
 	"github.com/go-chi/chi/v5"
@@ -34,7 +35,7 @@ func (h *BuyerHandler) GetBuyers(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Consultando buyers")
 	value, err := h.service.RetrieveAll()
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
@@ -47,11 +48,13 @@ func (h *BuyerHandler) GetBuyer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+
+	if err != nil || id <= 0 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
 		return
 	}
 	value, err := h.service.Retrieve(id)
+
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
 		return
@@ -67,6 +70,7 @@ func (h *BuyerHandler) PostBuyer(w http.ResponseWriter, r *http.Request) {
 
 	if err := render.Bind(r, bodyRequest); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	buyer := models.Buyer{
@@ -81,7 +85,7 @@ func (h *BuyerHandler) PostBuyer(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
-	_ = render.Render(w, r, response.NewResponse(value, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(value, http.StatusCreated))
 
 }
 
@@ -89,12 +93,14 @@ func (h *BuyerHandler) DeleteBuyer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id <= 0 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
+		return
 	}
 	err = h.service.Remove(id)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
 	}
 	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 
@@ -105,20 +111,22 @@ func (h *BuyerHandler) PatchBuyer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id <= 0 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
+		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("unexpected JSON format, check the request body").Error(), http.StatusBadRequest))
 		return
 	}
 
 	buyer, err := h.service.PartialModify(id, fields)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
 	}
 	_ = render.Render(w, r, response.NewResponse(buyer, http.StatusOK))
 

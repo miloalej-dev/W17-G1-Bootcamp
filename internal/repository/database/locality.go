@@ -154,11 +154,11 @@ func (l LocalityRepository) FindAllCarriers() ([]models.LocalityCarrierCount, er
 		Find(&carriers).Error
 
 	if err != nil {
-		return make([]models.LocalityCarrierCount, 0), err
+		return nil, err
 	}
 
 	if len(carriers) == 0 {
-		return make([]models.LocalityCarrierCount, 0), repository.ErrEntityNotFound
+		return nil, repository.ErrEntityNotFound
 	}
 
 	return carriers, nil
@@ -175,11 +175,11 @@ func (l LocalityRepository) FindCarriersByLocality(id int) ([]models.LocalityCar
 		Find(&carriers).Error
 
 	if err != nil {
-		return make([]models.LocalityCarrierCount, 0), err
+		return nil, err
 	}
 
 	if len(carriers) == 0 {
-		return make([]models.LocalityCarrierCount, 0), repository.ErrEntityNotFound
+		return nil, repository.ErrEntityNotFound
 	}
 
 	return carriers, nil
