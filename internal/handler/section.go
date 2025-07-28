@@ -81,8 +81,6 @@ func (s *SectionHandler) PostSection(w http.ResponseWriter, r *http.Request) {
 			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusConflict))
 			return
 		}
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
-		return
 	}
 	_ = render.Render(w, r, response.NewResponse(createdSection, http.StatusOK))
 
@@ -103,7 +101,7 @@ func (s *SectionHandler) PatchSection(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
-	updatedSecton, err := s.sv.PartialModify(id, fields)
+	updatedSection, err := s.sv.PartialModify(id, fields)
 
 	if err != nil {
 		if errors.Is(err, repository.ErrEntityNotFound) {
@@ -113,7 +111,7 @@ func (s *SectionHandler) PatchSection(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, response.NewResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
-	_ = render.Render(w, r, response.NewResponse(updatedSecton, http.StatusOK))
+	_ = render.Render(w, r, response.NewResponse(updatedSection, http.StatusOK))
 
 }
 
