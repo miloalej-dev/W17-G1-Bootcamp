@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
@@ -22,24 +23,29 @@ func (e EmployeeRepository) FindAll() ([]models.Employee, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	if len(employees) == 0 {
-		return nil, repository.ErrEntityNotFound
-	}
+
 	return employees, nil
 }
 
 func (e EmployeeRepository) FindById(id int) (models.Employee, error) {
 	var employee models.Employee
 	result := e.db.First(&employee, id)
-	if result.Error != nil {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.Employee{}, repository.ErrEntityNotFound
+	}
+
+	if result.Error != nil {
+		return models.Employee{}, result.Error
 	}
 	return employee, nil
 }
 
 func (e EmployeeRepository) Create(employee models.Employee) (models.Employee, error) {
 	result := e.db.Create(&employee)
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Employee{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Employee{}, result.Error
 	}
 	return employee, nil
@@ -47,7 +53,10 @@ func (e EmployeeRepository) Create(employee models.Employee) (models.Employee, e
 
 func (e EmployeeRepository) Update(employee models.Employee) (models.Employee, error) {
 	result := e.db.Save(&employee)
-	if result.Error != nil {
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Employee{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Employee{}, result.Error
 	}
 	return employee, nil
@@ -56,11 +65,17 @@ func (e EmployeeRepository) Update(employee models.Employee) (models.Employee, e
 func (e EmployeeRepository) PartialUpdate(id int, fields map[string]interface{}) (models.Employee, error) {
 	var employee models.Employee
 	result := e.db.First(&employee, id)
-	if result.Error != nil {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return models.Employee{}, repository.ErrEntityNotFound
 	}
-	result = e.db.Model(&employee).Updates(fields)
 	if result.Error != nil {
+		return models.Employee{}, result.Error
+	}
+	result = e.db.Model(&employee).Updates(fields)
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Employee{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
 		return models.Employee{}, result.Error
 	}
 	return employee, nil
@@ -70,6 +85,9 @@ func (e EmployeeRepository) Delete(id int) error {
 	result := e.db.Delete(&models.Employee{}, id)
 	if result.Error != nil {
 		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return repository.ErrEntityNotFound
 	}
 	return nil
 }
@@ -119,12 +137,11 @@ func (e EmployeeRepository) InboundOrdersReportById(id int) (models.EmployeeInbo
 		Group("e.id, e.card_number_id, e.first_name, e.last_name, e.warehouse_id").
 		Scan(&report)
 
-	if result.Error != nil {
-		return models.EmployeeInboundOrdersReport{}, result.Error
-	}
-
-	if result.RowsAffected == 0 {
+	switch {
+	case result.RowsAffected == 0:
 		return models.EmployeeInboundOrdersReport{}, repository.ErrEntityNotFound
+	case result.Error != nil:
+		return models.EmployeeInboundOrdersReport{}, result.Error
 	}
 
 	return report, nil

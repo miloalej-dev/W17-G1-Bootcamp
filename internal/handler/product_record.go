@@ -32,7 +32,7 @@ func (h *ProductRecordHandler) GetProductRecords(w http.ResponseWriter, r *http.
 
 	value, err := h.service.RetrieveAll()
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
@@ -45,8 +45,8 @@ func (h *ProductRecordHandler) GetProductRecord(w http.ResponseWriter, r *http.R
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
 		return
 	}
 	value, err := h.service.Retrieve(id)
@@ -96,20 +96,22 @@ func (h *ProductRecordHandler) PatchProductRecord(w http.ResponseWriter, r *http
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
+		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("unexpected JSON format, check the request body").Error(), http.StatusBadRequest))
 		return
 	}
 
 	value, err := h.service.PartialModify(id, fields)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
 	}
 	_ = render.Render(w, r, response.NewResponse(value, http.StatusOK))
 
@@ -119,12 +121,14 @@ func (h *ProductRecordHandler) DeleteProductRecord(w http.ResponseWriter, r *htt
 	w.Header().Set("Content-Type", "application/json")
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
+		return
 	}
 	err = h.service.Remove(id)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
 	}
 	_ = render.Render(w, r, response.NewResponse(nil, http.StatusNoContent))
 

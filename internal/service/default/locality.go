@@ -1,16 +1,16 @@
 package _default
 
 import (
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository/database"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 )
 
 type LocalityService struct {
-	rp database.LocalityRepository
+	rp repository.LocalityRepository
 }
 
-func NewLocalityService(rp *database.LocalityRepository) *LocalityService {
-	return &LocalityService{*rp}
+func NewLocalityService(rp repository.LocalityRepository) *LocalityService {
+	return &LocalityService{rp}
 }
 
 func (l LocalityService) RetrieveAll() ([]models.Locality, error) {
@@ -24,8 +24,8 @@ func (l LocalityService) Retrieve(id int) (models.Locality, error) {
 func (l LocalityService) RetrieveLocalityBySeller(id int) (models.LocalitySellerCount, error) {
 	return l.rp.FindLocalityBySeller(id)
 }
-func (l LocalityService) Register(seller models.LocalityDoc) (models.LocalityDoc, error) {
-	return l.rp.Create(seller)
+func (l LocalityService) Register(locality models.Locality) (models.Locality, error) {
+	return l.rp.Create(locality)
 }
 
 func (l LocalityService) Modify(locality models.Locality) (models.Locality, error) {
@@ -50,4 +50,8 @@ func (l LocalityService) RetrieveCarriersByLocality(id int) ([]models.LocalityCa
 
 func (l LocalityService) RetrieveAllLocalitiesBySeller() ([]models.LocalitySellerCount, error) {
 	return l.rp.FindAllLocality()
+}
+
+func (l LocalityService) RegisterWithNames(locality models.LocalityDoc) (models.LocalityDoc, error) {
+	return l.rp.CreateWithNames(locality)
 }
