@@ -8,4 +8,5 @@ type LocalityRepository interface {
 	FindAllLocality() ([]models.LocalitySellerCount, error)
 	FindAllCarriers() ([]models.LocalityCarrierCount, error)
 	FindCarriersByLocality(id int) ([]models.LocalityCarrierCount, error)
+	CreateWithNames(locality models.LocalityDoc) (models.LocalityDoc, error)
 }

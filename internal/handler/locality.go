@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
-	_default "github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -12,15 +12,14 @@ import (
 )
 
 type LocalityHandler struct {
-	service _default.LocalityService
+	service service.LocalityService
 }
 
-func NewLocalityHandler(service *_default.LocalityService) *LocalityHandler {
-	return &LocalityHandler{service: *service}
+func NewLocalityHandler(service service.LocalityService) *LocalityHandler {
+	return &LocalityHandler{service: service}
 }
 
 func (h *LocalityHandler) GetLocalities(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	localities, err := h.service.RetrieveAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -30,7 +29,6 @@ func (h *LocalityHandler) GetLocalities(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idParam := r.URL.Query().Get("id")
 	if idParam == "" {
 		localites, err := h.service.RetrieveAllLocalitiesBySeller()
@@ -60,10 +58,9 @@ func (h *LocalityHandler) GetLocality(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *LocalityHandler) PostLocality(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	data := &request.LocalityRequest{}
 	if err := render.Bind(r, data); err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(repository.ErrInvalidEntity.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
 	}
 	locality := models.LocalityDoc{
@@ -73,7 +70,7 @@ func (h *LocalityHandler) PostLocality(w http.ResponseWriter, r *http.Request) {
 		Country:  *data.Country,
 	}
 
-	localityCreated, err := h.service.Register(locality)
+	localityCreated, err := h.service.RegisterWithNames(locality)
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 		return
@@ -82,7 +79,6 @@ func (h *LocalityHandler) PostLocality(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *LocalityHandler) GetCarrier(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idRequest := r.URL.Query().Get("id")
 	var id int
 
@@ -92,7 +88,7 @@ func (h *LocalityHandler) GetCarrier(w http.ResponseWriter, r *http.Request) {
 		var err error
 		id, err = strconv.Atoi(idRequest)
 		if err != nil {
-			_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+			_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 			return
 		}
 
