@@ -150,6 +150,7 @@ func (h *BuyerHandler) GetBuyerPurchaseOrderReport(w http.ResponseWriter, r *htt
 
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		return
 	}
 	_ = render.Render(w, r, response.NewResponse(report, http.StatusOK))
 
