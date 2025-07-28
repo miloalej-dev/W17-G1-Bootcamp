@@ -7,6 +7,7 @@ import (
 )
 
 func TestNewBuyer(t *testing.T) {
+
 	id := 10
 	cardNumber := "1234-5678"
 	firstName := "Juan"
