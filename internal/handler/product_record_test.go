@@ -568,6 +568,6 @@ func (s *ProductRecordHandlerTestSuite) TestDeleteProductRecord_InternalError() 
 }
 
 // Run the test suite
-func TestBuyerHandlerTestSuite(t *testing.T) {
+func TestProductRecordHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(ProductRecordHandlerTestSuite))
 }
