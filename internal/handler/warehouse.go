@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"encoding/json"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"net/http"
 	"strconv"
 
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -62,6 +64,7 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+
 	warehouse := models.NewWarehouse(
 		0, // placeholder, will be overwritten later
 		*warehouseJson.WarehouseCode,
@@ -74,6 +77,11 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 
 	warehouseResponse, err := h.sv.Register(*warehouse)
 	if err != nil {
+		if errors.Is(err, repository.ErrLocalityNotFound) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+			return
+		}
+
 		_ = render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
 	}
@@ -99,7 +107,12 @@ func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request
 
 	warehouseResponse, err := h.sv.PartialModify(id, fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		if errors.Is(err, repository.ErrEntityNotFound) {
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			return
+		}
+
+		_ = render.Render(w, r, response.NewErrorResponse("internal error", http.StatusInternalServerError))
 		return
 	}
 
