@@ -54,7 +54,7 @@ func (a *ServerChi) Run() (err error) {
 	productRepository := database.NewProductRepository(db)
 	warehouseRepository := database.NewWarehouseDB(db)
 	carrierRepository := database.NewCarrierDB(db)
-	productBatchRepository := database.NewProductBatchDB(db)
+	productBatchRepository := database.NewProductBatchRepository(db)
 	sellerRepository := database.NewSellerRepository(db)
 	employeeRepository := database.NewEmployeeRepository(db)
 	buyerRepository := database.NewBuyerRepository(db)
