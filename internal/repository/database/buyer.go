@@ -1,7 +1,8 @@
 package database
 
 import (
-	"fmt"
+	"errors"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -64,13 +65,12 @@ func (s *BuyerRepository) PartialUpdate(id int, fields map[string]interface{}) (
 	var buyer models.Buyer
 
 	result := s.db.First(&buyer, id)
-	if result.Error != nil {
-		return models.Buyer{}, result.Error
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return models.Buyer{}, repository.ErrEntityNotFound
 	}
 
-	fmt.Println(fields)
-	result2 := s.db.Model(&buyer).Updates(fields)
-	if result2.Error != nil {
+	result = s.db.Model(&buyer).Updates(fields)
+	if result.Error != nil {
 		return models.Buyer{}, result.Error
 	}
 
@@ -80,8 +80,8 @@ func (s *BuyerRepository) PartialUpdate(id int, fields map[string]interface{}) (
 func (s *BuyerRepository) Delete(id int) error {
 	result := s.db.Delete(&models.Buyer{}, id)
 
-	if result.Error != nil {
-		return result.Error
+	if result.RowsAffected < 1 {
+		return repository.ErrEntityNotFound
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func (r *BuyerRepository) FindByPurchaseOrderReport(id int) ([]models.BuyerRepor
 		err = r.db.
 			Table("buyers").
 			Select("buyers.id, buyers.card_number_id, buyers.first_name, buyers.last_name,  COUNT(purchase_orders.id) AS purchase_orders_count").
-			Joins("LEFT JOIN purchase_orders ON purchase_orders.buyer_id = buyers.id").
+			Joins("LEFT JOIN purchase_orders ON purchase_orders.buyers_id = buyers.id").
 			Where("buyers.id = ?", id).
 			Group("buyers.id").
 			Scan(&report).Error

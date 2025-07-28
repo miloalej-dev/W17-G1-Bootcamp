@@ -13,7 +13,7 @@ type Section struct {
 }
 
 type SectionReport struct {
-	SectionId     int `json:"section_id"`
-	SectionNumber int `json:"section_number"`
-	ProductsCount int `json:"products_count"`
+	SectionId     int    `json:"section_id"`
+	SectionNumber string `json:"section_number"`
+	ProductsCount int    `json:"products_count"`
 }

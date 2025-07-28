@@ -1,7 +1,7 @@
 package database
 
 import (
-	"fmt"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"gorm.io/gorm"
 )
@@ -68,9 +68,8 @@ func (s *ProductRecordRepository) PartialUpdate(id int, fields map[string]interf
 		return models.ProductRecord{}, result.Error
 	}
 
-	fmt.Println(fields)
-	result2 := s.db.Model(&productRecord).Updates(fields)
-	if result2.Error != nil {
+	result = s.db.Model(&productRecord).Updates(fields)
+	if result.Error != nil {
 		return models.ProductRecord{}, result.Error
 	}
 
@@ -80,8 +79,8 @@ func (s *ProductRecordRepository) PartialUpdate(id int, fields map[string]interf
 func (s *ProductRecordRepository) Delete(id int) error {
 	result := s.db.Delete(&models.ProductRecord{}, id)
 
-	if result.Error != nil {
-		return result.Error
+	if result.RowsAffected < 1 {
+		return repository.ErrEntityNotFound
 	}
 
 	return nil

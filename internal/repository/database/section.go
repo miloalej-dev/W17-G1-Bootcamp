@@ -58,9 +58,6 @@ func (r *SectionRepository) PartialUpdate(id int, fields map[string]interface{})
 	if result.Error != nil {
 		return models.Section{}, result.Error
 	}
-	if result.RowsAffected == 0 {
-		return models.Section{}, result.Error
-	}
 
 	if val, ok := fields["section_number"]; ok {
 		section.SectionNumber = val.(string)
@@ -119,11 +116,6 @@ func (r *SectionRepository) FindSectionReport(id int) (models.SectionReport, err
 
 	if result.Error != nil {
 		return models.SectionReport{}, result.Error
-	}
-
-	// if there is no registry, means there is no Section with that id
-	if result.RowsAffected == 0 {
-		return models.SectionReport{}, repository.ErrEmptyReport
 	}
 
 	return report, nil

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -13,10 +13,10 @@ import (
 )
 
 type EmployeeHandler struct {
-	service *_default.EmployeeService
+	service service.EmployeeService
 }
 
-func NewEmployeeHandler(service *_default.EmployeeService) *EmployeeHandler {
+func NewEmployeeHandler(service service.EmployeeService) *EmployeeHandler {
 	return &EmployeeHandler{
 		service: service,
 	}
@@ -24,7 +24,6 @@ func NewEmployeeHandler(service *_default.EmployeeService) *EmployeeHandler {
 
 // GetEmployees handles GET requests to retrieve all employees
 func (h *EmployeeHandler) GetEmployees(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	employees, err := h.service.RetrieveAll()
 	if err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNoContent))
@@ -35,11 +34,10 @@ func (h *EmployeeHandler) GetEmployees(w http.ResponseWriter, r *http.Request) {
 
 // GetEmployee handles GET requests to retrieve an employee by ID
 func (h *EmployeeHandler) GetEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -54,7 +52,6 @@ func (h *EmployeeHandler) GetEmployee(w http.ResponseWriter, r *http.Request) {
 
 // CreateEmployee handles POST requests to create a new employee
 func (h *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	data := &request.EmployeeRequest{}
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
@@ -76,11 +73,10 @@ func (h *EmployeeHandler) CreateEmployee(w http.ResponseWriter, r *http.Request)
 
 // PutEmployee handles PUT requests to update an employee
 func (h *EmployeeHandler) PutEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 	data := &request.EmployeeRequest{}
@@ -106,11 +102,10 @@ func (h *EmployeeHandler) PutEmployee(w http.ResponseWriter, r *http.Request) {
 
 // PatchEmployee handles PATCH requests to partially update an employee
 func (h *EmployeeHandler) PatchEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 	var fields map[string]interface{}
@@ -132,8 +127,8 @@ func (h *EmployeeHandler) PatchEmployee(w http.ResponseWriter, r *http.Request) 
 func (h *EmployeeHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
