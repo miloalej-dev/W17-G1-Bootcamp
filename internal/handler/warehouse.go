@@ -77,7 +77,7 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 	warehouseResponse, err := h.sv.Register(*warehouse)
 	if err != nil {
 		if errors.Is(err, repository.ErrLocalityNotFound) {
-			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 			return
 		}
 
@@ -145,7 +145,7 @@ func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request
 	warehouseResponse, err := h.sv.PartialModify(id, fields)
 	if err != nil {
 		if errors.Is(err, repository.ErrEntityNotFound) {
-			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 			return
 		}
 
