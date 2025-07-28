@@ -264,7 +264,7 @@ func (s *ProductRecordHandlerTestSuite) TestPostProductRecord_BadRequest() {
 		"purchase_price": 4.99,
 	}
 
-	expectedResponse := response.Response{Message: "Sale price must be not null and greater than 0", StatusCode: http.StatusUnprocessableEntity}
+	expectedResponse := response.Response{Message: "sale price must be not null and greater than 0", StatusCode: http.StatusUnprocessableEntity}
 
 	requestBodyBytes, _ := json.Marshal(requestBody)
 	request := httptest.NewRequest(http.MethodPost, s.path, bytes.NewBuffer(requestBodyBytes))
