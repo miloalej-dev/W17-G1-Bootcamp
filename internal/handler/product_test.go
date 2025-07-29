@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"github.com/stretchr/testify/mock"
@@ -23,13 +24,13 @@ type ProductServiceMock struct {
 }
 
 func (p *ProductServiceMock) RetrieveRecordsCountByProductId(id int) (models.ProductReport, error) {
-	//TODO implement me
-	panic("implement me")
+	args := p.Called(id)
+	return args.Get(0).(models.ProductReport), args.Error(1)
 }
 
 func (p *ProductServiceMock) RetrieveRecordsCount() ([]models.ProductReport, error) {
-	//TODO implement me
-	panic("implement me")
+	args := p.Called()
+	return args.Get(0).([]models.ProductReport), args.Error(1)
 }
 
 type ProductHandlerTestSuite struct {
@@ -531,6 +532,131 @@ func (p *ProductHandlerTestSuite) TestDeleteSection_BadRequest() {
 	// Assert
 	p.Equal(http.StatusBadRequest, rec.Code)
 	p.JSONEq(string(expectedBody), rec.Body.String())
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReport_AllProducts_Success() {
+	expected := []models.ProductReport{
+		{Id: 1, Description: "Coca", RecordsCount: 2},
+		{Id: 2, Description: "pepsi", RecordsCount: 4},
+	}
+
+	expectedData := response.Response{Data: expected, StatusCode: http.StatusOK}
+
+	p.mock.On("RetrieveRecordsCount").Return(expected, nil)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords"), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+
+	expectedResponse, _ := json.Marshal(expectedData)
+
+	p.Equal(expectedData.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedResponse), recorder.Body.String())
+
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReport_AllProducts_InternalServerError() {
+
+	var expectedBody []byte
+	expectedError := errors.New("something went wrong")
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusInternalServerError}
+
+	p.mock.On("RetrieveRecordsCount").Return([]models.ProductReport{}, expectedError)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords"), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	p.Equal(expectedResponse.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedBody), recorder.Body.String())
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReportById_Success() {
+
+	var expectedBody []byte
+	id := 1
+	expected := models.ProductReport{
+		Id: id, Description: "Coca", RecordsCount: 2,
+	}
+
+	expectedResponse := response.Response{Data: expected, StatusCode: http.StatusOK}
+
+	p.mock.On("RetrieveRecordsCountByProductId", id).Return(expected, nil)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords?id=", id), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	p.Equal(expectedResponse.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedBody), recorder.Body.String())
+
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReportById_BadRequest() {
+
+	var expectedBody []byte
+	id := "asc"
+
+	expectedError := errors.New("invalid request")
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusBadRequest}
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords?id=", id), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	p.Equal(expectedResponse.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedBody), recorder.Body.String())
+
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReportById_NotFound() {
+
+	var expectedBody []byte
+	id := 999
+
+	expectedResponse := response.Response{Message: service.ErrProductNotFound.Error(), StatusCode: http.StatusNotFound}
+
+	p.mock.On("RetrieveRecordsCountByProductId", id).Return(models.ProductReport{}, service.ErrProductNotFound)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords?id=", id), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	p.Equal(expectedResponse.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedBody), recorder.Body.String())
+
+}
+
+func (p *ProductHandlerTestSuite) TestGetProductReportById_InternalServerError() {
+
+	var expectedBody []byte
+	id := 1
+	expectedError := errors.New("something went wrong")
+	expectedResponse := response.Response{Message: expectedError.Error(), StatusCode: http.StatusInternalServerError}
+
+	p.mock.On("RetrieveRecordsCountByProductId", id).Return(models.ProductReport{}, expectedError)
+
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprint(p.path, "/reportRecords?id=", id), nil)
+	recorder := httptest.NewRecorder()
+
+	p.handler.GetProductReport(recorder, request)
+
+	expectedBody, _ = json.Marshal(expectedResponse)
+
+	// Assert
+	p.Equal(expectedResponse.StatusCode, recorder.Code)
+	p.JSONEq(string(expectedBody), recorder.Body.String())
 }
 
 // Run the test suite

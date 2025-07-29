@@ -151,7 +151,7 @@ func (h *ProductDefault) GetProductReport(w http.ResponseWriter, r *http.Request
 	}
 	id, errConverter := strconv.Atoi(idParam)
 	if errConverter != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
 		return
 	}
 
