@@ -29,7 +29,7 @@ func (p *CarrierRequest) Bind(r *http.Request) error {
 		return errors.New("telephone must not be null")
 	}
 	if p.LocalityId == nil {
-		return errors.New("locality id  must not be null")
+		return errors.New("locality id must not be null")
 	}
 
 	return nil
