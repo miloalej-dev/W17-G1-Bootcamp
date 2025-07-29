@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -15,14 +14,14 @@ import (
 )
 
 // NewProductDefault is a function that returns a new instance of ProductDefault
-func NewProductDefault(sv *_default.ProductDefault) *ProductDefault {
+func NewProductDefault(sv service.ProductService) *ProductDefault {
 	return &ProductDefault{sv: sv}
 }
 
 // ProductDefault is a struct with methods that represent handlers for Products
 type ProductDefault struct {
 	// sv is the service that will be used by the handler
-	sv *_default.ProductDefault
+	sv service.ProductService
 }
 
 // GetProducts GetAll is a method that returns a handler for the route GET /products
@@ -47,6 +46,7 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	product := models.NewProduct(
