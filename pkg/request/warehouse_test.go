@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func Test_WareHouseBind(t *testing.T) {
+
+func Test_WarehouseBind(t *testing.T) {
+
 
 	code := "WAR-001"
 	address := "Calle estación"
