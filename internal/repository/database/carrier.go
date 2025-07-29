@@ -2,9 +2,9 @@ package database
 
 import (
 	"errors"
-	"gorm.io/gorm"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
+	"gorm.io/gorm"
 )
 
 // Carrier repository
@@ -44,7 +44,8 @@ func (r *CarrierDB) Create(carrier models.Carrier) (models.Carrier, error) {
 		First(&exists).Error
 
 	if err != nil {
-		// Record not found is not an error in this context. Everything else is
+		// Gorm treats not found as an error. In this case we explicitly want to find zero rows
+		// so this is not an error. Everything else is
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Carrier{}, err
 		}
@@ -58,12 +59,30 @@ func (r *CarrierDB) Create(carrier models.Carrier) (models.Carrier, error) {
 	result := r.db.Create(&carrier)
 	switch {
 	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
-			return models.Carrier{}, repository.ErrLocalityNotFound
+		return models.Carrier{}, repository.ErrLocalityNotFound
 	}
 	return carrier, result.Error
 }
 
 func (r *CarrierDB) Update(carrier models.Carrier) (models.Carrier, error) {
+	var exists bool
+	err := r.db.Model(&models.Carrier{}).
+		Select("1").
+		Where("`carriers`.`cid` = ? AND `carriers`.`id` <> ?", carrier.CId, carrier.ID).
+		First(&exists).Error
+
+	if err != nil {
+		// Gorm treats not found as an error. In this case we explicitly want to find zero rows
+		// so this is not an error. Everything else is
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Carrier{}, err
+		}
+	}
+
+	if exists {
+		return models.Carrier{}, repository.ErrEntityAlreadyExists
+	}
+
 	result := r.db.Save(&carrier)
 	if result.Error == nil {
 		return carrier, nil
@@ -72,13 +91,34 @@ func (r *CarrierDB) Update(carrier models.Carrier) (models.Carrier, error) {
 }
 
 func (r *CarrierDB) PartialUpdate(id int, fields map[string]interface{}) (models.Carrier, error) {
+	// 1- Validate that there is no carrier with this cid already
+	if val, ok := fields["cid"]; ok {
+		var exists bool
+		err := r.db.Model(&models.Carrier{}).
+			Select("1").
+			Where("`carriers`.`cid` = ? AND `carriers`.`id` <> ?", val.(string), id).
+			First(&exists).Error
+
+		if err != nil {
+			// Gorm treats not found as an error. In this case we explicitly want to find zero rows
+			// so this is not an error. Everything else is
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return models.Carrier{}, err
+			}
+		}
+
+		if exists {
+			return models.Carrier{}, repository.ErrEntityAlreadyExists
+		}
+	}
+
 	var carrier models.Carrier
 	result := r.db.First(&carrier, id)
 	switch {
 	case errors.Is(result.Error, gorm.ErrRecordNotFound):
-			return models.Carrier{}, repository.ErrEntityNotFound
+		return models.Carrier{}, repository.ErrEntityNotFound
 	case result.Error != nil:
-			return models.Carrier{}, result.Error
+		return models.Carrier{}, result.Error
 	}
 
 	if val, ok := fields["cid"]; ok {

@@ -16,7 +16,7 @@ type ProductRepository struct {
 
 // NewProductMap is a constructor that creates and returns a new instance of ProductMap.
 // It can be initialized with a pre-existing map of products.
-func NewProductDB(db *gorm.DB) *ProductRepository {
+func NewProductRepository(db *gorm.DB) *ProductRepository {
 	return &ProductRepository{db: db}
 }
 
@@ -27,7 +27,7 @@ func (r *ProductRepository) FindAll() ([]models.Product, error) {
 	// GORM genera: SELECT * FROM products;
 	result := r.db.Find(&products)
 	if result.Error != nil {
-		return nil, repository.ErrProductNotFound
+		return nil, repository.ErrEmptyEntity
 	}
 	return products, nil
 }
@@ -36,17 +36,24 @@ func (r *ProductRepository) FindAll() ([]models.Product, error) {
 // It returns an error if a product with the same ID already exists.
 func (r *ProductRepository) Create(body models.Product) (models.Product, error) {
 	result := r.db.Create(&body)
-	if result.Error != nil {
-		return models.Product{}, errors.New(result.Error.Error())
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Product{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
+		return models.Product{}, result.Error
 	}
 	return body, nil
 }
 func (r *ProductRepository) Update(body models.Product) (models.Product, error) {
-	result := r.db.Save(body)
-	if result.Error != nil {
-		return models.Product{}, repository.ErrProductAlreadyExists
+	result := r.db.Save(&body)
+	switch {
+	case errors.Is(result.Error, gorm.ErrForeignKeyViolated):
+		return models.Product{}, repository.ErrForeignKeyViolation
+	case result.Error != nil:
+		return models.Product{}, result.Error
 	}
 	return body, nil
+
 }
 
 // FindById searches for a product by its unique ID.
@@ -71,9 +78,7 @@ func (r *ProductRepository) PartialUpdate(id int, fields map[string]interface{})
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Product{}, repository.ErrProductNotFound
 		}
-		return models.Product{}, err
 	}
-
 	// Updates the product
 	if err := r.db.Model(&product).Updates(fields).Error; err != nil {
 		return models.Product{}, err
@@ -85,10 +90,6 @@ func (r *ProductRepository) PartialUpdate(id int, fields map[string]interface{})
 // Delete elimina un producto por su ID.
 func (r *ProductRepository) Delete(id int) error {
 	result := r.db.Delete(&models.Product{}, id)
-
-	if result.Error != nil {
-		return result.Error
-	}
 	if result.RowsAffected == 0 {
 		return repository.ErrProductNotFound
 	}
@@ -97,18 +98,32 @@ func (r *ProductRepository) Delete(id int) error {
 
 func (r *ProductRepository) FindRecordsCountByProductId(id int) (models.ProductReport, error) {
 	reports := models.ProductReport{}
-	err := r.db.Table("products").Select("products.id, products.description, COUNT(product_records.id) as records_count").Joins("inner join  product_records on product_records.product_id = products.id").Where("products.id = ?", id).Group("products.id").Scan(&reports).Error
+	err := r.db.
+		Table("products").
+		Select("products.id, products.description, COUNT(product_records.id) as records_count").
+		Joins("inner join  product_records on product_records.product_id = products.id").
+		Where("products.id = ?", id).
+		Group("products.id").
+		Scan(&reports).Error
+
 	if err != nil {
 		return models.ProductReport{}, repository.ErrProductReportNotFound
 	}
+
 	return reports, nil
 }
 
 func (r *ProductRepository) FindRecordsCount() ([]models.ProductReport, error) {
 	var reports []models.ProductReport
-	err := r.db.Table("products").Select("products.id, products.description, COUNT(product_records.id) as records_count").Joins("inner join  product_records on product_records.product_id = products.id").Group("products.id").Scan(&reports).Error
+	err := r.db.
+		Table("products").
+		Select("products.id, products.description, COUNT(product_records.id) as records_count").
+		Joins("inner join  product_records on product_records.products_id = products.id").
+		Group("products.id").
+		Scan(&reports).Error
+
 	if err != nil {
-		return nil, repository.ErrProductReportNotFound
+		return []models.ProductReport{}, repository.ErrProductReportNotFound
 	}
 	return reports, nil
 }

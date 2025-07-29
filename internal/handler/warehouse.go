@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -31,7 +31,7 @@ func (h *WarehouseDefault) GetWarehouses(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	warehouses, err := h.sv.RetrieveAll()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
@@ -42,8 +42,8 @@ func (h *WarehouseDefault) GetWarehouse(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
@@ -64,7 +64,6 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-
 	warehouse := models.NewWarehouse(
 		0, // placeholder, will be overwritten later
 		*warehouseJson.WarehouseCode,
@@ -78,7 +77,7 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 	warehouseResponse, err := h.sv.Register(*warehouse)
 	if err != nil {
 		if errors.Is(err, repository.ErrLocalityNotFound) {
-			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 			return
 		}
 
@@ -89,26 +88,64 @@ func (h *WarehouseDefault) PostWarehouse(w http.ResponseWriter, r *http.Request)
 	_ = render.Render(w, r, response.NewResponse(warehouseResponse, http.StatusCreated))
 }
 
+// PutWarehouse handles PUT requests to update a warehouse
+func (h *WarehouseDefault) PutWarehouse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
+		return
+	}
+
+	data := &request.WarehouseRequest{}
+
+	err = render.Bind(r, data)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
+	}
+
+	warehouse := models.NewWarehouse(
+		id, // placeholder, will be overwritten later
+		*data.WarehouseCode,
+		*data.Address,
+		*data.Telephone,
+		*data.MinimumCapacity,
+		*data.MinimumTemperature,
+		*data.LocalityId,
+	)
+
+	updatedWarehouse, err := h.sv.Modify(*warehouse)
+	if err != nil {
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
+		return
+	}
+
+	_ = render.Render(w, r, response.NewResponse(updatedWarehouse, http.StatusOK))
+}
+
 func (h *WarehouseDefault) PatchWarehouse(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
-	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+	if err != nil || id < 1 {
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
 	var fields map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&fields)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(ErrUnexpectedJSON.Error(), http.StatusBadRequest))
 		return
 	}
 
 	warehouseResponse, err := h.sv.PartialModify(id, fields)
 	if err != nil {
 		if errors.Is(err, repository.ErrEntityNotFound) {
-			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+			_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
 			return
 		}
 
@@ -124,13 +161,13 @@ func (h *WarehouseDefault) DeleteWarehouse(w http.ResponseWriter, r *http.Reques
 	idRequest := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idRequest)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse("invalid id", http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(ErrInvalidId.Error(), http.StatusBadRequest))
 		return
 	}
 
 	err = h.sv.Remove(id)
 	if err != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusNotFound))
+		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusInternalServerError))
 		return
 	}
 
