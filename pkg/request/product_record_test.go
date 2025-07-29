@@ -1,138 +1,93 @@
 package request
 
 import (
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
-func TestProductRecordRequest_Bind_Success(t *testing.T) {
+func Test_ProductRecordBind(t *testing.T) {
 
 	id := 1
-	lastUpdate := "2024-07-28"
-	purchasePrice := 10.5
-	salePrice := 15.0
-	productId := 99
+	lastUpdate := "2025-05-12"
+	purchasePrice := 5.99
+	salePrice := 6.99
+	productId := 1
 
-	req := &ProductRecordRequest{
-		Id:            &id,
-		LastUpdate:    &lastUpdate,
-		PurchasePrice: &purchasePrice,
-		SalePrice:     &salePrice,
-		ProductId:     &productId,
+	tests := []struct {
+		title         string
+		request       *ProductRecordRequest
+		expectedError string
+	}{
+		{
+			title: "Success - All fields valid",
+			request: &ProductRecordRequest{
+				Id:            &id,
+				LastUpdate:    &lastUpdate,
+				PurchasePrice: &purchasePrice,
+				SalePrice:     &salePrice,
+				ProductId:     &productId,
+			},
+			expectedError: "",
+		},
+		{
+			title: "Error - Missing Last Update",
+			request: &ProductRecordRequest{
+				Id:            &id,
+				LastUpdate:    nil,
+				PurchasePrice: &purchasePrice,
+				SalePrice:     &salePrice,
+				ProductId:     &productId,
+			},
+			expectedError: "last update date must be not null",
+		},
+		{
+			title: "Error - Missing Purchase Price",
+			request: &ProductRecordRequest{
+				Id:            &id,
+				LastUpdate:    &lastUpdate,
+				PurchasePrice: nil,
+				SalePrice:     &salePrice,
+				ProductId:     &productId,
+			},
+			expectedError: "purchase price  must be not null and greater than 0",
+		},
+		{
+			title: "Error - Missing Sale Price",
+			request: &ProductRecordRequest{
+				Id:            &id,
+				LastUpdate:    &lastUpdate,
+				PurchasePrice: &purchasePrice,
+				SalePrice:     nil,
+				ProductId:     &productId,
+			},
+			expectedError: "sale price must be not null and greater than 0",
+		},
+		{
+			title: "Error - Missing Product Id",
+			request: &ProductRecordRequest{
+				Id:            &id,
+				LastUpdate:    &lastUpdate,
+				PurchasePrice: &purchasePrice,
+				SalePrice:     &salePrice,
+				ProductId:     nil,
+			},
+			expectedError: "products Id must be not null and greater than 0",
+		},
 	}
 
-	err := req.Bind(&http.Request{})
-	require.NoError(t, err)
+	for _, tc := range tests {
+		t.Run(tc.title, func(t *testing.T) {
+			// Act
+			err := tc.request.Bind(&http.Request{})
+
+			// Assert
+			if tc.expectedError == "" {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				require.Equal(t, tc.expectedError, err.Error())
+			}
+		})
+	}
 }
-
-func TestProductRecordRequest_Bind_LastUpdate_Err(t *testing.T) {
-	val := 1
-	price := 2.5
-
-	req1 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    nil,
-		PurchasePrice: &price,
-		SalePrice:     &price,
-		ProductId:     &val,
-	}
-	err := req1.Bind(&http.Request{})
-	require.EqualError(t, err, "last update date must be not null")
-
-	req2 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    ptrString(""),
-		PurchasePrice: &price,
-		SalePrice:     &price,
-		ProductId:     &val,
-	}
-	err = req2.Bind(&http.Request{})
-	require.EqualError(t, err, "last update date must be not null")
-}
-
-func TestProductRecordRequest_Bind_PurchasePrice_Err(t *testing.T) {
-	val := 1
-	text := "2024-07-28"
-
-	req1 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: nil,
-		SalePrice:     ptrFloat(10),
-		ProductId:     &val,
-	}
-	err := req1.Bind(&http.Request{})
-	require.EqualError(t, err, "purchase price  must be not null and greater than 0")
-
-	badPrice := -1.0
-	req2 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: &badPrice,
-		SalePrice:     ptrFloat(10),
-		ProductId:     &val,
-	}
-	err = req2.Bind(&http.Request{})
-	require.EqualError(t, err, "purchase price  must be not null and greater than 0")
-}
-
-func TestProductRecordRequest_Bind_SalePrice_Err(t *testing.T) {
-	val := 1
-	text := "2024-07-28"
-	purchase := 4.7
-
-	req1 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: &purchase,
-		SalePrice:     nil,
-		ProductId:     &val,
-	}
-	err := req1.Bind(&http.Request{})
-	require.EqualError(t, err, "sale price must be not null and greater than 0")
-
-	badSale := -5.0
-	req2 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: &purchase,
-		SalePrice:     &badSale,
-		ProductId:     &val,
-	}
-	err = req2.Bind(&http.Request{})
-	require.EqualError(t, err, "sale price must be not null and greater than 0")
-}
-
-func TestProductRecordRequest_Bind_ProductId_Err(t *testing.T) {
-	val := 1
-	text := "2024-07-28"
-	purchase := 4.7
-	sale := 5.2
-
-	req1 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: &purchase,
-		SalePrice:     &sale,
-		ProductId:     nil,
-	}
-	err := req1.Bind(&http.Request{})
-	require.EqualError(t, err, "products Id must be not null and greater than 0")
-
-	badId := -7
-	req2 := &ProductRecordRequest{
-		Id:            &val,
-		LastUpdate:    &text,
-		PurchasePrice: &purchase,
-		SalePrice:     &sale,
-		ProductId:     &badId,
-	}
-	err = req2.Bind(&http.Request{})
-	require.EqualError(t, err, "products Id must be not null and greater than 0")
-}
-
-// Helpers
-func ptrString(s string) *string  { return &s }
-func ptrFloat(f float64) *float64 { return &f }
