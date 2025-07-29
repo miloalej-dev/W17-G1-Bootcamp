@@ -1,12 +1,12 @@
 package request
 
 import (
-	"testing"
 	"github.com/stretchr/testify/require"
 	"net/http"
+	"testing"
 )
 
-func Test_Bind(t *testing.T) {
+func Test_WareHouseBind(t *testing.T) {
 
 	code := "WAR-001"
 	address := "Calle estación"
@@ -22,7 +22,7 @@ func Test_Bind(t *testing.T) {
 	}{
 		{
 			title: "Success - All fields valid",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            &address,
 				Telephone:          &telephone,
@@ -34,7 +34,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing code",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      nil,
 				Address:            &address,
 				Telephone:          &telephone,
@@ -46,7 +46,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing address",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            nil,
 				Telephone:          &telephone,
@@ -58,7 +58,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing telephone",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            &address,
 				Telephone:          nil,
@@ -70,7 +70,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing minimum capacity",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            &address,
 				Telephone:          &telephone,
@@ -82,7 +82,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing minimum temperature",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            &address,
 				Telephone:          &telephone,
@@ -94,7 +94,7 @@ func Test_Bind(t *testing.T) {
 		},
 		{
 			title: "Error - Missing locality id",
-			request: &WarehouseRequest {
+			request: &WarehouseRequest{
 				WarehouseCode:      &code,
 				Address:            &address,
 				Telephone:          &telephone,
