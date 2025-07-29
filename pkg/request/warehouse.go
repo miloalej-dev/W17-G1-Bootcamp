@@ -32,7 +32,7 @@ func (p *WarehouseRequest) Bind(r *http.Request) error {
 		return errors.New("minimum Temperature must not be null")
 	}
 	if p.LocalityId == nil {
-		return errors.New("locality id  must not be null")
+		return errors.New("locality id must not be null")
 	}
 
 	return nil
