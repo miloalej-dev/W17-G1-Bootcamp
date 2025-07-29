@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/repository"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
 	"github.com/stretchr/testify/mock"
@@ -107,6 +108,63 @@ func (p *ProductBatchHandlerTestSuite) TestPostSeller_Ok() {
 	// Assert
 	p.Equal(http.StatusCreated, recorder.Code)
 	p.JSONEq(string(expectedBody), recorder.Body.String())
+
+}
+
+// PostSeller tests
+func (p *ProductBatchHandlerTestSuite) TestPostSeller_errorBinder() {
+	requestBody := map[string]interface{}{
+		"batch_number":        40,
+		"current_temperature": 20,
+		"due_date":            "2022-04-04",
+		"initial_quantity":    10,
+		"manufacturing_date":  "2020-04-04",
+		"manufacturing_hour":  10,
+		"minimum_temperature": 5,
+		"product_id":          1,
+		"section_id":          1,
+	}
+
+	requestBodyBytes, _ := json.Marshal(requestBody)
+	request := httptest.NewRequest(http.MethodPost, p.path, bytes.NewBuffer(requestBodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	// Act
+	p.handler.PostProductBatch(recorder, request)
+
+	// Assert
+	p.Equal(http.StatusUnprocessableEntity, recorder.Code)
+}
+
+// PostSeller tests
+func (p *ProductBatchHandlerTestSuite) TestPostSeller_errorService() {
+	requestBody := map[string]interface{}{
+		"batch_number":        40,
+		"current_quantity":    200,
+		"current_temperature": 20,
+		"due_date":            "2022-04-04",
+		"initial_quantity":    10,
+		"manufacturing_date":  "2020-04-04",
+		"manufacturing_hour":  10,
+		"minimum_temperature": 5,
+		"product_id":          1,
+		"section_id":          1,
+	}
+	expectedErr := repository.ErrEntityAlreadyExists
+	p.mock.On("Register", mock.AnythingOfType("models.ProductBatch")).Return(models.ProductBatch{}, expectedErr)
+
+	requestBodyBytes, _ := json.Marshal(requestBody)
+	request := httptest.NewRequest(http.MethodPost, p.path, bytes.NewBuffer(requestBodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	// Act
+	p.handler.PostProductBatch(recorder, request)
+
+	// Assert
+	p.Equal(http.StatusConflict, recorder.Code)
+	p.Contains(recorder.Body.String(), expectedErr.Error())
 
 }
 

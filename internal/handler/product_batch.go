@@ -27,6 +27,7 @@ func (h *ProductBatchDefault) PostProductBatch(w http.ResponseWriter, r *http.Re
 
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusUnprocessableEntity))
+		return
 	}
 
 	product := models.NewProductBatch(
