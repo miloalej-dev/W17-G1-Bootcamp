@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service"
-	"github.com/miloalej-dev/W17-G1-Bootcamp/internal/service/default"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/models"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/request"
 	"github.com/miloalej-dev/W17-G1-Bootcamp/pkg/response"
@@ -15,14 +14,14 @@ import (
 )
 
 // NewProductDefault is a function that returns a new instance of ProductDefault
-func NewProductDefault(sv *_default.ProductDefault) *ProductDefault {
+func NewProductDefault(sv service.ProductService) *ProductDefault {
 	return &ProductDefault{sv: sv}
 }
 
 // ProductDefault is a struct with methods that represent handlers for Products
 type ProductDefault struct {
 	// sv is the service that will be used by the handler
-	sv *_default.ProductDefault
+	sv service.ProductService
 }
 
 // GetProducts GetAll is a method that returns a handler for the route GET /products
@@ -38,7 +37,6 @@ func (h *ProductDefault) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(v, http.StatusOK))
-	return
 }
 
 // PostProduct is a method that returns a handler for the route CREATE /product/{ID}
@@ -48,6 +46,7 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err := render.Bind(r, data); err != nil {
 		_ = render.Render(w, r, response.NewErrorResponse(err.Error(), http.StatusBadRequest))
+		return
 	}
 
 	product := models.NewProduct(
@@ -69,7 +68,6 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(createdProduct, http.StatusCreated))
-	return
 }
 
 // GetProduct is a method that returns a handler for the route GET /product/{ID}
@@ -86,7 +84,6 @@ func (h *ProductDefault) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(p, http.StatusOK))
-	return
 }
 
 // PatchProduct handles PATCH requests to partially update a product.
@@ -136,7 +133,6 @@ func (h *ProductDefault) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse("product Deleted", http.StatusNoContent))
-	return
 }
 
 func (h *ProductDefault) GetProductReport(w http.ResponseWriter, r *http.Request) {
@@ -155,7 +151,7 @@ func (h *ProductDefault) GetProductReport(w http.ResponseWriter, r *http.Request
 	}
 	id, errConverter := strconv.Atoi(idParam)
 	if errConverter != nil {
-		_ = render.Render(w, r, response.NewErrorResponse(errConverter.Error(), http.StatusBadRequest))
+		_ = render.Render(w, r, response.NewErrorResponse(errors.New("invalid request").Error(), http.StatusBadRequest))
 		return
 	}
 

@@ -36,11 +36,11 @@ func configure() (*configuration, error) {
 	}
 
 	if user == "" {
-		return nil, fmt.Errorf("user enviroment variable is required")
+		return nil, fmt.Errorf("user environment variable is required")
 	}
 
 	if password == "" {
-		return nil, fmt.Errorf("password enviroment variable is required")
+		return nil, fmt.Errorf("password environment variable is required")
 	}
 
 	return &configuration{
@@ -50,6 +50,33 @@ func configure() (*configuration, error) {
 		port:     port,
 		database: database,
 	}, nil
+}
+
+// buildDSN builds the Data Source Name (DSN) for the MySQL connection
+func buildDSN(config *configuration) string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.user,
+		config.password,
+		config.host,
+		config.port,
+		config.database,
+	)
+}
+
+// configurePool sets up the connection pool for the database
+func configurePool(db *gorm.DB) error {
+	sqlDB, err := db.DB()
+
+	if err != nil {
+		return fmt.Errorf("failed to get underlying sql.DB: %w", err)
+	}
+
+	// Connection pool settings
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	return nil
 }
 
 // NewConnection creates a new GORM database connection
@@ -62,19 +89,11 @@ func NewConnection() (*gorm.DB, error) {
 	}
 
 	// Build DSN (Data Source Name)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.user,
-		config.password,
-		config.host,
-		config.port,
-		config.database,
-	)
+	dsn := buildDSN(config)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info), // Enable logging
-		NowFunc: func() time.Time {
-			return time.Now().Local()
-		},
+		Logger:         logger.Default.LogMode(logger.Info), // Enable logging
+		TranslateError: true,
 	})
 
 	if err != nil {
@@ -82,15 +101,9 @@ func NewConnection() (*gorm.DB, error) {
 	}
 
 	// Configure connection pool
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
+	if err = configurePool(db); err != nil {
+		return nil, err
 	}
-
-	// Connection pool settings
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	return db, nil
 }

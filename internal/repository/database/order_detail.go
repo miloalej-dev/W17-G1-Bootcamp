@@ -18,7 +18,7 @@ func (r *OrderDetailRepository) FindAll() ([]models.OrderDetail, error) {
 	orderDetails := make([]models.OrderDetail, 0)
 	result := r.db.Find(&orderDetails)
 	if result.Error != nil {
-		return []models.OrderDetail{}, result.Error
+		return nil, result.Error
 	}
 	return orderDetails, nil
 }

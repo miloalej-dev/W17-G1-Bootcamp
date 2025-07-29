@@ -12,8 +12,6 @@ func main() {
 	// - config
 	cfg := &application.ConfigServerChi{
 		ServerAddress:          ":8080",
-		LoaderFilePathEmployee: "docs/db/json/employee.json",
-		LoaderFilePathSection:  "docs/db/json/sections.json",
 	}
 	app := application.NewServerChi(cfg)
 	// - run
