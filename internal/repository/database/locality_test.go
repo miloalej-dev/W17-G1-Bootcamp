@@ -770,6 +770,367 @@ func (s *LocalityRepositoryTestSuite) TestDelete_DatabaseError() {
 	s.Equal(sql.ErrConnDone, err)
 }
 
+// Test CreateWithNames - Success
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_Success() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Buenos Aires",
+		Province: "Buenos Aires",
+		Country:  "Argentina",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país
+	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
+		AddRow(1, "Buenos Aires", 1)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs("Buenos Aires", "Argentina", 1).
+		WillReturnRows(provinceRows)
+
+	// Mock la creación de la localidad
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocalityDoc.Locality, 1, newLocalityDoc.Id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.mock.ExpectCommit()
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.NoError(err)
+	s.Equal(newLocalityDoc.Id, createdLocality.Id)
+	s.Equal(newLocalityDoc.Locality, createdLocality.Locality)
+	s.Equal(newLocalityDoc.Province, createdLocality.Province)
+	s.Equal(newLocalityDoc.Country, createdLocality.Country)
+}
+
+// Test CreateWithNames - Province Not Found
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_ProvinceNotFound() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Unknown City",
+		Province: "Unknown Province",
+		Country:  "Unknown Country",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país que devuelve un error de registro no encontrado
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs(newLocalityDoc.Province, newLocalityDoc.Country, 1).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrProvinceNotFound, err)
+	s.Equal(models.LocalityDoc{}, createdLocality)
+}
+
+// Test CreateWithNames - Database Error en búsqueda de provincia
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_DatabaseErrorFindingProvince() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Buenos Aires",
+		Province: "Buenos Aires",
+		Country:  "Argentina",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país que devuelve un error de base de datos
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs(newLocalityDoc.Province, newLocalityDoc.Country, 1).
+		WillReturnError(sql.ErrConnDone)
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.LocalityDoc{}, createdLocality)
+}
+
+// Test CreateWithNames - Duplicated Key Error
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_DuplicatedKeyError() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Buenos Aires",
+		Province: "Buenos Aires",
+		Country:  "Argentina",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país
+	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
+		AddRow(1, "Buenos Aires", 1)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs(newLocalityDoc.Province, newLocalityDoc.Country, 1).
+		WillReturnRows(provinceRows)
+
+	// Mock la creación de la localidad que devuelve un error de clave duplicada
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocalityDoc.Locality, 1, newLocalityDoc.Id).
+		WillReturnError(gorm.ErrDuplicatedKey)
+	s.mock.ExpectRollback()
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrEntityAlreadyExists, err)
+	s.Equal(models.LocalityDoc{}, createdLocality)
+}
+
+// Test CreateWithNames - Foreign Key Violation
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_ForeignKeyViolation() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Buenos Aires",
+		Province: "Buenos Aires",
+		Country:  "Argentina",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país
+	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
+		AddRow(1, "Buenos Aires", 1)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs(newLocalityDoc.Province, newLocalityDoc.Country, 1).
+		WillReturnRows(provinceRows)
+
+	// Mock la creación de la localidad que devuelve un error de violación de clave foránea
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocalityDoc.Locality, 1, newLocalityDoc.Id).
+		WillReturnError(gorm.ErrForeignKeyViolated)
+	s.mock.ExpectRollback()
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(repository.ErrForeignKeyViolation, err)
+	s.Equal(models.LocalityDoc{}, createdLocality)
+}
+
+// Test CreateWithNames - Other Database Error
+func (s *LocalityRepositoryTestSuite) TestCreateWithNames_OtherDatabaseError() {
+	// Arrange
+	newLocalityDoc := models.LocalityDoc{
+		Id:       1,
+		Locality: "Buenos Aires",
+		Province: "Buenos Aires",
+		Country:  "Argentina",
+	}
+
+	// Mock la búsqueda de la provincia por nombre y país
+	provinceRows := sqlmock.NewRows([]string{"id", "province", "country_id"}).
+		AddRow(1, "Buenos Aires", 1)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT `provinces`.`id`,`provinces`.`province`,`provinces`.`country_id` FROM `provinces` INNER JOIN countries ON countries.id = provinces.country_id WHERE provinces.province = ? AND countries.country = ? ORDER BY `provinces`.`id` LIMIT ?")).
+		WithArgs(newLocalityDoc.Province, newLocalityDoc.Country, 1).
+		WillReturnRows(provinceRows)
+
+	// Mock la creación de la localidad que devuelve un error de base de datos
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `localities` (`locality`,`province_id`,`id`) VALUES (?,?,?)")).
+		WithArgs(newLocalityDoc.Locality, 1, newLocalityDoc.Id).
+		WillReturnError(sql.ErrConnDone)
+	s.mock.ExpectRollback()
+
+	// Act
+	createdLocality, err := s.repo.CreateWithNames(newLocalityDoc)
+
+	// Asserts
+	s.Error(err)
+	s.Equal(sql.ErrConnDone, err)
+	s.Equal(models.LocalityDoc{}, createdLocality)
+}
+
+// Test for the find all success
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriers_Success() {
+	// Arrange
+	expectedLocalities := []models.LocalityCarrierCount{
+		{
+			LocalityID:    1,
+			LocalityName:  "Locality_1",
+			TotalCarriers: 3,
+		},
+		{
+			LocalityID:    2,
+			LocalityName:  "Locality_2",
+			TotalCarriers: 0,
+		},
+	}
+
+	columns := []string{
+		"locality_id",
+		"locality_name",
+		"total_carriers",
+	}
+
+	rows := s.mock.NewRows(columns)
+	for _, w := range expectedLocalities {
+		rows = rows.AddRow(
+			w.LocalityID,
+			w.LocalityName,
+			w.TotalCarriers,
+		)
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id GROUP BY `localities`.`id`",
+	)).WillReturnRows(rows)
+
+	// Act
+	localities, err := s.repo.FindAllCarriers()
+
+	// Assert
+	s.NoError(err)
+	s.Len(localities, 2)
+	s.Equal(expectedLocalities, localities)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+// Error on retireve all
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriers_NoRecordsFound() {
+	// Arrange
+	columns := []string{
+		"locality_id",
+		"locality_name",
+		"total_carriers",
+	}
+
+	rows := s.mock.NewRows(columns)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id GROUP BY `localities`.`id`",
+	)).WillReturnRows(rows)
+
+	// Act
+	localities, err := s.repo.FindAllCarriers()
+
+	// Assert
+	s.Error(err)
+	s.Nil(localities)
+	s.Equal(repository.ErrEntityNotFound, err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriers_DatabaseError() {
+	// Arrange
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id GROUP BY `localities`.`id`",
+	)).WillReturnError(sql.ErrConnDone)
+
+	// Act
+	localities, err := s.repo.FindAllCarriers()
+
+	// Assert
+	s.Error(err)
+	s.Nil(localities)
+	s.Equal(sql.ErrConnDone, err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriersByLocality_Success() {
+	// Arrange
+	id := 1
+	expectedLocalities := []models.LocalityCarrierCount{
+		{
+			LocalityID:    1,
+			LocalityName:  "Locality_1",
+			TotalCarriers: 3,
+		},
+	}
+
+	columns := []string{
+		"locality_id",
+		"locality_name",
+		"total_carriers",
+	}
+
+	rows := s.mock.NewRows(columns)
+	for _, w := range expectedLocalities {
+		rows = rows.AddRow(
+			w.LocalityID,
+			w.LocalityName,
+			w.TotalCarriers,
+		)
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id WHERE localities.id = ? GROUP BY `localities`.`id`",
+	)).WithArgs(id).WillReturnRows(rows)
+
+	// Act
+	localities, err := s.repo.FindCarriersByLocality(id)
+
+	// Assert
+	s.NoError(err)
+	s.Len(localities, 1)
+	s.Equal(expectedLocalities, localities)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriersByLocality_DatabasError() {
+	// Arrange
+	id := 1
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id WHERE localities.id = ? GROUP BY `localities`.`id`",
+	)).WithArgs(id).WillReturnError(sql.ErrConnDone)
+
+	// Act
+	localities, err := s.repo.FindCarriersByLocality(id)
+
+	// Assert
+	s.Error(err)
+	s.Nil(localities)
+	s.Equal(sql.ErrConnDone, err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
+func (s *LocalityRepositoryTestSuite) TestFindAllCarriersByLocality_NoRecordsFound() {
+	// Arrange
+	id := 1
+	columns := []string{
+		"locality_id",
+		"locality_name",
+		"total_carriers",
+	}
+
+	rows := s.mock.NewRows(columns)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT localities.id as 'locality_id', localities.locality as 'locality_name', COUNT(carriers.id) 'total_carriers' FROM `localities` LEFT JOIN carriers ON localities.id = carriers.locality_id WHERE localities.id = ? GROUP BY `localities`.`id`",
+	)).WithArgs(id).WillReturnRows(rows)
+
+	// Act
+	localities, err := s.repo.FindCarriersByLocality(id)
+
+	// Assert
+	s.Error(err)
+	s.Nil(localities)
+	s.Equal(repository.ErrEntityNotFound, err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+}
+
 func TestLocalityRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(LocalityRepositoryTestSuite))
 }
