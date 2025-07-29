@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSectionRequest_Bind_Success(t *testing.T) {
+func TestSectionRequest_Bind(t *testing.T) {
 	sectionNumber := "A1"
 	currentTemp := 5.5
 	minTemp := 2.0
@@ -17,87 +17,120 @@ func TestSectionRequest_Bind_Success(t *testing.T) {
 	warehouseId := 1
 	productTypeId := 2
 
-	req := &SectionRequest{
-		SectionNumber:      &sectionNumber,
-		CurrentTemperature: &currentTemp,
-		MinimumTemperature: &minTemp,
-		CurrentCapacity:    &currentCap,
-		MinimumCapacity:    &minCap,
-		MaximumCapacity:    &maxCap,
-		WarehouseId:        &warehouseId,
-		ProductTypeId:      &productTypeId,
+	tests := []struct {
+		title         string
+		request       *SectionRequest
+		expectedError string
+	}{
+		{
+			title: "Success - all fields valid",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "",
+		},
+		{
+			title: "Error - missing SectionNumber",
+			request: &SectionRequest{
+				SectionNumber:      nil,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "section_number is required",
+		},
+		{
+			title: "Error - missing CurrentTemperature",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: nil,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "current_temperature is required",
+		},
+		{
+			title: "Error - missing MinimumTemperature",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: nil,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "minimum_temperature is required",
+		},
+		{
+			title: "Error - missing CurrentCapacity",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    nil,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "current_capacity is required",
+		},
+		{
+			title: "Error - missing MinimumCapacity",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    nil,
+				MaximumCapacity:    &maxCap,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "minimum_capacity is required",
+		},
+		{
+			title: "Error - missing MaximumCapacity",
+			request: &SectionRequest{
+				SectionNumber:      &sectionNumber,
+				CurrentTemperature: &currentTemp,
+				MinimumTemperature: &minTemp,
+				CurrentCapacity:    &currentCap,
+				MinimumCapacity:    &minCap,
+				MaximumCapacity:    nil,
+				WarehouseId:        &warehouseId,
+				ProductTypeId:      &productTypeId,
+			},
+			expectedError: "maximum_capacity is required",
+		},
 	}
 
-	err := req.Bind(&http.Request{})
-	require.NoError(t, err)
-}
+	for _, tc := range tests {
+		t.Run(tc.title, func(t *testing.T) {
+			err := tc.request.Bind(&http.Request{})
 
-func validSectionRequest() *SectionRequest {
-	sectionNumber := "A1"
-	currentTemp := 5.5
-	minTemp := 2.0
-	currentCap := 30
-	minCap := 10
-	maxCap := 100
-	warehouseId := 1
-	productTypeId := 2
-
-	return &SectionRequest{
-		SectionNumber:      &sectionNumber,
-		CurrentTemperature: &currentTemp,
-		MinimumTemperature: &minTemp,
-		CurrentCapacity:    &currentCap,
-		MinimumCapacity:    &minCap,
-		MaximumCapacity:    &maxCap,
-		WarehouseId:        &warehouseId,
-		ProductTypeId:      &productTypeId,
+			if tc.expectedError == "" {
+				require.NoError(t, err)
+			} else {
+				require.EqualError(t, err, tc.expectedError)
+			}
+		})
 	}
-}
-
-func TestSectionRequest_Bind_SectionNumber_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.SectionNumber = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "section_number is required")
-}
-
-func TestSectionRequest_Bind_CurrentTemperature_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.CurrentTemperature = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "current_temperature is required")
-}
-
-func TestSectionRequest_Bind_MinimumTemperature_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.MinimumTemperature = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "minimum_temperature is required")
-}
-
-func TestSectionRequest_Bind_CurrentCapacity_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.CurrentCapacity = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "current_capacity is required")
-}
-
-func TestSectionRequest_Bind_MinimumCapacity_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.MinimumCapacity = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "minimum_capacity is required")
-}
-
-func TestSectionRequest_Bind_MaximumCapacity_Error(t *testing.T) {
-	req := validSectionRequest()
-	req.MaximumCapacity = nil
-
-	err := req.Bind(&http.Request{})
-	require.EqualError(t, err, "maximum_capacity is required")
 }
