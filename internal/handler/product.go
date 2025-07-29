@@ -68,7 +68,6 @@ func (h *ProductDefault) PostProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = render.Render(w, r, response.NewResponse(createdProduct, http.StatusCreated))
-	return
 }
 
 // GetProduct is a method that returns a handler for the route GET /product/{ID}
