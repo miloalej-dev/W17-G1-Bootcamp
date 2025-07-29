@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func Test_Bind(t *testing.T) {
+func Test_CarrierBind(t *testing.T) {
 
 	cId := "CID-001"
 	companyName := "Meli"
